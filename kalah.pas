@@ -1,6 +1,6 @@
 (*=p-,t-,l+*)_program КАЛАХ;
 _label 12561, 12633;
-_const zoneaddr = 64000B; zero = 0; one = 1;
+_const list = 64000B; zero = 0; one = 1;
 c54 = 54; z236 = 2400236B; c517 = 517; c523 = 523;
 z730 = 1660730B; z153 = 400153B; z635 = 660635B; c522 = 522;
 z600 = 660600B; z611 = 660611B; c4 = 4; c5 = 5; c25 = 25;
@@ -14,7 +14,7 @@ c7 = 7; c2 = 2; c12=12; c30=30; c39=39;
 _type
 bitset = _set _of 0..47;
 letter = 'a' .. 'z';
-both = _record a:alfa; c:_array[1..6] _of char _end;
+sixchars = _array[1..6] _of char;
 word = _record _case integer _of 
 0:(i:integer);
 1:(c:char);
@@ -27,15 +27,13 @@ zone = _array [0..1023] _of word;
 largeset = _array [0..5] _of bitset;
 _var
 gl10z,
-gl11z,gl12z,gl13z,gl14z,gl15z,gl16z,gl17z,gl18z:integer;gl19z,gl20z:boolean;
+gl11z,gl12z,gl13z,gl14z,gl15z,logidx,charidx,gl18z:integer;gl19z,gl20z:boolean;
 gl21z,gl22z,gl23z,gl24z,gl25z,gl26z,gl27z,gl28z:integer;bufptr:@zone;
-gl29z:_array[1..5] _of word;
-gl35z,gl36z,gl37z,gl38z,gl39z,gl40z:integer;
-gl41z,gl42z,gl43z,gl44z,gl45z,gl46z,gl47z,gl48z,gl49z,gl50z:integer;
-gl51z,gl52z,gl53z,gl54z,gl55z,gl56z,gl57z,gl58z,gl59z,gl60z:integer;
-gl61z,gl62z,gl63z,gl64z,gl65z,gl66z,gl67z,gl68z,gl69z,gl70z:integer;
-gl71z,gl72z,gl73z:bitset;gl74z,gl75z,gl76z,gl77z,gl78z,gl79z,gl80z:integer;
-gl81z,gl82z,gl83z,gl84z:integer;gl85z,gl86z:bitset;
+gl29z:_array[1..5] _of word; gl35z: integer;
+curLogWord:sixchars; 
+logPacked:_array [1..30] _of alfa;
+gl72z,gl73z:bitset;gl74z,gl75z,gl76z,gl77z,gl78z,gl79z,gl80z:integer;
+gl81z,gl82z,ogchezk,gl84z:alfa;gl85z,gl86z:bitset;
 gl87z:bitset;gl88z,gl89z:word;
 gl90z:boolean;
 gl91z,gl92z,gl93z:integer;
@@ -49,10 +47,10 @@ i,j:integer;b:bitset;ls:largeset;aa:alfa;
 _procedure filler; 
 _(
 % (q) _exit q; (q) _exit q;
- (q) _exit q;
-%   (q) _exit q; (q) _exit q;
 % (q) _exit q;
- (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
+%   (q) _exit q; (q) _exit q;
+% (q) _exit q; (q) _exit q;
+(q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
@@ -151,7 +149,7 @@ _( code(Э0634=,); remTime := ; _);
 
 _function ticks:integer;
 _( code(Э05310=,); ticks := ; _);
-_procedure unused; _( writeln_);
+_procedure unused; _( code(=14ПВ76255,) _);
 _procedure writeJinn;
 _( write('ДЖИН ') _);
 
@@ -181,7 +179,7 @@ _(
       rewrite(tempfile);
       gl18z := 0;
       write(tempfile,'SLЕ  {377');
-      gl87z := (gl87z + [47]);
+      gl87z := gl87z + [47];
       _goto 1570
     _);
     write(tempfile,input@);
@@ -202,7 +200,7 @@ _(
   checkTime := false;
   code(Э0634=,);
   l2v1z := ;
-  _if ((gl80z - l2v1z) < 120) _then _(
+  _if gl80z - l2v1z < 120 _then _(
     rewrite(output);
     rewrite(tempfile);
     writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
@@ -231,22 +229,22 @@ _(
   code(СД/6/=2ЗЧ5,МР=СД/-6/,МР=2ЗЧ4,);
   ins(l2v4z, l2v1z, 24, 6);
   gl94z[l2a1z] := ;
-  _if l2v2z > 0C _then _(
+  _if l2v2z > 0 _then _(
     gl24z := l2v2z;
     P1634(l2a1z - 1);
-    gl24z := 1C;
+    gl24z := 1;
   _);
   _if gl25z = 1 _then _(
-    l2v3z := (44C);
+    l2v3z := 36;
   _) _else _(
-    l2v3z := (26C);
+    l2v3z := 22;
   _);
   _if (l2a1z <= l2v3z) _and (l2a1z > 0) _then P1634(0);
 _);
 
 _function getTime:alfa;
 _var l2v1z, l2v2z:integer;
-l2v:_array [1..6] _of char; l2v9z:alfa;
+l2v:sixchars; l2v9z:alfa;
 _( 
   code(Э05310=,);
   l2v1z := ;
@@ -325,19 +323,17 @@ _);
 
 
 _function getDate: alfa;
-  _var v1: integer; v2: alfa;
-_(  
- v1 := 377777600000B;
- v2 := '3 1   ';
-  code(Э050114=,2Э0204=2Э0215,СД/20/=2ЗЧ4,МР=СД/-10/,2ЗЧ5=МР,2СМ5=СД/40/,17ЛС0=2СМ4,СД/-20/=17ЛС0,);
-  getDate := ;
+_var k:integer;l:alfa;
+_(
+  k:=00003777776Т;l:='3 1   ';
+  СОDЕ(Э050114=,2СБ4=2РБ5,СД120=2ЗЧ4,МР=СД70,2ЗЧ5=МР,2СМ5=СД140,17ЛС=2СМ4,СД60=17ЛС,2ЗЧ3=)
 _);
 
 _function F2112(a:alfa):integer;
 _type date = _record d10, d1, m10, m1, y10, y1: integer _end;
-_var p:@date; c:_array[0..5] _of char; 
+_var p:@date; c:sixchars; 
 _(
-  unpck(c[0], a);
+  unpck(c[1], a);
   p := ref(c);
   _with p@ _do F2112 := ((y10 * 10 + y1) * 100 + m10 * 10 + m1) * 100 + d10 * 10 + d1;
 _);
@@ -396,29 +392,29 @@ _(
  v3 := v3 + v2;
   
  _if (a = 60) _and v4 _then _(
- v2 := (2C);
+ v2 := 2;
  v1 := (35C);
   _) _else _(
- _if (a > (74C)) _and  v4 _then a := (a - (1C));
+ _if (a > (74C)) _and  v4 _then a := a - 1;
 
   _select 
-  a > 334: _(v2 := (14C);v1 := (334); _);
-  a > 304: _(v2 := (13C);v1 := (304); _);
-  a > 273: _(v2 := (12C);v1 := (273); _);
-  a > 243: _(v2 := (11C);v1 := (243); _);
-  a > 212: _(v2 := (10C);v1 := (212); _);
-  a > 181: _(v2 := (7C);v1 := (181); _);
-  a > 151: _(v2 := (6C);v1 := (151); _);
-  a > 120: _(v2 := (5C);v1 := (120); _);
-  a > 132C: _(v2 := (4C);v1 := (132C); _);
-  a > 73C: _(v2 := (3C);v1 := (73C); _);
-  a > 37C: _(v2 := (2C);v1 := (37C); _);
-  true: _(v2 := (1C); v1 := (0C); _)
+  a > 334: _(v2 := 12; v1 := 334; _);
+  a > 304: _(v2 := 11; v1 := 304; _);
+  a > 273: _(v2 := 10; v1 := 273; _);
+  a > 243: _(v2 := 9;  v1 := 243; _);
+  a > 212: _(v2 := 8;  v1 := 212; _);
+  a > 181: _(v2 := 7;  v1 := 181; _);
+  a > 151: _(v2 := 6;  v1 := 151; _);
+  a > 120: _(v2 := 5;  v1 := 120; _);
+  a > 90 : _(v2 := 4;  v1 := 90; _);
+  a > 59 : _(v2 := 3;  v1 := 59; _);
+  a > 31 : _(v2 := 2;  v1 := 31; _);
+  true   : _(v2 := 1;  v1 := 0; _)
   _end;
- v1 := a - v1;
+  v1 := a - v1;
   _);
- F2227 := ((((v3 * (100)) + v2) * (100)) + v1);
-  _);
+  F2227 := (v3 * 100 + v2) * 100 + v1;
+_);
 
 _function F2355(l2a1z, l2a2z:integer):integer;
 _(
@@ -427,18 +423,18 @@ _);
 
 _function zeller(l2a1z, l2a2z, l2a3z:integer):integer;
 _(
- _if (l2a2z < (3C)) _then l2a3z := (l2a3z - (1C));
- l2a2z := (l2a2z + (11C));
- _if (l2a2z > (13C)) _then l2a2z := (l2a2z - (14C));
- l2a2z := (l2a2z + (1C));
- zeller := (((((l2a1z + l2a3z) + (l2a3z _div 4)) + ((((15C) * l2a2z) - (1C)) _DIV 5)) - (34C)) _MOD (7C));
+ _if l2a2z < 3 _then l2a3z := l2a3z - 1;
+ l2a2z := l2a2z + 9;
+ _if l2a2z > 11 _then l2a2z := l2a2z - 12;
+ l2a2z := l2a2z + 1;
+ zeller := (((((l2a1z + l2a3z) + (l2a3z _div 4)) + (((13 * l2a2z) - 1) _DIV 5)) - 28) _MOD 7);
   _);
 
 _procedure checkOpen;
 _label 1, 2;
 _var l2v1z, l2v2z, l2v3z, l2v4z, l2v5z:integer;
 l2v6z:alfa;
-t:_array [1..6] _of char;
+t:sixchars;
 l2v13z:bitset;
 _(
   _if 32 _IN gl85z _then _( gl85z := gl85z - [32]; exit _); 
@@ -518,7 +514,7 @@ _(
 _);
 
 _procedure getName(_var l2a1z:alfa; _var l2a2z:alfa);
-_var l2v1z:_array[1..6] _of char; l2v7z: boolean; l2v8z:integer;
+_var l2v1z:sixchars; l2v7z: boolean; l2v8z:integer;
 l2v9z:char; l2v10z, l2v11z:alfa;
 _(
   l2v10z := l2a1z;
@@ -621,6 +617,103 @@ _(
   _)
 _);
 
+_procedure logWord(arg:alfa);
+_(
+  _if logidx > 30 _then exit;
+ logPacked[logidx] := arg;
+ logidx := logidx + 1;
+_);
+_procedure logChar(arg:char);
+_var w:alfa;
+_(
+  curLogWord[charidx] := arg;
+  charidx := charidx + 1;
+  _if charidx = 7 _then _(
+    charidx := 1;
+    pck(curLogWord[1], w);
+    logWord(w);
+  _)
+_);
+
+_procedure initLog;
+_var l2v1z:alfa; l2v2z:sixchars;
+_(
+  logPacked[1] := 'САLАН+';
+  logPacked[2] := getDate;
+  logPacked[3] := getTime;
+  l2v1z := ogchezk;
+  code(СД/10/=);
+  l2v1z := ;
+  unpck(l2v2z[1], l2v1z);
+  l2v2z[1] := space;
+  l2v2z[6] := '{175';
+  pck(l2v2z[1], logPacked[4]);
+  logidx := 5;
+_);
+
+_procedure saveLog;
+_label 3247;
+_var l2v1z, l2v2z, l2v3z, l2v4z:integer; l2v5z: alfa;
+_procedure P3203(l3a1z:alfa);
+_label 1;
+_(
+  _if l2v2z > 1023 _then _goto 1;
+  bufptr@[l2v2z].a := l3a1z;
+  l2v5z := ;
+  l2v2z := l2v2z + 1;
+  _if (l2v5z = fin) _then _(
+1:  code(2СЧ3=СД/-14/,2ЛС4=);
+    bufptr@[0].i := ;
+    _GOTO 3247;
+  _)
+_);
+_( (* saveLog *)
+  _if logidx > 30 _then exit;
+  logWord( fin );
+  readZone( (66C), (522) );
+  l2v5z := bufptr@[0].a;
+  code(СД/14/=2ЗЧ3,МР=СД/44/,);
+  l2v2z := ;
+  _if (l2v2z <= 896) _or (660600B <> 0) _then _(
+    l2v3z := 1;
+    (loop) _(
+      P3203( logPacked[l2v3z] );
+      l2v3z := l2v3z + 1;
+      _goto loop
+    _);
+3247:
+    _if (l2v2z > 928) _and (660600B > 0) _then _(
+      l2v4z := bufptr@[1].i;
+      _if (l2v4z > 0) _and (l2v4z <= 660611B) _and (l2v4z >= 660600B) _then _(
+        writeZone(0, l2v4z );
+        bufptr@[1].i := l2v4z + 1;
+        bufptr@[0].i := (sel(bufptr@[0].i, 12, 12) + 1) * 4096 + 2;
+      _)
+    _);
+    writeZone( (66C), (522) );
+  _)
+_);
+_procedure playKalah;
+_var locvars:_array[1..365] _of word;
+_FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
+_(
+  СОDЕ(К;ВР77=17ЗЧ1,РА3=СЧХRАND,АУАRАND=МР,
+ЦССRАND=ЛУЕВПИЛ,ЛСЕСОРВ=ЗЧХRАND,РА=АС,17РК1=ПБЮЮR,
+С;ХRАND:0,АRАND:4004142135623735,
+СRАND:0003303130564677,ЕВПИЛ:0017777777777777,Л;ЕСОРВ:В1/57,
+К;ЮЮR:ЗЧ=,);RАNDОМ:=;_);(*ЕND RАNDОМ*)
+
+_РRОСЕD RАND0;(* НАЧАЛЬНАЯ УСТАНОВКА RАNDОМ *)
+_(СОDЕ(К;Э05310=,СД/-31/=ЗЧХRАND,Э050114=,
+СД/-5/=ЦСХRАND,ЛУЕВПИЛ=ЛСЕСОРВ,ЗЧХRАND=,)_);(*ЕND RАND0*)
+
+_function randint(arg:integer):integer;
+_(
+  randint := trunc(random * arg);
+_);
+
+_( (* playKalah *)
+_);
 (* main program *)
 
 _(      
