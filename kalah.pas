@@ -25,9 +25,15 @@ word = _record _case integer _of
 _end;
 zone = _array [0..1023] _of word;
 largeset = _array [0..5] _of bitset;
+player = (jinn, user);
+contents = _record val:integer _end;
+unppits = _record move:player; pits:_array [1..7] _of contents _end;
+
 _var
 gl10z,
-gl11z,gl12z,gl13z,gl14z,gl15z,logidx,charidx,gl18z:integer;gl19z,gl20z:boolean;
+gl11z:integer;
+gl12z:alfa;
+gl13z,gl14z,gl15z,logidx,charidx,gl18z:integer;gl19z,gl20z:boolean;
 gl21z,gl22z,gl23z,gl24z,gl25z,gl26z,gl27z,gl28z:integer;bufptr:@zone;
 gl29z:_array[1..5] _of word; gl35z: integer;
 curLogWord:sixchars; 
@@ -46,15 +52,8 @@ tempfile:text;
 i,j:integer;b:bitset;ls:largeset;aa:alfa;
 _procedure filler; 
 _(
-% (q) _exit q; (q) _exit q;
-% (q) _exit q;
-%   (q) _exit q; (q) _exit q;
-% (q) _exit q; (q) _exit q;
-(q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
+(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
@@ -492,7 +491,7 @@ _function F2573B(a, b:integer):integer;
 _var l:_array[1..7] _of word;
 _( code(=14ПВ77400,) _);
 
-_procedure packPits(_var l2a1z:_array [0..7] _of integer; _var l2a2z:word);
+_procedure packPits(_var l2a1z:unppits; _var l2a2z:word);
 _var l2v2z:integer;
 _( code(2ИК3=СЧ,СД/-6/=17ЗЧ,);
   _for l2v2z := 1 _to 6 _do 
@@ -502,11 +501,11 @@ _( code(2ИК3=СЧ,СД/-6/=17ЗЧ,);
   l2a2z :=;
 _);
 
-_procedure unpackPits(_var l2a1z:_array [0..7] _of integer; l2a2z:word);
+_procedure unpackPits(_var l2a1z:unppits; l2a2z:word);
 _var l2v1z:integer;
 _(
   code(2СЧ4=СД/-3/,2ЗЧ4=МР,);
-  l2a1z[0] := ;
+  l2a1z.move := ;
   _for l2v1z := (1C) _to 6 _do _(
     code(2СЧ4=СД/-6/,2ЗЧ4=MP,17ЗЧ=2СЧ5,2АС3=17ЗЧ,17ИК=ИА,15ПА=17СЧ,15ЗЧ=)
   _);
@@ -560,11 +559,11 @@ _(
  TTOUT;
 _);
 _procedure drawField(_var pckpits:_array [0..1] _of word);
-_var l2v1z, l2v2z:integer;l2v3z:_array[0..7] _of integer;
+_var l2v1z, l2v2z:integer;l2v3z:unppits;
 _procedure drawPit(pit:integer);
 _(
   write(oparen:2);
-  l2v2z := l2v3z[pit];
+  l2v2z := l2v3z.pits[pit].val;
   _if (l2v2z = (0C)) _then
     write(space:2)
   _else
@@ -694,7 +693,17 @@ _( (* saveLog *)
   _)
 _);
 _procedure playKalah;
-_var locvars:_array[1..365] _of word;
+_const caa = 7346545000B; cab = 575360400B;
+cac = 37777202417400C; cad = 303240B;
+cae = 37777777474540C; caf = 3641100B;
+cba = 8415; cbb = 72; cbc = 114; cbd = 121; cbe = 102;
+cbf = 126; cbg = 127; cbh = 98;
+_type
+unpboth = _array [jinn..user] _of unppits;
+pckboth = _array [jinn..user] _of word;
+_var locvars:_array[1..7] _of word;
+l2v8z:alfa;
+locv2:_array[9..365] _of word;
 _FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
 _(
   СОDЕ(К;ВР77=17ЗЧ1,РА3=СЧХRАND,АУАRАND=МР,
@@ -712,6 +721,187 @@ _(
   randint := trunc(random * arg);
 _);
 
+_function checkEnding(arg:alfa):boolean;
+_(
+  code(тут2:7патут2=пбдавай,
+c;7760000000000000,7777740000000000,7777777700000000,
+7777777777600000,7777777777777400,377,15,17,
+к;давай:3сч4=7лу6,уи6=1сч12,3ср4=6иа,7лу=3зч4,);
+  checkEnding := arg = '{000{000{000{000{000{000';
+_);
+
+_function eqstr(l3a1z:alfa):boolean;
+_var l3v1z: alfa; l3v2z,l3v8z:sixchars;
+_(
+  eqstr := false;
+  _if (l3a1z = l2v8z) _then _( eqstr := true; exit _);
+  unpck(l3v2z[1], l3a1z);
+  l3v1z := '      ';
+  unpck (l3v8z[1], l3v1z);
+  l3v8z[1] := l3v2z[1];
+  pck(l3v8z[1], l3v1z);
+  _if (l3v1z = l2v8z) _then eqstr := true;
+_);
+
+_function F3404(l3a1z, l3a2z: alfa):alfa;
+_var l3v1z, l3v2z, l3v3z: alfa;
+_(
+  l3v1z := '7DDDDD';
+  l3v2z := 'D{3770000';
+  l3v3z := '{375{3760000';
+  code(3сч4=3сб6,3см5=3сб7,3рб10=сд/-17/,мр=17лс,);
+  F3404 := ;
+_);
+_procedure putNchars(l3a1z:char; l3a2z:integer);
+_var l3v1z:integer;
+_(
+  _for l3v1z := 1 _to l3a2z _do write(l3a1z);
+_);
+
+_procedure packBoth(_var from:unpboth; _var to:pckboth);
+_(
+  packPits(from[jinn], to[jinn]);
+  packPits(from[user], to[user]);
+_);
+
+_procedure unpckBoth(_var to:unpboth; _var from:pckboth);
+_(
+  unpackPits(to[jinn], from[jinn]);
+  unpackPits(to[user], from[user]);
+_);
+
+_function F3475(_var l3a1z:unpboth; l3a2z:integer):integer;
+_label 3520;
+_var l3v1z:player;
+l3v2z,l3v3z:integer;
+l3v4z:integer;
+l3v5z:player;
+l3v6z:integer;
+l3v7z:integer;
+l3v8z:player;
+l3v9z:integer;
+l3v10z:@unpboth;
+l3v11z,l3v12z,l3v13z:@integer;
+_(
+  l3v1z := l3a1z[user].move;
+  l3v5z := ;
+  l3v10z := ref(l3a1z);
+  l3v6z := l3a1z[l3v1z].pits[l3a2z].val;
+  _if (l3v6z = 0) _then _( F3475 := 0; exit _);
+  l3v10z@[l3v1z].pits[l3a2z].val := 0;
+3520:
+   code(3сч6=ср13,3зч15=);
+  _if (l3v1z = l3v5z) _then
+    l3v4z := 7
+  _else
+    l3v4z := 6;
+
+  _for l3v3z := 1 _to l3v6z _do _(
+    l3v2z := (l3a2z + l3v3z);
+    _if (l3v2z <= l3v4z) _then _(
+      l3v13z := ref(l3v10z@[l3v1z].pits[l3v2z]);
+      l3v13z@ := l3v13z@ + 1;
+      l3v7z := ;
+      _if (l3v3z = l3v6z) _then _(
+        _if (l3v2z = (7C)) _then _(
+          F3475 := (2C);
+        _) _else _(
+          F3475 := 1;
+          l3a1z[jinn].move := l3v5z;
+          code(ср13=);
+          l3a1z[user].move := ;
+          _if (l3v7z = (1C)) _and (l3v1z = l3v5z) _then _(
+            code(3сч15=сд75,ас74=3ав7,3ас17=3зч20,);
+%%%%%%%%%%  l3v11z := ref(l3v10z@[l3v8z].pits[7-l3v2z]);
+            l3v9z := l3v11z@;
+            _if (l3v9z > (0C)) _then _(
+              code(3сч12=сд75,ас74=3ас17,3зч21=);            
+%%%%%%%%%%%%  l3v12z := ref(l3v10z@[l3v5z].pits[7]);
+              l3v12z@ := l3v12z@ + l3v9z + 1;
+              l3v13z@ := 0;
+              l3v11z@ := ;
+            _);
+            exit
+          _)
+        _)
+      _);
+    _) _else _(
+      l3v6z := ((l3v6z - l3v3z) + (1C));
+      code(3cч6=ср13,3зч6=);
+      l3a2z := (0C);
+      _goto 3520;
+    _)
+  _)
+_);
+
+_functin performMove(_var l3a1z:unpboth; l3a2z:integer):integer;
+_var l3v:_array [1..10] _of integer;
+     l3v11z, l3v12z, l3v13z:integer;
+_procedure drawMove(l4a1z: player; l4a2z: integer);
+_var l4v1z, l4v2z, l4v3z,l4v4z,l4v5z,l4v6z,l4v7z:integer;
+l4v8z:char;
+_(
+  _if (l4a2z = (7C)) _then _(
+    l4v5z := (0C);
+    _if (l4a1z = user) _then
+      l4v4z := ((22C) + (44C))
+    _else
+      l4v4z := ((22C) - (1C));
+  _) _else _(
+    _if (l4a1z = user) _then _(
+      l4v6z := l4a2z;
+      l4v5z := -1;
+    _) _else _(
+      l4v6z := ((7C) - l4a2z);
+      l4v5z := (1C);
+    _);
+    l4v4z := ((l4v6z * (5C)) + (22C));
+  _);
+  _if (l4v4z > l3v11z) _then _(
+    l4v8z := chr(121);
+    l4v3z := (l4v4z - l3v11z);
+  _) _else _(
+    _if (l4v4z < l3v11z) _then _(
+      l4v8z := chr(102);
+      l4v3z := (l3v11z - l4v4z);
+    _) _else _(
+      l4v3z := (0C); (q) _exit q
+    _);
+  _);
+  _for l4v2z := (1C) _to l4v3z _do _(
+    _for l4v1z := (1C) _to gl28z _do _(
+      write(chr(142B));
+    _);
+    write(l4v8z);
+  _);
+  _if (l4v5z > l3v12z) _then _(
+    l4v8z := chr(126);
+    l4v3z := (l4v5z - l3v12z);
+  _) _else _(
+    _if (l3v12z > l4v5z) _then _(
+      l4v8z := chr(127);
+      l4v3z := (l3v12z - l4v5z);
+    _) _else _(
+      l4v3z := (0C); (q) _exit q
+    _)
+  _);
+  _for l4v2z := (1C) _to l4v3z _do _(
+    _for l4v1z := (1C) _to gl28z _do _(
+      write(chr(142B));
+    _);
+    write(l4v8z);
+  _);
+  l4v7z := l3a1z[l4a1z].pits[l4a2z].val;
+  _if (l4v7z = (0C)) _then
+    write(space:2)
+  _else
+    write(l4v7z:2);
+  putNchars( chr(142B), gl28z );
+  l3v11z := (l4v4z + (2C));
+  l3v12z := l4v5z;
+_);
+_( (* performMove *)
+_);
 _( (* playKalah *)
 _);
 (* main program *)
@@ -721,7 +911,7 @@ _(
   checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); readZone(0,0); writeZone(0,0);
   enq66; deq66; gl90z := getminel(i, b); P2023(ls); toLargeSet(1, ls); gl90z := inLargeSet(1, ls);
   i := getDays + F2355(0,0) + zeller(0,0,0) + F2573B(0,0);
-  checkOpen; packPits(gl94z, gl89z); unpackPits(gl94z, gl89z);
+  checkOpen; 
   TTOUT; P2747;
   12561 :; 12633 :
 _).     
