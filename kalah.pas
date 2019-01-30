@@ -772,6 +772,7 @@ _);
 
 _function F3475(_var l3a1z:unpboth; l3a2z:integer):integer;
 _label 3520;
+_type fake = _array [0..15] _of contents;
 _var l3v1z:player;
 l3v2z,l3v3z:integer;
 l3v4z:integer;
@@ -780,15 +781,15 @@ l3v6z:integer;
 l3v7z:integer;
 l3v8z:player;
 l3v9z:integer;
-l3v10z:@unpboth;
+l3v10z:@fake;
 l3v11z,l3v12z,l3v13z:@integer;
 _(
   l3v1z := l3a1z[user].move;
   l3v5z := ;
   l3v10z := ref(l3a1z);
-  l3v6z := l3a1z[l3v1z].pits[l3a2z].val;
+  l3v6z := l3v10z@[ord(l3v1z)*8+l3a2z].val;
   _if (l3v6z = 0) _then _( F3475 := 0; exit _);
-  l3v10z@[l3v1z].pits[l3a2z].val := 0;
+  l3v10z@[ord(l3v1z)*8+l3a2z].val := 0;
 3520:
    code(3сч6=ср13,3зч15=);
   _if (l3v1z = l3v5z) _then
@@ -799,7 +800,7 @@ _(
   _for l3v3z := 1 _to l3v6z _do _(
     l3v2z := (l3a2z + l3v3z);
     _if (l3v2z <= l3v4z) _then _(
-      l3v13z := ref(l3v10z@[l3v1z].pits[l3v2z]);
+      l3v13z := ref(l3v10z@[ord(l3v1z)*8+l3v2z]);
       l3v13z@ := l3v13z@ + 1;
       l3v7z := ;
       _if (l3v3z = l3v6z) _then _(
@@ -811,12 +812,10 @@ _(
           code(ср13=);
           l3a1z[user].move := ;
           _if (l3v7z = (1C)) _and (l3v1z = l3v5z) _then _(
-            code(3сч15=сд75,ас74=3ав7,3ас17=3зч20,);
-%%%%%%%%%%  l3v11z := ref(l3v10z@[l3v8z].pits[7-l3v2z]);
+            l3v11z := ref(l3v10z@[ord(l3v8z)*8+7-l3v2z]);
             l3v9z := l3v11z@;
             _if (l3v9z > (0C)) _then _(
-              code(3сч12=сд75,ас74=3ас17,3зч21=);            
-%%%%%%%%%%%%  l3v12z := ref(l3v10z@[l3v5z].pits[7]);
+              l3v12z := ref(l3v10z@[ord(l3v5z)*8+7]);
               l3v12z@ := l3v12z@ + l3v9z + 1;
               l3v13z@ := 0;
               l3v11z@ := ;
