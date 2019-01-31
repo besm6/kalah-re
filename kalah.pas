@@ -27,7 +27,7 @@ zone = _array [0..1023] _of word;
 largeset = _array [0..5] _of bitset;
 player = integer;
 contents = _record val:integer _end;
-unppits = _record move:player; pits:_array [1..7] _of contents _end;
+unppits = _record move:word; pits:_array [1..7] _of contents _end;
 
 _var
 gl10z,
@@ -711,7 +711,9 @@ locv2c:_array[9..18] _of word;
 locv2d:_array[9..18] _of word;
 locv2e:_array[9..14] _of word;
 l2v65z:integer;
-locv3:_array[1..100] _of word;
+locv3:_array[1..15] _of word;
+lll1, lll2: integer;
+unpState:unpboth;
 locv3a:_array[1..100] _of word;
 locv3b:_array[1..100] _of word;
 _FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
@@ -794,14 +796,14 @@ l3v9z:integer;
 l3v10z:@fake;
 l3v11z,l3v12z,l3v13z:@integer;
 _(
-  l3v1z := l3a1z[user].move;
+  l3v1z := l3a1z[user].move.i;
   l3v5z := ;
   l3v10z := ref(l3a1z);
   l3v6z := l3v10z@[l3v1z*8+l3a2z].val;
   _if (l3v6z = 0) _then _( F3475 := 0; exit _);
   l3v10z@[l3v1z*8+l3a2z].val := 0;
 3520:
-   code(3сч6=ср13,3зч15=);
+  code(3сч6=ср13,3зч15=); (* l3v8z := _not l3v1z *)
   _if (l3v1z = l3v5z) _then
     l3v4z := 7
   _else
@@ -814,11 +816,11 @@ _(
       l3v13z@ := l3v13z@ + 1;
       l3v7z := ;
       _if (l3v3z = l3v6z) _then _(
-        _if (l3v2z = (7C)) _then _(
-          F3475 := (2C);
+        _if l3v2z = 7 _then _(
+          F3475 := 2;
         _) _else _(
           F3475 := 1;
-          l3a1z[jinn].move := l3v5z;
+          l3a1z[jinn].move.i := l3v5z;
           code(ср13=);
           l3a1z[user].move := ;
           _if (l3v7z = (1C)) _and (l3v1z = l3v5z) _then _(
@@ -836,7 +838,7 @@ _(
       _);
     _) _else _(
       l3v6z := ((l3v6z - l3v3z) + (1C));
-      code(3cч6=ср13,3зч6=);
+      code(3cч6=ср13,3зч6=); (* l3v1z := _not l3v1z *)
       l3a2z := (0C);
       _goto 3520;
     _)
@@ -844,9 +846,10 @@ _(
 _);
 
 _functin performMove(_var l3a1z:unpboth; l3a2z:integer):integer;
-_var l3v1z:boolean;
+_label 4171;
+_var l3v1z:integer;
 l3v2z:integer; l3v3z:player; l3v4z, l3v5z, l3v6z, l3v7z, l3v8z, l3v9z, l3v10z: integer;
-     l3v11z, l3v12z, l3v13z:integer;
+l3v11z, l3v12z:integer; l3v13z:char;
 _procedure drawMove(l4a1z: player; l4a2z: integer);
 _var l4v1z, l4v2z, l4v3z,l4v4z,l4v5z,l4v6z,l4v7z:integer;
 l4v8z:char;
@@ -865,7 +868,7 @@ _(
       l4v6z := 7 - l4a2z;
       l4v5z := 1;
     _);
-    l4v4z := ((l4v6z * (5C)) + (22C));
+    l4v4z := (l4v6z * 5) + 18;
   _);
   _if (l4v4z > l3v11z) _then _(
     l4v8z := right;
@@ -878,8 +881,8 @@ _(
       l4v3z := (0C); (q) _exit q
     _);
   _);
-  _for l4v2z := (1C) _to l4v3z _do _(
-    _for l4v1z := (1C) _to gl28z _do _(
+  _for l4v2z := 1 _to l4v3z _do _(
+    _for l4v1z := 1 _to gl28z _do _(
       write(delay);
     _);
     write(l4v8z);
@@ -892,26 +895,173 @@ _(
       l4v8z := down;
       l4v3z := (l3v12z - l4v5z);
     _) _else _(
-      l4v3z := (0C); (q) _exit q
+      l4v3z := 0; (q) _exit q
     _)
   _);
-  _for l4v2z := (1C) _to l4v3z _do _(
-    _for l4v1z := (1C) _to gl28z _do _(
+  _for l4v2z := 1 _to l4v3z _do _(
+    _for l4v1z := 1 _to gl28z _do _(
       write(delay);
     _);
     write(l4v8z);
   _);
   l4v7z := l3a1z[l4a1z].pits[l4a2z].val;
-  _if (l4v7z = (0C)) _then
+  _if l4v7z = 0 _then
     write(space:2)
   _else
     write(l4v7z:2);
   putNchars(delay, gl28z );
-  l3v11z := (l4v4z + (2C));
+  l3v11z := l4v4z + 2;
   l3v12z := l4v5z;
 _);
 _( (* performMove *)
+  l3v12z := 0;
+  l3v1z := l3a1z[user].move.i;
+  l3v5z := ;
+  _if (l3a2z = 0) _then _(
+    l3v8z := 0;
+    l3v6z := ;
+    l3v11z := 0;
+    _for l3v3z := 1 _to 6 _do _(
+      l3v8z := l3a1z[jinn].pits[l3v3z].val + l3v8z;
+      l3v6z := l3a1z[user].pits[l3v3z].val + l3v6z;
+    _);
+    _if l3v8z = 0 _then l3v3z := 1 _else l3v3z := 0; (* !!! l3v3z := ord(l3v8z = 0) *)
+    l3v6z := (l3v6z + l3v8z);
+    putNchars(up, l3v1z);
+    _for l3v4z := 1 _to 6 _do _(
+      _if l3a1z[l3v3z].pits[l3v4z].val > 0 _then _(
+        l3a1z[l3v3z].pits[l3v4z].val := 0;
+        drawMove(l3v3z, l3v4z);
+      _)
+    _);
+    l3a1z[l3v3z].pits[7].val := l3a1z[l3v3z].pits[7].val + l3v6z;
+    drawMove(l3v3z, 7);
+  _) _else _( (* 4035 *)
+    l3v11z := 7;
+    l3v6z := l3a1z[l3v1z].pits[l3a2z].val;
+    l3a1z[l3v1z].pits[l3a2z].val := 0;
+    putNchars(up, l3v1z);
+    write(l2v65z:4);
+    write(space:3);
+    drawMove(l3v1z, l3a2z);
+    (loop) _(
+     l3v8z := 1-l3v1z; (* !!! l3v8z := _not l3v1z *)
+    _if (l3v1z = l3v5z) _then _(
+      l3v4z := 7;
+    _) _else _(
+      l3v4z := 6;
+    _);
+% L4066:
+    _for l3v3z := 1 _to l3v6z _do _(
+      l3v2z := (l3a2z + l3v3z);
+      _if (l3v2z <= l3v4z) _then _(
+        l3a1z[l3v1z].pits[l3v2z].val := l3a1z[l3v1z].pits[l3v2z].val + 1;
+        l3v7z := ;
+        drawMove( l3v1z, l3v2z );
+        _if (l3v3z = l3v6z) _then _(
+          _if l3v2z = 7 _then _(
+            performMove := 2;
+          _) _else _(
+            performMove := 1;
+            l3a1z[jinn].move.i := l3v5z;
+            code(ср13=);
+            l3a1z[user].move := ;
+            _if (l3v7z = (1C)) _and (l3v1z = l3v5z) _then _(
+              l3v10z := ((7C) - l3v2z);
+              l3v9z := l3a1z[l3v8z].pits[l3v10z].val;
+              _if (l3v9z > (0C)) _then _(
+                l3a1z[l3v8z].pits[l3v10z].val := 0;
+                drawMove( l3v8z, l3v10z );
+                l3a1z[l3v1z].pits[l3v2z].val := 0;
+                drawMove( l3v1z, l3v2z );
+                l3a1z[l3v5z].pits[7].val := l3a1z[l3v5z].pits[7].val + l3v9z + 1;
+                drawMove( l3v5z, (7C) );
+              _);
+% L4160:
+              _goto 4171
+            _)
+          _)
+% L4161:
+        _)
+      _) _else _(
+% L4162:
+        l3v6z := (l3v6z - l3v3z) + 1;
+        l3v1z := 1-l3v1z; (* !!! l3v1z := _not l3v1z *)
+        l3a2z := (0C);
+        _goto loop;
+      _); 
+% L4167:
+    _)
+  _)
+  _); (* 4171 *)
+4171:
+  putNchars(left, l3v11z);
+  _if l3v12z > 0 _then _(
+    l3v13z := down;
+  _) _else _if l3v12z < 0 _then _(
+    l3v12z := -l3v12z;
+    l3v13z := up;
+  _);
+  putNchars( l3v13z, l3v12z );
+  TTOUT;
 _);
+_function F4210(_var l3a1z:unpboth): boolean;
+_var l3v1z, l3v2z: integer; l3v3z: _array[0..1] _of integer;
+_(
+  _for l3v1z := 0 _to 1 _do _(
+    l3v3z[l3v1z] := 0;
+    _for l3v2z := 1 _to 6 _do _(
+      l3v3z[l3v1z] := l3a1z[l3v1z].pits[l3v2z].val + l3v3z[l3v1z];
+    _);
+    _if (l3v3z[l3v1z] = (0C)) _then _( F4210 := true; exit _);
+  _);
+  F4210 := false;
+_);
+_procedure U4241; (* unused *)
+_var l3v1z, l3v2z: integer;
+_(
+  _for l3v1z := 0 _to 1 _do 
+  _for l3v2z := 1 _to 6 _do _(
+    unpState[l3v1z].pits[7].val := unpState[l3v1z].pits[7].val + unpState[l3v1z].pits[l3v2z].val;
+    unpState[l3v1z].pits[l3v2z].val := 0;
+  _)
+_);
+
+_function U4273(_var l3a1z:unpboth; l3a2z:player):bitset; (* unused *)
+_var l3v1z, l3v2z, l3v3z:integer; l3v4z:bitset;
+_(
+  l3v4z := [];
+  _for l3v3z := 1 _to 6 _do _(
+    l3v2z := l3a1z[l3a2z].pits[l3v3z].val;
+    _if (l3v2z > 0) _then _(
+      l3v1z := (l3v2z + l3v3z);
+      _if (l3v1z = 7) _or (l3v1z = 20) _then
+        l3v4z := [l3v3z] + l3v4z;
+    _)
+  _);
+  U4273 := l3v4z;
+_);
+
+_function F5206(l3a1z, l3a2z, l3a3z:integer):integer;
+_var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z: integer;
+  l3loc:_array[1..72] _of integer;
+_function diff(_var l4a1z:unpboth):integer;
+_var l4v1z, l4v2z, l4v3z, l4v4z:integer;
+_(
+  l4v3z := l4a1z[user].move.i;
+  code(CP13=);
+  l4v4z := ;
+  l4v1z := 0;
+  _for l4v2z := 1 _to 7 _do _(
+    l4v1z := l4a1z[l4v3z].pits[l4v2z].val + l4v1z - l4a1z[l4v4z].pits[l4v2z].val;
+  _);
+  _if l4v1z > 0 _then diff := 100000 
+  _else _if l4v1z < 0 _then diff := 37777777474540C (* !!! -100000 remains an expression *)
+  _else _( diff := 0; (q) _exit q _)
+  _);
+_( (* F5206 *)
+_);
+
 _( (* playKalah *)
 _);
 (* main program *)
