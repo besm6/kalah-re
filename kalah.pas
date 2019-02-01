@@ -8,7 +8,7 @@ etx = '{377'; c62 = 62; c1008 = 1008; space = ' '; dot = '.';
 c13 = 13; c10 = 10; c11 = 11; lf = '{214'; cr = '{175'; c212 = 21;
 spaces = '      '; arrow = ' =++> '; admin = '417700'; sleep = 'sle   ';
 fin = '(FIN){175'; c31 = 31; oparen = '('; cparen = ')'; excl = '!'; c94 = 94;
-c49 = 49; c45 = 45; c47 = 47; c36 = 36; c50 = 50; c32 = 32; c61 = 61;
+c49 = 49; c45 = 45; c47 = 47; c36 = 36; c50 = 50; femEnding = 'A'; c61 = 61;
 K = 'K'; c51 = 51; c60 = 60; z = 'z'; c9 = 9; e10p1 = 1777B; c6 = 6;
 c7 = 7; c2 = 2; c12=12; c30=30; c39=39;
 _type
@@ -53,30 +53,7 @@ i,j:integer;b:bitset;ls:largeset;aa:alfa;
 _procedure filler; 
 _(
 
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
+(q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
@@ -701,21 +678,29 @@ up = '{176'; down = '{177'; delay = '{142';
 _type
 unpboth = _array [jinn..user] _of unppits;
 pckboth = _array [jinn..user] _of word;
+gender = (unksex, masc, fem);
 _var locvars:_array[1..7] _of word;
 l2v8z:alfa;
-(* 9 - 64 *)
-locv2:_array[9..18] _of word;
-locv2a:_array[9..18] _of word;
-locv2b:_array[9..18] _of word;
-locv2c:_array[9..18] _of word;
-locv2d:_array[9..18] _of word;
-locv2e:_array[9..14] _of word;
+l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z:integer;
+l2v15z, l2v16z, l2v17z: boolean; l2v18z: integer;
+l2v19z, efendi:boolean; l2v21z, l2v22z:word;
+wrongGender:boolean; l2v24z, l2v25z, l2v26z, l2v27z, l2v28z: integer;
+l22v29z, l2v30z, level : integer; l2v32z,
+userScore, jinnScore, NgameToday, l2v36z, l2v37z, l2v38z: integer;
+l2v39z, l2v40z, l2v41z, l2v42z, l2v43z, l2v44z, l2v45z, l2v46z, l2v47z, l2v48z: integer;
+l2v49z, l2v50z, l2v51z, l2v52z, l2v53z, l2v54z, l2v55z, l2v56z, l2v57z, l2v58z,
+l2v59z, l2v60z, l2v61z, l2v62z, l2v63z, l2v64z : integer;
 l2v65z:integer;
-locv3:_array[1..15] _of word;
-lll1, lll2: integer;
+l2v66z, l2v67z, l2v68z, l2v69z, l2v70z, l2v71z, l2v72z, l2v73z,
+l2v74z, jinnTicks, userTicks, l2v77z, l2v78z, l2v79z, l2v80z: integer;
+age, l2v82z: integer;
 unpState:unpboth;
-locv3a:_array[1..100] _of word;
-locv3b:_array[1..100] _of word;
+l2v99z, l2v100z, l2v101z, l2v102z, l2v103z, l2v104z, l2v105z, l2v106z, l2v107z, l2v108z, l2v109z, l2v110z, l2v111z, l2v112z, l2v113z, l2v114z, l2v115z, l2v116z:integer;
+knownGender:gender;
+l2v118z, l2v119z, l2v120z, l2v121z, l2v122z, l2v123z, l2v124z, l2v125z, l2v126z, l2v127z, l2v128z, l2v129z, l2v130z: integer;
+oneOverLN2:real; (* 131 *)
+l2v132z, l2v133z, l2v134z, l2v135z, l2v136z, l2v137z, l2v138z, l2v139z, l2v140z, l2v141z, l2v142z, l2v143z, l2v144z, l2v145z, l2v146z, l2v147z, l2v148z, l2v149z, l2v150z, l2v151z, l2v152z, l2v153z, l2v154z, l2v155z, l2v156z, l2v157z, l2v158z, l2v159z, l2v160z, l2v161z, l2v162z, l2v163z, l2v164z, l2v165z, l2v166z, l2v167z, l2v168z, l2v169z, l2v170z, l2v171z, l2v172z, l2v173z, l2v174z, l2v175z, l2v176z, l2v177z, l2v178z, l2v179z, l2v180z, l2v181z, l2v182z, l2v183z, l2v184z, l2v185z: integer;
+l2v186z:_array[1..100] _of bitset;
 _FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
 _(
   СОDЕ(К;ВР77=17ЗЧ1,РА3=СЧХRАND,АУАRАND=МР,
@@ -1058,11 +1043,214 @@ _(
   _if l4v1z > 0 _then diff := 100000 
   _else _if l4v1z < 0 _then diff := 37777777474540C (* !!! -100000 remains an expression *)
   _else _( diff := 0; (q) _exit q _)
-  _);
-_( (* F5206 *)
 _);
 
+_( (* F5206 *)
+  writeln('"ЧП" ДЕРЦЕН');
+  writeln('"ЧП" ДЕБЮТОВ !!');
+  age := 1547;
+  age := 224;
+  writeln('ПУСТАЯ ЛУНКА В ДЕБЮТАХ - "ЧП" !');
+  writeln('ИСТОРИЯ ');
+  age := 4212T;
+  writeln('ОШ ДРЕВД');
+  write('!CORR!');
+  writeln('"ЧП" - ИСПОРЧЕНЫ КОРРЕКЦИИ');
+  age := 32767;
+  age := 777777777777777C;
+_);
+
+_procedure phrase;
+_label 6553, 7660; 
+_var pckName:_array [0..1] _of alfa;l3v3z, l3v4z, l3v5z, l3v6z, l3v7z, l3v8z, l3v9z, l3v10z: integer;
+l3v11z, l3v12z, l3v13z:integer; l3v14z:char; l3v15z, l3v16z, l3v17z, l3v18z, l3v19z, l3v20z: integer;
+l3v21z, l3v22z, l3v23z, l3v24z, l3v25z, l3v26z, l3v27z, l3v28z, l3v29z, l3v30z: integer;
+unpName:_array [1..12] _of char;
+l3v43z:_array [1..6] _of char;
+(* 48 locals total *)
+_function chkRandom(l4a1z:integer):integer;
+_var l4v1z:integer;
+_(
+  _if (l3v9z > (0C)) _then _(
+   l4v1z := trunc(l4a1z * random) + 1;
+   _if (l4v1z _IN l2v186z[l3v9z]) _then _GOTO 6553;
+   chkRandom := l4v1z;
+   l2v186z[l3v9z] := [l4v1z] + l2v186z[l3v9z];
+  _) _else _(
+   l3v9z := trunc(l4a1z * random) + 1;
+   chkRandom := ;
+  _)
+_);
+
+_procedure Dear;
+_(
+  _if knownGender = MASC _then write(', ДОРОГОЙ')
+  _else _if knownGender = FEM _then write(', ДОРОГАЯ');
+_);
+
+_procedure maybeFeminine;
+_(
+  _if knownGender = FEM _then write(femEnding);
+  write(excl:2);
+_);
+_function countEnding(l4a1z:integer):integer;
+_(
+ _if (l4a1z >= 20) _then _(
+   l4a1z := l4a1z _MOD 10;
+  _if (l4a1z <> (1C)) _then 
+  _if (l4a1z > (1C)) _and (l4a1z < (5C)) _then
+    l4a1z := 2
+  _else
+    l4a1z := (3C);
+ countEnding := l4a1z;
+  _);
+_);
+_( (* phrase *)
+  pckName[0] := ogchezk;
+  getName(pckName[0], pckName[1]);
+  _if NgameToday = 0 _then
+    write(' ПРИВЕТСТВУЮ ТЕБЯ, ')
+  _else _if NgameToday = 1 _then
+    write(' САЛАМ АЛЕЙКУМ, ')
+  _else
+    write(' САЛАМ, ');
+  unpck(unpName[1], pckName[0]);
+  unpck(unpName[7], pckName[1]);
+  wrongGender := false;
+  _if (knownGender = MASC) _or (knownGender = FEM) _then _(
+    _if (age > (0C)) _then 
+    _if (age < 20) _then write('ЮН')
+    _else _if (age < 50) _then write('УВАЖАЕМ')
+    _else write('ПОЧТЕНН');
+    _if (knownGender = MASC) _then write('ЫЙ ')
+    _else write('АЯ ');
+  _);
+  (loop) _for l3v4z := 1 _to 12 _do _(
+    l3v14z := unpName[l3v4z];
+    _if l3v14z = space _then _exit loop;
+    write(l3v14z);
+  _);
+
+  pckName[0] := '      ';
+  unpck(l3v43z[1], pckName[0]);
+  _for l3v5z := (1C) _to (3C) _do _(
+  _if ((l3v4z - l3v5z) > (0C)) _then
+    l3v43z[l3v5z] := unpName[(l3v4z - l3v5z)];
+  _);
+  _if (knownGender = MASC) _then _(
+    wrongGender := checkEnding( 'ОВА  4') _or
+      checkEnding( 'ЕВА  4') _or
+      checkEnding( 'ИНА  4') _or
+      checkEnding( 'АЯ   3');
+  _) _else _if knownGender = FEM _then _(
+    wrongGender := checkEnding( 'ОВ   3') _or
+      checkEnding( 'ЕВ   3') _or
+      checkEnding( 'ИН   3') _or
+      checkEnding( 'ИЙ   3'); 
+  _);
+  _if (knownGender = MASC) _then write('-ХАН')
+  _else _if (knownGender = FEM) _then write('-ХАНУМ');
+  efendi := Level = 4;
+  _if efendi _then _(
+    _if (knownGender = MASC) _then write(', ЭФЕНДИ');
+    write('  !!');
+  _);
+% L6367  
+  _if l2v17z _then _(
+    l3v4z :=   randint(8);
+    _if l3v4z = 0 _then write('ПРОДОЛЖАТЬ НЕТ СМЫСЛА.')
+    _else _if l3v4z = 1 _then write('ДАВАЙ КОНЧИМ.')
+    _else _if l3v4z = 2 _then write('ТЕПЕРЬ УЖЕ НИЧЕГО НЕ ИЗМЕНИШЬ.')
+    _else _if l3v4z = 3 _then write('НЕ БУДЕМ ТЕРЯТЬ ВРЕМЕНИ.');
+   _) _else _( (* 6414 *)
+     _if (l3v7z > 36) _or (l3v8z > 36) _then _(
+       l2v17z := true;
+       _if (l3v7z > 36 ) _then _(
+       _if Level = 1 _then _(
+         write('ЛЮБЛЮ ОБЫГРЫВАТЬ НОВИЧКОВ !');
+         _goto 7660;
+       _);
+       l3v4z :=   randint( (5C) );
+       _if (l3v4z = (0C)) _then write('СЛАВА АЛЛАХУ - Я ВЫИГРАЛ !')
+       _else _if (l3v4z = (1C)) _then write('Я УЖЕ ВЫИГРАЛ. ПОРА КОНЧАТЬ !')
+       _else _if (l3v4z <> (2C)) _then _(
+         write('ТЫ ПРОИГРАЛ'); maybeFeminine;
+         write('  ТЫ ПРОИГРАЛ');  maybeFeminine;  write('!!');
+       _) _else _if (l3v4z = (3C)) _then write('НЕ ПЕЧАЛЬСЯ, УДАЧА БУДЕТ ЖДАТЬ ТЕБЯ ЗАВТРА !')
+       _else _( write('СДАВАЙСЯ, ТЫ УЖЕ ПРОИГРАЛ'); maybeFeminine; _)
+  _) _else  (* 6465 *)
+  _if (l3v8z > 36) _then (again) _(
+    l3v4z :=   randint(8);
+    _if (l3v4z = (0C)) _then write('СЛЕДУЮЩИЙ РАЗ ОБЯЗАТЕЛЬНО ВЫИГРАЮ !')
+    _else _if (l3v4z = (1C)) _then write('НЕ ПОНИМАЮ, КАК ЭТО Я ПРОИГРАЛ . . .')
+    _else _if (l3v4z = (2C)) _then write('ПОГОДИ !  СЛЕДУЮЩИЙ РАЗ Я ТЕБЕ ПОКАЖУ КАК НАДО ИГРАТЬ !')
+    _else _if (l3v4z = (3C)) _then write('Я ПРОИГРАЛ - НЕПОНЯТНО . . .')
+    _else _if (l3v4z = (4C)) _then  write('ШАЙТАН ТЕБЕ ДРУГ !!')
+    _else _if (l3v4z = (5C)) _then _(
+      _if (knownGender <> MASC) _or
+         ((userScore - jinnScore) < (3C)) _or
+         (Level < (4C)) _then _goto again;
+        write('О, ЭФЕНДИ, ТЫ ДОСТОИН ЗВАНИЯ ИМАМА !');
+    _) _else _if (l3v4z = (6C)) _then _(
+    _if (Level < (4C)) _then _goto again;
+     write('ВЫИГРАЕШЬ У МЕНЯ 12 РАЗ ПОДРЯД - ПОЛУЧИШЬ ВОЛШЕБНОЕ КОЛЬЦО !');
+    _) _else _(
+      write('О, ШАЙТАН !  ТЫ МЕНЯ ОБЫГРАЛ');  maybeFeminine;
+    _)
+  _) (* 6545 *)
+ _) _else _( (* 6546 *) _)
+ _);  
+  6553:; 7660:;
+_);
 _( (* playKalah *)
+  checkOpen;
+  RAND0;
+  l2v38z := (100);
+  l2v15z := true;
+  l2v43z := 1000000;
+  oneOverLn2 := 1.0 / LN(2);
+   l2v73z := (0C);
+  jinnTicks := ;
+  userTicks := ;
+ l2v77z := ;
+ l2v78z := ;
+ l2v70z := ;
+ l2v71z := ;
+ l2v44z := ;
+ l2v72z := ;
+ l2v26z := ;
+ l2v9z := ;
+ l2v45z := ;
+ l2v48z := ;
+ l2v49z := ;
+ l2v16z := ;
+ gl15z := ;
+ l2v17z := ;
+ l2v21z := ;
+ l2v24z := ;
+ l2v64z := ;
+ l2v25z := ;
+ l2v28z := ;
+ l2v67z := ;
+ l2v22z := ;
+ l2v18z := ;
+ l2v19z := ;
+ l2v58z := ;
+ l2v59z := ;
+ l2v14z := ;
+ l2v129z := ;
+ l2v40z := ;
+  
+ _if (l2v36z = (0C)) _or (l2v50z = (2C)) _then _(
+ _if (l2v36z = (0C)) _then  writeln('КАТЕГОРИЯ ? <Ю,К,У,Э>')
+ _else _if (l2v50z = (2C)) _then  writeln('КТО НАЧИНАЕТ ? <ДЖИН,ПОЛЬЗ>');
+ TTIN(false);
+  (* goto 10266 *)
+  _) _else _(
+   writeln('ТУРНИР ЗАКРЫТ');
+   _GOTO 12561;
+  _);
+  phrase
 _);
 (* main program *)
 
@@ -1071,7 +1259,7 @@ _(
   checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); readZone(0,0); writeZone(0,0);
   enq66; deq66; gl90z := getminel(i, b); P2023(ls); toLargeSet(1, ls); gl90z := inLargeSet(1, ls);
   i := getDays + F2355(0,0) + zeller(0,0,0) + F2573B(0,0);
-  checkOpen; 
+  checkOpen; playKalah;
   TTOUT; P2747;
   12561 :; 12633 :
 _).     
