@@ -1115,20 +1115,107 @@ _(
   l4v10z := (((((l4v16z * l3v73z) + (l4v14z * l3v75z)) + (l4v12z * l3v76z)) + (l4v18z * l3v77z)) + l4v10z);
   estimate := (l4v9z - l4v10z);
 _);
-_function F4612(l4a1z, l4a2z, l4a3z, l4a4z, l4a5z: integer):integer;
+_function F4612(_var l4a1z:unpboth; l4a2z, l4a3z: integer; _var l4a4z, l4a5z: integer):integer;
+_label 5050, 5054, 5070, 999;
 _var
 l4v1z, l4v2z, l4v3z, l4v4z, l4v5z, l4v6z, l4v7z, l4v8z, l4v9z, l4v10z,
-l4v11z, l4v12z, l4v13z, l4v14z, l4v15z, l4v16z, l4v17z, l4v18z, l4v19z, l4v20z,
-l4v21z, l4v22z, l4v23z, l4v24z, l4v25z, l4v26z, l4v27z, l4v28z, l4v29z, l4v30z,
-l4v31z, l4v32z, l4v33z, l4v34z, l4v35z, l4v36z, l4v37z, l4v38z, l4v39z, l4v40z,
-l4v41z, l4v42z, l4v43z, l4v44z, l4v45z, l4v46z, l4v47z, l4v48z, l4v49z, l4v50z,
-l4v51z, l4v52z, l4v53z, l4v54z, l4v55z, l4v56z, l4v57z, l4v58z, l4v59z:integer;
+l4v11z, l4v12z, l4v13z, l4v14z, l4v15z, l4v16z, l4v17z, l4v18z, l4v19z, l4v20i:integer;
+l4v20z:_array [1..7] _of integer;
+l4v28z, l4v44z:unpboth; 
 _(
-  writeln('"ЧП" ДЕРЦЕН');
-  (q) _exit q;
-  F4612 := 0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
-  *0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
-  *0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
+  _if (l4a2z = (0C)) _then _(
+    l4v10z :=   estimate( l4a1z );
+    _goto 5070; (* a potential hack, could something + goto 5054 *)
+    _goto 5054;
+  _);
+  l4v28z := l4a1z;
+  l4v10z := (37777202417400C);
+  l4v11z := l4a4z;
+  l4v12z := l4a5z;
+  l4v7z := (0C);
+  l4v8z := ;
+  l4v14z := ;
+  l4v15z := l2v73z;
+  l4v16z := l4a3z;
+  l4v4z := (1C);
+  l4v17z := ;
+  l4v5z := (6C);
+  l4v2z := l4v28z[user].move.i;
+  l4v1z := l4v28z[jinn].move.i;
+  _for l4v3z := (6C) _downto (1C) _do _(
+    l4v6z := l4v28z[l4v2z].pits[l4v3z].val;
+    _if (l4v6z > (0C)) _then l4v17z := (l4v17z + (1C));
+    l4v6z := (l4v6z + l4v3z);
+    l4v8z := l4v28z[l4v1z].pits[l4v3z].val + l4v8z;
+    _if (l4v6z = (7C)) _or (l4v6z = (24C)) _then _(
+      l4v20z[l4v4z] := l4v3z;
+      l4v4z := (l4v4z + (1C));
+    _) _else _if (l4v6z <> l4v3z) _then _(
+      l4v20z[l4v5z] := l4v3z;
+      l4v5z := (l4v5z - (1C));
+    _);
+  _);
+
+  _if (l4v8z = (0C)) _then _(
+    l4v10z := diff(l4v28z);
+    l2v39z := (0C);
+    _goto 5070;
+  _); 
+
+  _if (l4v4z > (1C)) _and (l4a2z > (1C)) _then
+    l4a2z := (l4a2z - (1C));
+  _for l4v3z := l4v4z _to l4v5z _do
+    l4v20z[l4v3z] := (0C);
+% L4727
+  _for l4v3z := (1C) _to (6C) _do _(
+    _if ((l2v73z - l4v15z) > l4a3z) _and (l4v7z <> (0C)) _then _(
+      l2v44z := (l2v44z + (1C));
+      _goto 5050
+    _); (* 4737 *)
+    (*=m+ may be unnecessary, but helps matching code for mul/mod/div by powers of 2 *)
+    l4v4z := l4v20z[l4v3z];
+    _if (l4v4z = (0C)) _then _goto 999;
+    _if (l4a2z > (1C)) _then _(
+      l4v16z := trunc(((l4a3z - l2v73z) + l4v15z) * 2 / l4v17z);
+      l4v17z := (l4v17z - (1C));
+    _) _else _(
+      l4v16z := l4a3z;
+    _);
+    l4v44z := l4v28z;
+    l4v19z :=   F3475(l4v44z, l4v4z );
+    _if (l4v19z = (1C)) _then _(
+      l4v9z := - F4612(l4v44z, l4a2z-1, l4v16z, l4v12z, l4v11z);
+    _) _else _if (l4v19z = (2C)) _then _(
+      l4v13z := l4v12z;
+      l4v9z :=   F4612(l4v44z, l4a2z, l4a3z, l4v11z, l4v13z);
+    _) _else _if (l4v19z = (0C)) _then _(
+        _goto 999; (* a potential hack: could be something + fall through to 5025 *)
+        (q) _exit q;
+    _); (* 5025 *)
+    _if (l4v9z > l4v10z) _then _(
+      l4v10z := l4v9z;
+      l4v14z := l4v4z;
+    _); (* 5031 *)
+    l4v7z := (l4v7z + (1C));
+    _if (l4v10z >= l4a5z) _and (l4v10z <> (7346545000C)) _then _(
+      l4v10z := l4a5z;
+      _goto 5054
+    _);
+999:;
+  _); (* 5042 *)
+  _if (l4v7z = (0C)) _then _(
+    l4v10z := diff(l4v28z);
+  _); 
+5050:
+  _if (l4v10z < l4a5z) _then l4a5z := l4v10z;
+5054:
+  l2v39z := l4v14z;
+  _if (l4v14z = (0C)) _and _not F4210(l4v28z) _then _(
+    writeln('"ЧП" ДЕРЦЕН');
+    _GOTO 12561;
+  _);
+5070: 
+ F4612 := l4v10z;
 _);
 
 _procedure assertOpenings(l4a1z: bitset);
@@ -1139,14 +1226,37 @@ _(
   _);
 _);
 
-_function F5104(l4a1z, l4a2z:integer):integer;
+_function F5104(_var l4a1z: unpboth; l4a2z:integer):integer;
 _var
-l4v1z, l4v2z, l4v3z, l4v4z, l4v5z, l4v6z, l4v7z, l4v8z, l4v9z, l4v10z,
-l4v11z, l4v12z, l4v13z, l4v14z, l4v15z, l4v16z, l4v17z, l4v18z, l4v19z, l4v20z:integer;
+l4v1z:unpboth; l4v17z, l4v18z, l4v19z:integer;
+l4v20z:word;
 _(
-  (q) _exit q;
-  F5104 := 0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0;
-  _);
+  _if l4a2z > 8415 _then l4v19z := 1 _else _(
+    _if l4a2z > 1547 _then l4v17z := l4a2z - 224
+    _else l4v17z := l4a2z;
+    l4v18z := (7 - l4v17z _MOD 8) * 6;
+    l4v20z.i := sel(bufptr@[l4v17z _div 8], l4v18z, 6);
+    assertOpenings( l4v20z.s );
+    l4v19z := 0;
+    l4a2z := l4a2z * 6;
+
+    _while l4v20z.s <> [] _do _(
+      l4v18z := minel(l4v20z.s);
+      l4v20z.s := l4v20z.s - [l4v18z];
+      l4v18z := (l4v18z - (51C));
+      l4v1z := l4a1z;
+      l3v42z := F3475(l4v1z, l4v18z );
+      _if (l3v42z = (1C)) _then _(
+        l4v19z := (l4v19z + (1C));
+      _) _else _(
+        l4v19z := F5104(l4v1z, l4a2z + l4v18z) + l4v19z;
+        (q) _exit q
+      _); 
+    _)
+  _); (* 5204 *)
+  F5104 := l4v19z;
+_);
+(*=m- ... and back to non-negative multiplicative ops *)
 _( (* F5206 *)
   age := 1547;
   age := 224;
