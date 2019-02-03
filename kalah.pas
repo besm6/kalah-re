@@ -1413,15 +1413,67 @@ _);
 (*=m- ... and back to non-negative multiplicative ops *)
 
 _function correction(l3a1z:integer):integer;
-_var l3v1z, l3v2z, l3v3z, l3v4z:integer;
+_var l3v1z, l3v2z, l3v3z:integer; l3v4z:@word;
 _(
-  write('!CORR!');
-  writeln('"ЧП" - ИСПОРЧЕНЫ КОРРЕКЦИИ');
-  age := 32767;
-  age := 777777777777777C;
-  (q) _exit q;
-  age := 0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
-  *0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
+  correction := l3a1z;
+  l3v3z := (((17C) - l2v66z) * (3C));
+  _if (l2v67z = (0C)) _then _(
+    readZone( (0C), (660635C) );
+    _if (bufptr@[0].a <> '!СОRR!') _then _(
+      writeln('"ЧП" - ИСПОРЧЕНЫ КОРРЕКЦИИ');
+      _GOTO 12561;
+    _);
+    l2v67z := (2C);
+    l2v68z := bufptr@[1].i;
+    (loop) _for l3v1z := l2v67z _to l2v68z _do _(
+      _if (sel(bufptr@[l3v1z], 30, 15) = l2v71z) _then _(
+        _exit loop
+      _) _else _(
+        l2v67z := (l3v1z + (1C));
+      _)
+    _); (* 5723 *)
+    (loop) _for l3v1z := l2v68z _downto l2v67z _do _(
+      _if (sel(bufptr@[l3v1z], 30, 15) = l2v71z) _then _(
+        _exit loop
+      _) _else _(
+        l2v68z := (l3v1z - (1C));
+      _)
+    _)
+  _); (* 5737 *)
+  (loop) _for l3v1z := l2v67z _to l2v68z _do _(
+    _if (sel(bufptr@[l3v1z], l3v3z, 3) = l3a1z) _then _(
+      _exit loop;
+    _) _else _(
+      l2v67z := (l3v1z + (1C));
+    _)
+  _); (* 5754 *)
+  (loop) _for l3v1z := l2v68z _downto l2v67z _do _(
+    _if (sel(bufptr@[l3v1z], l3v3z, 3) = l3a1z) _then _(
+      _exit loop
+    _) _else _(
+      l2v68z := (l3v1z - (1C));
+    _)
+  _); (* 5771 *)
+  _if (l2v67z > l2v68z) _then _(
+    l2v28z := (0C);
+    exit
+  _); (* 5774 *)
+  l3v3z := (l3v3z - (3C));
+  _if (l2v67z = l2v68z) _then _(
+    l3v4z := ptr(l2v67z + ord(bufptr));
+    _if (l2v66z = (16C)) _or
+        (sel(l3v4z@.i,l3v3z, 3) = 0) _then _(
+      correction := l3v4z@.i _mod 8;
+      enq66;
+      readZone( (0C), (660635C) );
+      l3v2z := shift(l3v4z@.i, 45) + 1;
+      _if (l3v2z < (10C)) _then _(
+        ins(l3v4z@, l3v2z, 45, 3);
+        writeZone( (0C), (660635C) );
+      _);
+      deq66;
+    _)
+  _);
 _);
 
 _procedure phrase;
