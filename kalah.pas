@@ -28,7 +28,7 @@ zone = _array [0..1023] _of word;
 largeset = _array [0..5] _of bitset;
 player = integer;
 contents = _record val:integer _end;
-unppits = _record move:word; pits:_array [1..7] _of contents _end;
+OneSide = _record move:word; pits:_array [1..7] _of contents _end;
 
 _var
 gl10z,
@@ -423,7 +423,7 @@ _function F2573B(a, b:integer):integer;
 _var l:_array[1..7] _of word;
 _( code(=14ПВ77400,) _);
 
-_procedure packPits(_var l2a1z:unppits; _var l2a2z:word);
+_procedure packPits(_var l2a1z:OneSide; _var l2a2z:word);
 _var l2v2z:integer;
 _( code(2ИК3=СЧ,СД/-6/=17ЗЧ,);
   _for l2v2z := 1 _to 6 _do 
@@ -433,7 +433,7 @@ _( code(2ИК3=СЧ,СД/-6/=17ЗЧ,);
   l2a2z :=;
 _);
 
-_procedure unpackPits(_var l2a1z:unppits; l2a2z:word);
+_procedure unpackPits(_var l2a1z:OneSide; l2a2z:word);
 _var l2v1z:integer;
 _(
   code(2СЧ4=СД/-3/,2ЗЧ4=МР,);
@@ -491,7 +491,7 @@ _(
  TTOUT;
 _);
 _procedure drawField(_var pckpits:_array [0..1] _of word);
-_var l2v1z, l2v2z:integer;l2v3z:unppits;
+_var l2v1z, l2v2z:integer;l2v3z:OneSide;
 _procedure drawPit(pit:integer);
 _(
   write(oparen:2);
@@ -631,31 +631,33 @@ cae = 37777777474540C; caf = 3641100B;
 cba = 8415; cbb = 72; cbc = 114; right = '{171'; left = '{146';
 up = '{176'; down = '{177'; delay = '{142';
 _type
-unpboth = _array [jinn..user] _of unppits;
+Position = _array [jinn..user] _of OneSide;
 pckboth = _array [jinn..user] _of word;
 gender = (unksex, masc, fem);
 _var locvars:_array[1..7] _of word;
 l2v8z:alfa;
-l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z:integer;
+l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z,
 l2v15z, l2v16z, l2v17z: boolean; l2v18z: boolean;
 l2v19z, efendi:boolean; l2v21z, l2v22z:word;
 wrongGender, l2v24z, l2v25z, l2v26z:boolean;  l2v27z, l2v28z: integer;
 l2v29z:boolean; l2v30z, level : integer; l2v32z,
 userScore, jinnScore, NgameToday, l2v36z, l2v37z, l2v38z: integer;
 l2v39z, l2v40z, l2v41z, l2v42z, l2v43z, l2v44z, l2v45z, l2v46z, l2v47z, l2v48z: integer;
-l2v49z, l2v50z, l2v51z, l2v52z, l2v53z, l2v54z, l2v55z, l2v56z, l2v57z, l2v58z,
+l2v49z, l2v50z, l2v51z, l2v52z, l2v53z, nextMove, l2v55z, l2v56z, l2v57z, l2v58z,
 l2v59z, l2v60z, l2v61z, l2v62z, l2v63z, l2v64z : integer;
 l2v65z:integer;
 l2v66z, l2v67z, l2v68z, oldHandler, l2v70z, l2v71z, l2v72z, l2v73z,
 l2v74z, jinnTicks, userTicks, l2v77z, l2v78z, l2v79z, l2v80z: integer;
 age, spentThinking: integer;
-unpState:unpboth;
+unpState:Position;
 l2v99z, l2v100z, l2v101z, l2v102z, l2v103z, l2v104z, l2v105z, l2v106z, l2v107z, l2v108z, l2v109z, l2v110z, l2v111z, l2v112z, l2v113z, l2v114z:integer; currentState:_array [0..1] _of word;
 knownGender:gender;
-l2v118z, l2v119z, l2v120z, l2v121z, l2v122z, l2v123z, l2v124z, l2v125z, l2v126z, l2v127z, l2v128z, l2v129z, l2v130z: integer;
+l2v118z, l2v119z, l2v120z, l2v121z, l2v122z, l2v123z, l2v124z, l2v125z, l2v126z, l2v127z, l2v128z:integer; l2v129z, l2v130z: real;
 oneOverLN2:real; (* 131 *)
-l2v132z, l2v133z, l2v134z, l2v135z, l2v136z, l2v137z, l2v138z, l2v139z, l2v140z, l2v141z, l2v142z, l2v143z, l2v144z, l2v145z, l2v146z, l2v147z, l2v148z, l2v149z, l2v150z, l2v151z, l2v152z, l2v153z, l2v154z, l2v155z, l2v156z, l2v157z, l2v158z, l2v159z, l2v160z, l2v161z, l2v162z, l2v163z, l2v164z, l2v165z, l2v166z, l2v167z, l2v168z, l2v169z, l2v170z, l2v171z, l2v172z, l2v173z, l2v174z, l2v175z, l2v176z, l2v177z, l2v178z, l2v179z, l2v180z, l2v181z, l2v182z, l2v183z, l2v184z, l2v185z: integer;
-l2v186z:_array[1..100] _of bitset;
+l2v132z, l2v133z, l2v134z, l2v135z, l2v136z, l2v137z, l2v138z, l2v139z, l2v140z, l2v141z, l2v142z, l2v143z, l2v144z, l2v145z, l2v146z, l2v147z, l2v148z, l2v149z, l2v150z, l2v151z, l2v152z, l2v153z, l2v154z, l2v155z, l2v156z, l2v157z, l2v158z, l2v159z, l2v160z, l2v161z, l2v162z, l2v163z, l2v164z, l2v165z, l2v166z, l2v167z, l2v168z, l2v169z, l2v170z, l2v171z, x172z:integer;
+l2v172z:_array [1..6] _of integer;  xx179z:integer;
+l2v179z:_array [1..6] _of integer; l2v186z: integer;
+haveSaid:_array[1..36] _of bitset;
 _FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
 _(
   СОDЕ(К;ВР77=17ЗЧ1,РА3=СЧХRАND,АУАRАND=МР,
@@ -710,19 +712,19 @@ _(
   _for l3v1z := 1 _to l3a2z _do write(l3a1z);
 _);
 
-_procedure packBoth(_var from:unpboth; _var to:pckboth);
+_procedure packBoth(_var from:Position; _var to:pckboth);
 _(
   packPits(from[jinn], to[jinn]);
   packPits(from[user], to[user]);
 _);
 
-_procedure unpckBoth(_var to:unpboth; _var from:pckboth);
+_procedure unpckBoth(_var to:Position; _var from:pckboth);
 _(
   unpackPits(to[jinn], from[jinn]);
   unpackPits(to[user], from[user]);
 _);
 
-_function F3475(_var l3a1z:unpboth; l3a2z:integer):integer;
+_function F3475(_var l3a1z:Position; l3a2z:integer):integer;
 _label 3520;
 _type fake = _array [0..15] _of contents;
 _var l3v1z:player;
@@ -785,7 +787,7 @@ _(
   _)
 _);
 
-_functin performMove(_var l3a1z:unpboth; l3a2z:integer):integer;
+_functin performMove(_var l3a1z:Position; l3a2z:integer):integer;
 _label 4171;
 _var l3v1z:integer;
 l3v2z:integer; l3v3z:player; l3v4z, l3v5z, l3v6z, l3v7z, l3v8z, l3v9z, l3v10z: integer;
@@ -945,7 +947,7 @@ _( (* performMove *)
   putNchars( l3v13z, l3v12z );
   TTOUT;
 _);
-_function F4210(_var l3a1z:unpboth): boolean;
+_function F4210(_var l3a1z:Position): boolean;
 _var l3v1z, l3v2z: integer; l3v3z: _array[0..1] _of integer;
 _(
   _for l3v1z := 0 _to 1 _do _(
@@ -967,7 +969,7 @@ _(
   _)
 _);
 
-_function U4273(_var l3a1z:unpboth; l3a2z:player):bitset; (* unused *)
+_function U4273(_var l3a1z:Position; l3a2z:player):bitset; (* unused *)
 _var l3v1z, l3v2z, l3v3z:integer; l3v4z:bitset;
 _(
   l3v4z := [];
@@ -982,17 +984,16 @@ _(
   U4273 := l3v4z;
 _);
 
-_function F5206(l3a1z, l3a2z, l3a3z:integer):integer;
+_function F5206(_var l3a1z, l3a2z: Position; l3a3z:integer):integer;
+_label 5250, 5655;
 _var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z: integer;
-l3v6z, l3v7z, l3v8z, l3v9z, l3v10z,
-l3v11z, l3v12z, l3v13z, l3v14z, l3v15z, l3v16z, l3v17z, l3v18z, l3v19z, l3v20z,
-l3v21z, l3v22z, l3v23z, l3v24z, l3v25z, l3v26z, l3v27z, l3v28z, l3v29z, l3v30z,
-l3v31z, l3v32z, l3v33z, l3v34z, l3v35z, l3v36z, l3v37z, l3v38z, l3v39z, l3v40z,
-l3v41z, l3v42z, l3v43z, l3v44z, l3v45z, l3v46z, l3v47z, l3v48z, l3v49z, l3v50z,
-l3v51z, l3v52z, l3v53z, l3v54z, l3v55z, l3v56z, l3v57z, l3v58z, l3v59z, l3v60z,
-l3v61z, l3v62z, l3v63z, l3v64z, l3v65z, l3v66z, l3v67z, l3v68z, l3v69z, l3v70z,
+l3v6z, l3v7z, l3v8z, l3v9z:integer;
+l3v10z:Position;
+l3v26z:Position; l3v42z, l3x43z:integer; l3v43z:_array [1..6] _of integer; l3v50z,
+l3x51z:integer; l3v51z: _array[1..6] _of integer; l3v58z, l3v59z, l3v60z,
+l3v61z, l3v62z, l3v63z, l3v64z:integer; l3v65z: bitset; l3v66z, l3v67z, l3v68z, l3v69z, l3v70z,
 l3v71z, l3v72z, l3v73z, l3v74z, l3v75z, l3v76z, l3v77z: integer;
-_function diff(_var l4a1z:unpboth):integer;
+_function diff(_var l4a1z:Position):integer;
 _var l4v1z, l4v2z, l4v3z, l4v4z:integer;
 _(
   l4v3z := l4a1z[user].move.i;
@@ -1007,14 +1008,14 @@ _(
   _else _( diff := 0; (q) _exit q _)
 _);
 
-_function estimate(_var l4a1z: unpboth):integer;
+_function estimate(_var l4a1z: Position):integer;
 _var (* 22 locals *)
 l4v1z, l4v2z: integer;
 l4v3z, l4v4z: integer;
 l4v5z, l4v6z, l4v7z, l4v8z, l4v9z, l4v10z,
 l4v11z, l4v12z, l4v13z, l4v14z, l4v15z, l4v16z, l4v17z, l4v18z,
 l4v19z, l4v20z: integer;
-l4v21z, l4v22z: @unppits;
+l4v21z, l4v22z: @OneSide;
 
 _(
   l4v3z := l4a1z[user].move.i;
@@ -1115,17 +1116,17 @@ _(
   l4v10z := (((((l4v16z * l3v73z) + (l4v14z * l3v75z)) + (l4v12z * l3v76z)) + (l4v18z * l3v77z)) + l4v10z);
   estimate := (l4v9z - l4v10z);
 _);
-_function F4612(_var l4a1z:unpboth; l4a2z, l4a3z: integer; _var l4a4z, l4a5z: integer):integer;
+_function F4612(_var l4a1z:Position; l4a2z, l4a3z: integer; _var l4a4z, l4a5z: integer):integer;
 _label 5050, 5054, 5070, 999;
 _var
 l4v1z, l4v2z, l4v3z, l4v4z, l4v5z, l4v6z, l4v7z, l4v8z, l4v9z, l4v10z,
 l4v11z, l4v12z, l4v13z, l4v14z, l4v15z, l4v16z, l4v17z, l4v18z, l4v19z, l4v20i:integer;
 l4v20z:_array [1..7] _of integer;
-l4v28z, l4v44z:unpboth; 
+l4v28z, l4v44z:Position; 
 _(
   _if (l4a2z = (0C)) _then _(
     l4v10z :=   estimate( l4a1z );
-    _goto 5070; (* a potential hack, could something + goto 5054 *)
+    _goto 5070; (* a potential hack, could be something + goto 5054 *)
     _goto 5054;
   _);
   l4v28z := l4a1z;
@@ -1226,49 +1227,190 @@ _(
   _);
 _);
 
-_function F5104(_var l4a1z: unpboth; l4a2z:integer):integer;
+_function consult(_var pos: Position; index:integer):integer;
 _var
-l4v1z:unpboth; l4v17z, l4v18z, l4v19z:integer;
-l4v20z:word;
+mypos:Position; l4v17z, move, ret:integer;
+mask:word;
 _(
-  _if l4a2z > 8415 _then l4v19z := 1 _else _(
-    _if l4a2z > 1547 _then l4v17z := l4a2z - 224
-    _else l4v17z := l4a2z;
-    l4v18z := (7 - l4v17z _MOD 8) * 6;
-    l4v20z.i := sel(bufptr@[l4v17z _div 8], l4v18z, 6);
-    assertOpenings( l4v20z.s );
-    l4v19z := 0;
-    l4a2z := l4a2z * 6;
+  _if index > 8415 _then ret := 1 _else _(
+    _if index > 1547 _then l4v17z := index - 224
+    _else l4v17z := index;
+    move := (7 - l4v17z _MOD 8) * 6;
+    mask.i := sel(bufptr@[l4v17z _div 8], move, 6);
+    assertOpenings( mask.s );
+    ret := 0;
+    index := index * 6;
 
-    _while l4v20z.s <> [] _do _(
-      l4v18z := minel(l4v20z.s);
-      l4v20z.s := l4v20z.s - [l4v18z];
-      l4v18z := (l4v18z - (51C));
-      l4v1z := l4a1z;
-      l3v42z := F3475(l4v1z, l4v18z );
-      _if (l3v42z = (1C)) _then _(
-        l4v19z := (l4v19z + (1C));
+    _while mask.s <> [] _do _(
+      move := minel(mask.s);
+      mask.s := mask.s - [move];
+      move := move - 41;
+      mypos := pos;
+      l3v42z := F3475(mypos, move );
+      _if l3v42z = 1 _then _(
+        ret := ret + 1;
       _) _else _(
-        l4v19z := F5104(l4v1z, l4a2z + l4v18z) + l4v19z;
+        ret := consult(mypos, index + move) + ret;
         (q) _exit q
       _); 
     _)
   _); (* 5204 *)
-  F5104 := l4v19z;
+  consult := ret;
 _);
-(*=m- ... and back to non-negative multiplicative ops *)
 _( (* F5206 *)
-  age := 1547;
-  age := 224;
-  writeln('ПУСТАЯ ЛУНКА В ДЕБЮТАХ - "ЧП" !');
-  writeln('ИСТОРИЯ ', l2v70z:1);
-  age := 4212T;
-  assertOpenings([]);
+  l3v9z :=   remTime;
+  _for l3v2z := (1C) _to (36C) _do 
+   haveSaid[l3v2z] := [];
+
+  l3v71z := l3a2z[jinn].pits[1].val;
+  l3v72z := l3a2z[jinn].pits[2].val;
+  l3v73z := l3a2z[jinn].pits[3].val;
+  l3v74z := l3a2z[jinn].pits[4].val;
+  l3v75z := l3a2z[jinn].pits[5].val;
+  l3v76z := l3a2z[jinn].pits[6].val;
+  l3v77z := l3a2z[jinn].pits[7].val;
+ l3v10z := l3a1z;
+ l3v2z := (37777202417400C);
+ l3v3z := (575360400C);
+ l2v72z := (0C);
+  l2v130z := ;
+ l2v26z := true;
+5250:
+   _if (l2v25z) _then _(
+     _if (l2v70z > (8415)) _then _(
+       l2v25z := false;
+       l2v28z := 1;
+       _goto 5250;
+     _);
+     _if (l2v70z > (1547)) _then l3v64z := (l2v70z - (224))
+     _else l3v64z := l2v70z;
+     l3v4z := (((7C) - (l3v64z _MOD (10C))) * (6C));
+     l3v4z := sel(bufptr@[l3v64z_div 8], l3v4z, 6);
+     code(СД/-51/=);
+     l3v65z := ;
+     assertOpenings( l3v65z );
+   _) _else _((* 5302 *)
+   _if (randint( (100)) >= l2v38z) _then _(
+     l3v66z := (7346545000C);
+     l3v67z := ;
+     l2v26z := false;
+     l2v74z := l2v73z;
+     l3v7z :=   F4612(l3v10z, l3a3z, l2v43z, l3v66z, l3v67z);
+     l3v6z := l2v39z;
+     _goto 5655;
+   _);
+   l3v8z :=   estimate(l3v10z);
+  _); (* 5325 *)
+  l3v70z := (1C);
+  l3v4z := l3v10z[user].move.i;
+  l3v68z := l2v43z;
+  _for l3v1z := (1C) _to (6C) _do _(
+    _if l3a1z[l3v4z].pits[l3v1z].val > 0 _then l3v70z := (l3v70z + (1C));
+  _);
+  l3v4z := (0C);
+  l3v6z := ;
+  l3v61z := ;
+  _for l3v1z := (1C) _to (6C) _do _(
+    l3v26z := l3v10z;
+    _if (l2v25z) _then _(
+    _if (l3v1z _IN l3v65z) _then _(
+      l3v42z :=   F3475(l3v26z, l3v1z );
+      l2v179z[l3v1z] := ;
+      _if (l3v42z = (0C)) _then _(
+        writeln('ПУСТАЯ ЛУНКА В ДЕБЮТАХ - "ЧП" !');
+        writeln('ИСТОРИЯ ', l2v70z:1);
+        _GOTO 12561;
+      _); (* 5401 *)
+      l3v4z := (l3v4z + (1C));
+      l3v6z := l3v1z;
+      _if (l3v42z = (2C)) _then 
+        l3v63z :=   consult(l3v26z, l2v70z * 6 + l3v1z)
+      _else
+        l3v63z := (1C);
+      l2v172z[l3v1z] := l3v63z;
+    _) (* 5417 *)
+    _else l2v179z[l3v1z] := (0C);
+    _) _else _( (* 5422 *)
+      l3v42z :=   F3475(l3v26z, l3v1z );
+      l2v179z[l3v1z] := ;
+      l2v74z := l2v73z;
+      _if (l3v42z <> (0C)) _then _(
+        l3v66z := (7346545000C);
+        l3v67z := ;
+        l3v69z := l3v68z * 2 _div l3v70z;
+        l3v70z := (l3v70z - (1C));
+        _if l3v42z = 1 _then _(
+          l3v7z := - F4612(l3v26z, l3a3z-1, l3v69z, l3v66z, l3v67z);
+        _) _else _(
+          l3v7z :=   F4612(l3v26z, l3a3z, l3v69z, l3v66z, l3v67z);
+        _); (* 5467 *)
+        l3v68z := ((l3v68z - l2v73z) + l2v74z);
+        l3v7z := (l3v7z - l3v8z);
+        l2v172z[l3v1z] := ;
+        l3v4z := (l3v4z + (1C));
+        _if (l3v7z > l3v2z) _then _(
+          l3v6z := l3v1z;
+          l3v2z := l3v7z;
+        _);
+        _if (l3v7z < l3v3z) _then l3v3z := l3v7z;
+      _)
+    _); (* 5504 *)  
+  _); (* 5506 *)
+  _if (l3v4z < (2C)) _then _goto 5655;
+  _if (l2v25z) _then
+    l3v61z := (0C)
+  _else _(
+    l3v4z := (0C);
+    _for l3v1z := (1C) _to (6C) _do _(
+      _if ((l2v172z[l3v1z] <> l3v3z) _or (l3v3z = l3v2z)) _and (l2v179z[l3v1z] <> (0C)) _then _(
+        l3v61z := (l3v61z + l2v172z[l3v1z]);
+        l3v4z := (l3v4z + (1C));
+      _)
+    _);
+    _if (l3v4z < (2C)) _then _goto 5655;
+    l3v61z := l3v61z _div l3v4z - 1;
+  _); (* 5541 *)
+  l3v59z := (0C);
+  l3v60z := ;
+  _for l3v5z := (1C) _to (6C) _do 
+  _if (l2v179z[l3v5z] <> (0C)) _and (l2v172z[l3v5z] > l3v61z) _then _(
+    l3v59z := (l3v59z + (1C));
+    l3v1z := (l2v172z[l3v5z] - l3v61z);
+    l3v43z[l3v59z] := ;
+    l3v60z := (l3v60z + l3v1z);
+    l3v51z[l3v59z] := l3v5z;
+  _); (* 5563 *)
+  _if (l3v59z < (2C)) _then _goto 5655;
+  l3v62z := (0C);
+  _for l3v6z := (1C) _to l3v59z _do _(
+    l3v1z := l3v43z[l3v6z] * 100 _div l3v60z;
+    _if l2v25z _then 
+      l3v63z := l3v1z
+    _else
+      l3v63z := (l3v1z * l3v1z);
+
+    _if (l3v63z > (0C)) _then
+      l2v130z := l2v130z - l3v63z * LN(l3v63z);
+    l3v62z := l3v63z + l3v62z;
+    l3v43z[l3v6z] := ;
+  _); (* 5622 *)
+  l2v130z := l2v130z / l3v62z + LN(l3v62z);
+  l2v129z := l2v130z + l2v129z;
+  l2v72z := round(l2v130z * 10.0 * oneOverLn2);
+  l3v1z := (randint( l3v62z) + (1C));
+  _for l3v2z := (1C) _to l3v59z _do _(
+    _if (l3v1z <= l3v43z[l3v2z]) _then _(
+      l3v6z := l3v51z[l3v2z];
+      _goto 5655
+    _)
+  _); (* 5650 *)
   writeln('ОШ ДРЕВД');
   _GOTO 12561;
+5655:
   F5206 := l3v6z;
   jinnTicks := ((  remTime  - l3v9z) + jinnTicks);
 _);
+(*=m- ... and back to non-negative multiplicative ops *)
 
 _function correction(l3a1z:integer):integer;
 _var l3v1z, l3v2z, l3v3z, l3v4z:integer;
@@ -1277,35 +1419,36 @@ _(
   writeln('"ЧП" - ИСПОРЧЕНЫ КОРРЕКЦИИ');
   age := 32767;
   age := 777777777777777C;
-  
+  (q) _exit q;
+  age := 0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
+  *0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0*0
 _);
 
 _procedure phrase;
 _label 6553, 7650, 7660; 
 _var pckName:_array [0..1] _of alfa;l3v3z, l3v4z, l3v5z, l3v6z, jstones, ustones, l3v9z, l3v10z: integer;
-l3v11z:boolean; l3v12z, l3v13z:integer; l3v14z:char; l3v15z: _array[0..5] _of integer;
-l3v21z, l3v22z, l3v23z: integer;
-l3v24z:_array [1..7] _of integer;
+l3v11z:boolean; l3v12z, l3v13z:boolean; l3v14z:char;
+l3v15z:Position;
 unpName:_array [1..12] _of char;
 l3v43z:_array [1..6] _of char;
 _function chkRandom(l4a1z:integer):integer;
 _var l4v1z:integer;
 _(
   _if (l3v9z > (0C)) _then _(
-   l4v1z := trunc(l4a1z * random) + 1;
-   _if (l4v1z _IN l2v186z[l3v9z]) _then _GOTO 6553;
+   l4v1z := trunc(random * l4a1z) + 1;
+   _if (l4v1z _IN haveSaid[l3v9z]) _then _GOTO 6553;
    chkRandom := l4v1z;
-   l2v186z[l3v9z] := [l4v1z] + l2v186z[l3v9z];
+   haveSaid[l3v9z] := [l4v1z] + haveSaid[l3v9z];
   _) _else _(
-   l3v9z := trunc(l4a1z * random) + 1;
+   l3v9z := trunc(random * l4a1z) + 1;
    chkRandom := ;
   _)
 _);
 
 _procedure Dear;
 _(
-  _if knownGender = MASC _then write(', ДОРОГОЙ')
-  _else _if knownGender = FEM _then write(', ДОРОГАЯ');
+  _if knownGender = MASC _then write(', ДОРОГОЙ');
+  _if knownGender = FEM _then write(', ДОРОГАЯ');
 _);
 
 _procedure maybeFeminine;
@@ -1313,67 +1456,84 @@ _(
   _if knownGender = FEM _then write(femEnding);
   write(excl:2);
 _);
-_function countEnding(l4a1z:integer):integer;
+_function countEnding(number:integer):integer;
+
 _(
- _if (l4a1z >= 20) _then _(
-   l4a1z := l4a1z _MOD 10;
-  _if (l4a1z <> (1C)) _then 
-  _if (l4a1z > (1C)) _and (l4a1z < (5C)) _then
-    l4a1z := 2
-  _else
-    l4a1z := (3C);
- countEnding := l4a1z;
-  _);
+ _if (number >= 20) _then
+   number := number _MOD 10;
+  _if (number = (1C)) _then _(_) _else
+  _if (number > (1C)) _and (number < (5C)) _then
+    number := 2
+  _else _(
+    number := (3C); (q) _exit q;
+  _); 
+  countEnding := number;
 _);
 _( (* phrase *)
-  pckName[0] := ogchezk;
-  getName(pckName[0], pckName[1]);
-  _if NgameToday = 0 _then
-    write(' ПРИВЕТСТВУЮ ТЕБЯ, ')
-  _else _if NgameToday = 1 _then
-    write(' САЛАМ АЛЕЙКУМ, ')
-  _else
-    write(' САЛАМ, ');
-  unpck(unpName[1], pckName[0]);
-  unpck(unpName[7], pckName[1]);
-  wrongGender := false;
-  _if (knownGender = MASC) _or (knownGender = FEM) _then _(
-    _if (age > (0C)) _then 
-    _if (age < 20) _then write('ЮН')
-    _else _if (age < 50) _then write('УВАЖАЕМ')
-    _else write('ПОЧТЕНН');
-    _if (knownGender = MASC) _then write('ЫЙ ')
-    _else write('АЯ ');
-  _);
-  (loop) _for l3v4z := 1 _to 12 _do _(
-    l3v14z := unpName[l3v4z];
-    _if l3v14z = space _then _exit loop;
-    write(l3v14z);
-  _);
+  l3v11z := false;
+  l3v15z := unpState;
+  l3v10z :=   F3475(l3v15z, nextMove );
+  jstones := l3v15z[jinn].pits[7].val;
+  ustones := l3v15z[user].pits[7].val;
+  _if l2v13z _then _goto 7660;
+  write(space:3);
+  _if (l2v15z) _then _(
+    l2v15z := false;
+    unpck(l3v43z[1], gl81z);
+    age := ord(l3v43z[5]) * 10 + ord(l3v43z[6]);
+    _if (age > (0C)) _then _(
+      pckName[1] :=   getDate;
+      unpck(l3v43z[1], pckName[1]);
+      age := ord(l3v43z[5]) * 10 + ord(l3v43z[6]) - age;
+    _);
+    pckName[0] := ogchezk;
+    getName(pckName[0], pckName[1]);
+    _if NgameToday = 0 _then
+      write(' ПРИВЕТСТВУЮ ТЕБЯ, ')
+    _else _if NgameToday = 1 _then
+      write(' САЛАМ АЛЕЙКУМ, ')
+    _else _(
+      write(' САЛАМ, '); (q) _exit q
+    _);
+    unpck(unpName[1], pckName[0]);
+    unpck(unpName[7], pckName[1]);
+    wrongGender := false;
+    _if ((knownGender = MASC) _or (knownGender = FEM)) _and (age > 0) _then _(
+      _if (age < 20) _then write('ЮН')
+      _else _if (age < 50) _then write('УВАЖАЕМ')
+      _else _( write('ПОЧТЕНН'); (q) _exit q _);
+      _if (knownGender = MASC) _then write('ЫЙ ')
+      _else write('АЯ ');
+    _);
+    (loop) _for l3v4z := 1 _to 12 _do _(
+      l3v14z := unpName[l3v4z];
+      _if l3v14z = space _then _exit loop;
+      write(l3v14z);
+    _);
 
-  pckName[0] := '      ';
-  unpck(l3v43z[1], pckName[0]);
-  _for l3v5z := (1C) _to (3C) _do _(
-  _if ((l3v4z - l3v5z) > (0C)) _then
-    l3v43z[l3v5z] := unpName[(l3v4z - l3v5z)];
-  _);
-  _if (knownGender = MASC) _then _(
-    wrongGender := checkEnding( 'ОВА  4') _or
-      checkEnding( 'ЕВА  4') _or
-      checkEnding( 'ИНА  4') _or
-      checkEnding( 'АЯ   3');
-  _) _else _if knownGender = FEM _then _(
-    wrongGender := checkEnding( 'ОВ   3') _or
-      checkEnding( 'ЕВ   3') _or
-      checkEnding( 'ИН   3') _or
-      checkEnding( 'ИЙ   3'); 
-  _);
-  _if (knownGender = MASC) _then write('-ХАН')
-  _else _if (knownGender = FEM) _then write('-ХАНУМ');
-  efendi := Level = 4;
-  _if efendi _then _(
-    _if (knownGender = MASC) _then write(', ЭФЕНДИ');
+    pckName[0] := '      ';
+    unpck(l3v43z[1], pckName[0]);
+    _for l3v5z := (1C) _to (3C) _do _(
+    _if ((l3v4z - l3v5z) > (0C)) _then
+      l3v43z[l3v5z] := unpName[(l3v4z - l3v5z)];
+    _);
+    _if (knownGender = MASC) _then _(
+      wrongGender := checkEnding( 'ОВА  4') _or
+        checkEnding( 'ЕВА  4') _or
+        checkEnding( 'ИНА  4') _or
+        checkEnding( 'АЯ   3');
+    _) _else _if knownGender = FEM _then _(
+      wrongGender := checkEnding( 'ОВ   3') _or
+        checkEnding( 'ЕВ   3') _or
+        checkEnding( 'ИН   3') _or
+        checkEnding( 'ИЙ   3'); 
+    _);
+    _if (knownGender = MASC) _then write('-ХАН')
+    _else _if (knownGender = FEM) _then _( write('-ХАНУМ'); (q) _exit q _);
+    efendi := Level = 4;
+    _if efendi _and (knownGender = MASC) _then write(', ЭФЕНДИ');
     write('  !!');
+    _goto 7650
   _);
 % L6367  
   _if l2v17z _then _(
@@ -1381,7 +1541,7 @@ _( (* phrase *)
     _if l3v4z = 0 _then write('ПРОДОЛЖАТЬ НЕТ СМЫСЛА.')
     _else _if l3v4z = 1 _then write('ДАВАЙ КОНЧИМ.')
     _else _if l3v4z = 2 _then write('ТЕПЕРЬ УЖЕ НИЧЕГО НЕ ИЗМЕНИШЬ.')
-    _else _if l3v4z = 3 _then write('НЕ БУДЕМ ТЕРЯТЬ ВРЕМЕНИ.');
+    _else _if l3v4z = 3 _then _( write('НЕ БУДЕМ ТЕРЯТЬ ВРЕМЕНИ.'); (q) _exit q _);
     _goto 7660;
    _) _else _( (* 6414 *)
      _if (jstones > 36) _or (ustones > 36) _then _(
@@ -1394,11 +1554,11 @@ _( (* phrase *)
        l3v4z :=   randint( (5C) );
        _if (l3v4z = (0C)) _then write('СЛАВА АЛЛАХУ - Я ВЫИГРАЛ !')
        _else _if (l3v4z = (1C)) _then write('Я УЖЕ ВЫИГРАЛ. ПОРА КОНЧАТЬ !')
-       _else _if (l3v4z <> (2C)) _then _(
+       _else _if (l3v4z = (2C)) _then _(
          write('ТЫ ПРОИГРАЛ'); maybeFeminine;
          write('  ТЫ ПРОИГРАЛ');  maybeFeminine;  write('!!');
        _) _else _if (l3v4z = (3C)) _then write('НЕ ПЕЧАЛЬСЯ, УДАЧА БУДЕТ ЖДАТЬ ТЕБЯ ЗАВТРА !')
-       _else _( write('СДАВАЙСЯ, ТЫ УЖЕ ПРОИГРАЛ'); maybeFeminine; _)
+       _else _( write('СДАВАЙСЯ, ТЫ УЖЕ ПРОИГРАЛ'); maybeFeminine; (q) _exit q _)
   _) _else  (* 6465 *)
   _if (ustones > 36) _then (again) _(
     l3v4z :=   randint(8);
@@ -1416,8 +1576,8 @@ _( (* phrase *)
      _if (Level < (4C)) _then _goto again;
        write('ВЫИГРАЕШЬ У МЕНЯ 12 РАЗ ПОДРЯД - ПОЛУЧИШЬ ВОЛШЕБНОЕ КОЛЬЦО !');
      _) _else _(
-       write('О, ШАЙТАН !  ТЫ МЕНЯ ОБЫГРАЛ');  maybeFeminine;
-     _)
+       write('О, ШАЙТАН !  ТЫ МЕНЯ ОБЫГРАЛ');  maybeFeminine; (q) _exit q
+     _); (q) _exit q
   _); _goto 7660 (* 6545 *)
   _) _else _( (* 6546 *)
   _if (l2v40z > (0C)) _then _(
@@ -1437,7 +1597,7 @@ _( (* phrase *)
     _);
     write('ПОЧЕМУ');
     _if (l3v4z < (4C)) _then write(' НИЧЕГО НЕ ГОВОРИШЬ')
-    _else write(' МОЛЧИШЬ');
+    _else _( write(' МОЛЧИШЬ'); (q) _exit q _);
     l2v40z := (0C);
     l2v19z := true;
     Dear;
@@ -1448,7 +1608,7 @@ _( (* phrase *)
    _if (l3v4z = (1C)) _and night _then _(
      l3v4z :=   chkRandom( (2C) );
      _if (l3v4z = (1C)) _then write('СХОДИ УМОЙСЯ ЛУННЫМ СВЕТОМ !')
-     _else write('ЗВЕЗДА АЛЬТАИР ВЗОШЛА, СДЕЛАЙ НАМАЗ.');
+     _else _( write('ЗВЕЗДА АЛЬТАИР ВЗОШЛА, СДЕЛАЙ НАМАЗ.'); (q) _exit q _);
      _goto 7650;
    _); (* 6626 *)
    _if (l3v4z = (2C)) _and (jstones > ustones) _then _(
@@ -1459,7 +1619,7 @@ _( (* phrase *)
    _if (l3v4z = (3C)) _and  (l3v10z = (2C)) _then _(
      l3v4z :=   chkRandom( (3C) );
      _if (l3v4z = (1C)) _then write('ЛЮБЛЮ ХОДИТЬ В КАЛАХ !')
-      _else _if (l2v126z = (2C)) _then write('ЕЩЕ РАЗ В КАЛАХ - ХОРОШО !');
+     _else _if (l2v126z = (2C)) _then _( write('ЕЩЕ РАЗ В КАЛАХ - ХОРОШО !'); (q) _exit q _);
       _goto 7650;
    _); (* 6654 *)
    _if (l3v4z = (4C)) _then _(
@@ -1468,15 +1628,15 @@ _( (* phrase *)
      _else _if (l3v4z = (2C)) _then  write('ЧЕЛОВЕК ПРОТИВ ДЖИННА НЕ УСТОИТ !')
      _else _if (l3v4z = (3C)) _then  write('БУДУ ДУМАТЬ КРЕПЧЕ.')
      _else _if (l3v4z = (4C)) _then write('ПРИЯТНО ПОИГРАТЬ В КАЛАХ !')
-     _else write('Х-ММ !'); 
+     _else _( write('Х-ММ !'); (q) _exit q _);
     _goto 7650;
   _); (* 6704 *)
   _if (l3v4z = (5C)) _and (jstones > ustones) _and (l2v58z <= l2v59z) _then _(
     l3v4z :=   chkRandom( (7C) );
     write('СЕЙЧАС У МЕНЯ БУДЕТ ');
-    write(jstones);
+    write(jstones:1);
     write(', А У ТЕБЯ ');
-    write(ustones);
+    write(ustones:1);
     _goto 7650;
   _);
    _if (l3v4z = (6C)) _and (jstones < ustones) _then _(
@@ -1499,17 +1659,17 @@ _( (* phrase *)
     write('Я ТЕБЕ НЕ ГОРНЫЙ ГУЛЬ !');
     _goto 7650;
   _); (* 6766 *)
-  _if (l3v4z = (12C)) _and l2v25z _then _(
+  _if (l3v4z = (12C)) _and _not l2v25z _then _(
     l3v4z :=   chkRandom( (3C) );
     l3v4z := l2v80z;
     _if (l3v4z = (0C)) _then l3v4z := (1C);
-    write('Я ПРОСМОТРЕЛ ', l3v4z, ' ПОЗИЦИ');
-   l3v4z :=   countEnding( l3v4z );
-   _if (l3v4z = (1C)) _then l3v14z := 'Ю'
-   _else _if (l3v4z = (2C)) _then l3v14z := 'И'
-   _else l3v14z := 'Й';
-   write(l3v14z, ', А ТЫ ?');
-   _goto 7650;
+    write('Я ПРОСМОТРЕЛ ', l3v4z:1, ' ПОЗИЦИ');
+    l3v4z :=   countEnding( l3v4z );
+    _if (l3v4z = (1C)) _then l3v14z := 'Ю'
+    _else _if (l3v4z = (2C)) _then l3v14z := 'И'
+    _else _( l3v14z := 'Й'; (q) _exit q _);
+    write(l3v14z, ', А ТЫ ?');
+    _goto 7650;
   _); (* 7024 *)
   _if (l3v4z = (13C)) _and ((ustones - jstones) > (4C)) _then _(
     l3v4z :=   chkRandom( (1C) );
@@ -1524,18 +1684,18 @@ _( (* phrase *)
     _goto 7650
   _); (* 7051 *)
   _if (l3v4z = (15C)) _and efendi _and ((knownGender = MASC) _or (knownGender = FEM)) _then _(
-   l3v4z :=   chkRandom( (6C) );
-   write('НЕТ ТЕБЕ РАВНО');
-   _if (knownGender = FEM) _then write('Й') _else write('ГО');
-   write(' СРЕДИ ');
-   _if (l3v4z = (1C)) _then write('АРАБОВ')
-   _else _if (l3v4z = (2C)) _then write('МАВРОВ')
-   _else _if (l3v4z = (3C)) _then write('БЕДУИНОВ')
-   _else _if (l3v4z = (4C)) _then write('ЧЕРНОКОЖИХ')
-   _else _if (l3v4z = (5C)) _then  write('ТУАРЕГОВ')
-   _else write('ЭФИОПОВ');
-   write(excl:2);
-   _goto 7650
+    l3v4z :=   chkRandom( (6C) );
+    write('НЕТ ТЕБЕ РАВНО');
+    _if (knownGender = FEM) _then write('Й') _else write('ГО');
+    write(' СРЕДИ ');
+    _if (l3v4z = (1C)) _then write('АРАБОВ')
+    _else _if (l3v4z = (2C)) _then write('МАВРОВ')
+    _else _if (l3v4z = (3C)) _then write('БЕДУИНОВ')
+    _else _if (l3v4z = (4C)) _then write('ЧЕРНОКОЖИХ')
+    _else _if (l3v4z = (5C)) _then  write('ТУАРЕГОВ')
+    _else _( write('ЭФИОПОВ'); (q) _exit q _);
+    write(excl:2);
+    _goto 7650
   _); (* 7125 *)
   _if (l3v4z = (16C)) _and (l3v10z <> (2C)) _and
     l2v26z _and  (l2v72z > (0C)) _then _(
@@ -1546,7 +1706,7 @@ _( (* phrase *)
   _if (l3v4z > (16C)) _and (l3v4z < (21C)) _and
       ((jstones - l2v58z) > (4C)) _then _(
     l3v4z :=   chkRandom( (5C) );
-    write('Я ВЫИГРАЛ ', jstones - l2v58z, ' КАМНЕЙ !');
+    write('Я ВЫИГРАЛ ', (jstones - l2v58z):1, ' КАМНЕЙ !');
     _goto 7650
   _); (* 7157 *)
   _if (l3v4z = (21C)) _then _(
@@ -1561,7 +1721,7 @@ _( (* phrase *)
     _else _if (l3v4z = (6C)) _then  write('Я ЗНАЮ ВЕЛИЧАЙШЕЕ ИЗ 99 ИМЕН АЛЛАХА !')
     _else _if (l3v4z = (7C)) _then  write('ПЕЧАТЬ СОЛОМОНА МНЕ НЕ СТРАШНА !')
     _else _if (l3v4z = (10C)) _then write('КУПИ СЕБЕ ВЕРБЛЮДА !')
-    _else write('АЛЛАХ ВЕЛИК !!!');
+    _else _( write('АЛЛАХ ВЕЛИК !!!'); (q) _exit q _);
     _goto 7650
     _); (* 7241 *)
   
@@ -1577,7 +1737,7 @@ _( (* phrase *)
     _if (l3v4z = (23C)) _and (wrongGender) _and (l2v65z > (20C)) _then _(
       l3v4z :=   chkRandom( (1C) );
       _if (knownGender = MASC) _then write('Я ДУМАЮ, ТЫ ВСЕ-ЖЕ ХАНУМ.')
-      _else _if (knownGender = FEM) _then write('Я ДУМАЮ, ВСЕ-ЖЕ ТЫ НЕ ХАНУМ.');
+      _else _if (knownGender = FEM) _then _( write('Я ДУМАЮ, ВСЕ-ЖЕ ТЫ НЕ ХАНУМ.'); (q) _exit q _);
       _goto 7650;
     _); (* 7276 *)
     _if (l3v4z = (24C)) _and (spentThinking > (300)) _then _(
@@ -1585,7 +1745,7 @@ _( (* phrase *)
       write('ТЫ ДУМАЛ');
       _if (knownGender = FEM) _then write(femending);
       l3v4z := ((spentThinking + (31C)) _DIV 50);
-      write(space, l3v4z, ' СЕКУНД');
+      write(space, l3v4z:1, ' СЕКУНД');
       l3v4z :=   countEnding( l3v4z );
       _if (l3v4z = (1C)) _then  l3v14z := 'У'
       _else _if (l3v4z = (2C)) _then l3v14z := 'Ы'
@@ -1603,17 +1763,19 @@ _( (* phrase *)
     _if (l3v4z = (26C)) _and (l3v10z <> (2C)) _then _(
       l3v4z :=   chkRandom( (2C) );
       (loop) _for l3v5z := (1C) _to (6C) _do _(
-        l3v4z := l3v24z[l3v5z];
+        l3v4z := l3v15z[user].pits[l3v5z].val;
         _if (l3v4z > (0C)) _then _(
           l3v3z := (l3v4z + l3v5z);
           l3v6z := ((7C) - l3v3z);
-          _if (l3v3z < (7C)) _and  (l3v24z[l3v3z] = (0C)) _and (l3v15z[l3v6z] <> (0C)) _then _(
+          _if (l3v3z < (7C)) _and
+              (l3v15z[user].pits[l3v3z].val = (0C)) _and
+              (l3v15z[jinn].pits[l3v6z].val <> (0C)) _then _(
             l3v4z :=   chkRandom( (4C) );
-            _if (l3v4z < (1C)) _then write('НЕ БЕРИ МОЮ ', l3v6z, ' ЛУНКУ.')
+            _if (l3v4z < (1C)) _then write('НЕ БЕРИ МОЮ ', l3v6z:1, ' ЛУНКУ.')
             _else _(
-              write('ВОЗЬМИ МОЮ ', l3v6z, ' ЛУНКУ - Я ');
+              write('ВОЗЬМИ МОЮ ', l3v6z:1, ' ЛУНКУ - Я ');
               _if (l3v4z = (2C)) _then write('НАРОЧНО ');
-              write('ПОДСТАВИЛ.');
+              write('ПОДСТАВИЛ.'); (q) _exit q
             _);
             _exit loop
           _)
@@ -1624,7 +1786,7 @@ _( (* phrase *)
     _if (l3v4z = (27C)) _and (Level > (2C)) _then _(
       l3v4z :=   chkRandom( (10C) );
       _if (l3v4z = (1C)) _then  write('КРАСНЫЕ ')
-      _else _if (l3v4z = (2C)) _then  write('ЧЕРНЫЕ ');
+      _else _if (l3v4z = (2C)) _then _( write('ЧЕРНЫЕ '); (q) _exit q _);
       _if (l3v4z < (3C)) _then write('ДЖИННЫ ОЧЕНЬ ОПАСНЫ !');
       _goto 7650
     _); (* 7457 *)
@@ -1638,9 +1800,11 @@ _( (* phrase *)
         _else write('НАВЕРНОЕ ');
         write('МАХАББА ТЕБЕ НЕ НУЖНА.');
       _) _else _(
-        _if (l3v4z = (4C)) _and (age > (36C)) _then
+        _if (l3v4z = (4C)) _and (age > (36C)) _then _(
           write('ЕСЛИ ТЕБЕ НУЖНА МАХАББА, СООБЩИ МНЕ ОБ ЭТОМ.');
-      _)
+         (q) _exit q
+        _);  
+      _);
     _);
     _goto 7650
   _); (* 7514 *)
@@ -1654,8 +1818,8 @@ _( (* phrase *)
   _if (l3v4z = (32C)) _and (knownGender = MASC) _and (Level > (2C)) _and (l2v65z > (5C)) _then _(
     l3v4z :=   chkRandom( (6C) );
     _if (l3v4z = (1C)) _then  write('СКАЖИ МНЕ, ЛАЛЛА МИРА')
-    _else _if (l3v4z = (2C)) _then  write('СОЗНАЙСЯ, АЙША КАДЕША');
-    _if (l3v4z < (3C)) _then write(' С ТОБОЙ НЕ ВСТРЕЧАЛАСЬ ?');
+    _else _if (l3v4z = (2C)) _then _( write('СОЗНАЙСЯ, АЙША КАДЕША'); (q) _exit q _);
+    _if (l3v4z < (3C)) _then write(' С ТОБОЙ НЕ ВСТРЕЧАЛАСЬ ?'); 
   _goto 7650;
   _); (* 7560 *)
   _if (l3v10z <> (2C)) _then _(
@@ -1663,12 +1827,12 @@ _( (* phrase *)
     l3v12z := ;
     l3v13z := ;
     _for l3v5z := (1C) _to (6C) _do _(
-      l3v4z := l3v24z[l3v5z];
+      l3v4z := l3v15z[user].pits[l3v5z].val;
       _if (l3v4z > (0C)) _then _(
         l3v3z := (l3v4z + l3v5z);
         l3v6z := (l3v6z + (1C));
-        _if (l3v3z = (7C)) _or (l3v3z = (24C)) _then l3v12z := (1C)
-        _else l3v13z := (1C);
+        _if (l3v3z = (7C)) _or (l3v3z = (24C)) _then l3v12z := true
+        _else l3v13z := true;
       _)
     _); (* 7605 *)
     l3v4z :=   chkRandom( (4C) );
@@ -1676,22 +1840,24 @@ _( (* phrase *)
      _if (l3v4z = (1C)) _then write('НЕЧЕГО ДУМАТЬ - ХОДИ !')
      _else _(
        _if (l3v4z = (2C)) _then write('ТЕПЕРЬ ТЕБЕ ДУМАТЬ НЕЧЕГО - ХОДИ !')
-       _else write('У ТЕБЯ ВСЕГО ОДИН ХОД.');
+       _else _( write('У ТЕБЯ ВСЕГО ОДИН ХОД.'); (q) _exit q _);
      _) (* 7624 *)
    _) _else _(
-     _if (l3v12z <> 0) _and (l3v13z <> 0) _then _(
+     _if l3v12z _and l3v13z _then _(
        _if (l3v4z = (1C)) _then write('НЕ СОВЕТУЮ ХОДИТЬ В КАЛАХ.')
        _else _if (l3v4z = (2C)) _then write('СОВЕТУЮ ПОЙТИ В КАЛАХ.')
        _else _if (l3v4z = (3C)) _then write('НА ХОД В КАЛАХ ОСОБЕННО НЕ НАДЕЙСЯ.')
-       _else write('ПОСМОТРЮ, ПОЙДЕШЬ ЛИ В КАЛАХ ?');
-     _)
+       _else _( write('ПОСМОТРЮ, ПОЙДЕШЬ ЛИ В КАЛАХ ?'); (q) _exit q _);
+       (q) _exit q
+     _);
+     (q) _exit q
    _) (* 7647 *)
   _) (* 7650 *)
    _)
  _);
  7650:;
   _if (l3v11z) _then _goto 7660;
-  code(СЧ75205=3ЗЧ7,СЧ75224=3ЗЧ10,);
+  code(СЧ75205=3ЗЧ6,СЧ75224=3ЗЧ7,);
   l3v11z := true;
   _if ((l3v4z + (1C)) = l3v5z) _then _goto 6553;
 7660:
@@ -1707,7 +1873,16 @@ _var l3v1z:integer;
 _(
   reset(tempfile);
   l2v64z := 5;
-  _if (tempfile@ _in digit) _then l2v64z := l2v64z + 1;
+  _while (tempfile@ _in digit) _or (tempfile@ = ',') _or (tempfile@ = space) _do _(
+    code(16ПВ76312=,);
+    l2v64z := l2v64z + 1;
+  _);
+  _while (tempfile@ <> etx) _do _(
+    _if (tempfile@ <> space) _then l2v40z := (l2v40z + (1C));
+    l2v64z := (l2v64z + (1C));
+    code(=16ПВ76312,);
+  _);
+  _if (l2v64z = (7C)) _then l2v64z := (10C);
 _);
 _procedure sigRestore;
 _(
@@ -1719,7 +1894,7 @@ _label 10017;
 _var l3v1z:char;
 _(
   TTOUT;
-  write((NgameToday + (1C)));
+  write((NgameToday + (1C)):1);
   title;
   write(space:25);
   writeJinn;
@@ -1733,7 +1908,7 @@ _(
   _else _if (Level = (4C)) _then l3v1z := 'Э';
   write(l3v1z:3);
   TTOUT;
-  _if ((jinnScore + userScore) >= (255)) _and  (l2v13z = 0) _then _(
+  _if ((jinnScore + userScore) >= (255)) _and  _not l2v13z _then _(
     TTOUT;
     write('В А Ш   Т У Р Н И Р   О К О Н Ч Е Н':54);
 10017:
@@ -1741,15 +1916,15 @@ _(
     sigrestore;
     _GOTO 12561;
   _);
-  _if (l2v11z <> 0) _then write('ПРОДОЛЖЕНИЕ ОТЛОЖЕННОЙ ПАРТИИ':51)
+  _if l2v11z _then write('ПРОДОЛЖЕНИЕ ОТЛОЖЕННОЙ ПАРТИИ':51)
   _else _if (NgameToday >= (5C)) _then _(
     TTOUT;
     write('СЕГОДНЯ ИГРАТЬ БОЛЬШЕ НЕ БУДУ':51);
     _goto 10017
   _);
-  _if (l2v13z <> 0) _then _(
+  _if l2v13z _then _(
     write('Т Р Е Н И Р О В О Ч Н А Я':49);
-  _) _else _if ((31C) _IN gl87z) _and _not ([3,6] <= gl73z) _then _(
+  _) _else _if ((31C) _IN gl87z) _and ((gl73z * [3,6]) = [] ) _then _(
     TTOUT;
     write('ТУРНИР ДЛЯ ВАС ЗАКРЫТ':47);
     _goto 10017
@@ -1812,7 +1987,7 @@ _( (* playKalah *)
    writeln('ТУРНИР ЗАКРЫТ');
    _GOTO 12561;
   _);
-  writeln(F5206(0,0,0));
+  writeln(F5206(unpState,unpState,0));
   phrase
 _);
 (* main program *)
