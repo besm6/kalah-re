@@ -62,9 +62,7 @@ i,j:integer;b:bitset;ls:largeset;aa:alfa;
 _procedure filler; 
 _(
 
- (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
+(q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
@@ -630,7 +628,7 @@ _( (* saveLog *)
   _)
 _);
 _procedure playKalah;
-_label 10266, 999, 12341, 11252;
+_label 10266, 999, 12341, 11225, 11252;
 _const caa = 7346545000B; cab = 575360400B;
 cac = 37777202417400C; cad = 303240B;
 cae = 37777777474540C; caf = 3641100B;
@@ -647,7 +645,7 @@ l2v8z:alfa;
 l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z,
 l2v15z, l2v16z, l2v17z: boolean; l2v18z: boolean;
 l2v19z, efendi:boolean; l2v21z, l2v22z:word;
-wrongGender, l2v24z, l2v25z, l2v26z:boolean;  l2v27z, l2v28z: integer;
+wrongGender, l2v24z, l2v25z, l2v26z, l2v27z:boolean;   l2v28z: integer;
 l2v29z:boolean; l2v30z:word; level : integer; l2v32z,
 userScore, jinnScore, NgameToday, l2v36z, l2v37z, l2v38z: integer;
 l2v39z, l2v40z, l2v41z, l2v42z, l2v43z, l2v44z, l2v45z, l2v46z, l2v47z, l2v48z: integer;
@@ -2096,7 +2094,7 @@ _( (* playKalah *)
   l2v40z := ;
   charidx := (1C);
   l2v66z := ;
-  l2v27z := (1C);
+  l2v27z := true;
   l2v13z := tempfile@ = 'T';
 
   _if ((33C) _IN gl87z) _then _(
@@ -2174,7 +2172,7 @@ _( (* playKalah *)
     l2v12z := ;
     (loop) _while _not l2v13z _and getMinel(l2v51z, l2v127z) _do _(
       l2v132z := ptr((l2v51z * (25C)) + (64004C));
-  _if (l2v132z@.i = (7C)) _and inLargeSet( gl72z, l2v132z@.ls) _then _(
+      _if (l2v132z@.i = (7C)) _and inLargeSet( gl72z, l2v132z@.ls) _then _(
         l2v128z := l2v128z - [l2v51z];
         bufptr@[3] := ;
         l2v11z := true;
@@ -2183,47 +2181,127 @@ _( (* playKalah *)
         _exit loop
       _);
     _); (* 10565 *)
-  deq66;
-  _if l2v11z _then _(
-    l2v65z := sel(l2v132z@.f12, 8, 8);
-    currentState[0].a :=   F3404( l2v132z@.f9, l2v132z@.f10 );
-    currentState[1].a :=   F3404( l2v132z@.f11, l2v132z@.f12 );
-    l2v52z := (4C);
-    _for l2v53z := (5C) _to (14C) _do _(
-      logPacked[l2v53z] := l2v132z@.f13[l2v53z];
-      l2v7z := ;
-      _if (l2v7z <> spaces) _then l2v52z := l2v53z;
+    deq66;
+    _if l2v11z _then _(
+      l2v65z := sel(l2v132z@.f12, 8, 8);
+      currentState[0].a :=   F3404( l2v132z@.f9, l2v132z@.f10 );
+      currentState[1].a :=   F3404( l2v132z@.f11, l2v132z@.f12 );
+      l2v52z := (4C);
+      _for l2v53z := (5C) _to (14C) _do _(
+        logPacked[l2v53z] := l2v132z@.f13[l2v53z];
+        l2v7z := ;
+        _if (l2v7z <> spaces) _then l2v52z := l2v53z;
+      _);
+    _) _else _(
+      currentState[0].i := (60606060606000C);
+      currentState[1].i := (1060606060606000C);
+      l2v65z := (1C);
+    _); (* 10624 *)
+    _for l2v63z := (1C) _to l2v55z _do _(
+      l2v5z := bufptr@[1008 - l2v63z];
+      code(2ЛУ4=2ЗЧ11,);
+      _if (l2v7z = l2v4z) _then _(
+        l2v10z := true;
+        code(2сч7=пбнашел,);
+      _);
     _);
-  _) _else _(
-    currentState[0].i := (60606060606000C);
-    currentState[1].i := (1060606060606000C);
-    l2v65z := (1C);
-  _); (* 10624 *)
-  _for l2v63z := (1C) _to l2v55z _do _(
-    l2v5z := bufptr@[1008 - l2v63z];
-    code(2ЛУ4=2ЗЧ11,);
-    _if (l2v7z = l2v4z) _then _(
-      l2v10z := true;
-      code(2сч7=пбнашел,);
+    l2v5z.i := (100000000C);
+    code(нашел:сд/-20/=2зч10,2рб5=2зч7,);
+    unpck(l2v124z@[1], l2v5z.a);
+    l2v37z := Level;
+    l2v53z := l2v30z.i;
+    NgameToday := l2v53z _div 2;
+    l2v30z.i := l2v53z _mod 2;
+    unpckBoth(unpState, currentState);
+    _if _not l2v11z _and l2v10z _then _(
+      unpState[jinn].move.b := l2v30z.b;
+      unpState[user].move.b := _not l2v30z.b;
     _);
-  _);
-  l2v5z.i := (100000000C);
-  code(нашел:сд/-20/=2зч10,2рб5=2зч7,);
-  unpck(l2v124z@[1], l2v5z.a);
-  l2v37z := Level;
-  l2v53z := l2v30z.i;
-  NgameToday := l2v53z _div 2;
-  l2v30z.i := l2v53z _mod 2;
-  unpckBoth(unpState, currentState);
-  _if _not l2v11z _and l2v10z _then _(
-    unpState[jinn].move.b := l2v30z.b;
-    unpState[user].move.b := _not l2v30z.b;
-  _);
-
-
+    _if l2v13z _and ((gl87z * [27]) = [27]) _then _(
+      Level := l2v36z;
+      unpState[jinn].move.i := l2v50z;
+      unpState[user].move.i := ((1C) - l2v50z);
+    _); (* 10674 *)
+    P7743;
+    P1634( (6C) );
   _); (* 10677 *)
+  l2v125z := (0C);
+  l2v126z := ;
+  gl28z := ((gl27z + (1C)) - (Level _div 2));
+  _if (gl28z < (0C)) _then gl28z := (0C);
+  _if (Level = (1C)) _then _(
+   l2v61z := (2C);
+   l2v43z := (45C);
+  _) _else _if (Level = (2C)) _then _(
+    l2v61z := (2C);
+    l2v43z := (600);
+  _) _else _if (Level > (2C)) _then _(
+    l2v61z := (4C);
+    l2v43z := (2500);
+    l2v25z := true;
+  _); (* 10723 *)
+
+ _if l2v11z _or l2v16z _then _(
+   l2v25z := false;
+   _if l2v16z _then  l2v27z := false;
+  _); (* 10731 *)
+  _if l2v13z _then l2v27z := false;
+  l2v27z := l2v27z _and (Level > 2);
+  _if l2v27z _then _(
+    initLog;
+    _if l2v11z _then logidx := (l2v52z + (1C))
+    _else _(
+      logChar( chr(Level) );
+      logChar( space );
+      _if (unpState[user].move.i = (0C)) _then logChar('Д')
+      _else logChar('П');
+      logChar( space );
+    _)
+  _); (* 10761 *)
+  _if l2v25z _then _(
+    readZone( (0C), (400153C) );
+    _if (bufptr@[35].a <> '!ДЕБЮТ') _then _(
+      writeln('ИСПОРЧЕНЫ ДЕБЮТЫ - "ЧП" !!');
+      _GOTO 12561;
+    _)
+  _); (* 10773 *) 
+  _if checkTime _then _if l2v13z _then _(
+      _goto 12341;
+    _) _else _( (* 11000 *)
+    _goto 11225;
+  _); (* 11001 *)
+  l2v53z := unpState[user].move.i;
+  _if (l2v53z = (0C)) _then _(
+    putNchars( up, (7C) );
+    write('МОЙ ХОД:');
+    TTOUT;
+  _) _else _(
+    _if (l2v78z = (0C)) _then _(
+      putNchars( down, (2C) ); (* this must cause scrolling if needed *)
+      write('ВАШ ХОД:');
+      l2v79z := (5C);
+      TTOUT;
+    _) _else l2v79z := (1C);
+  _); (* 11024 *)
+  l2v56z := (0C);
+  _if (l2v53z = (1C)) _then _(
+% 11027
+  _if (l2v78z < (1C)) _then _(
+  _if (l2v64z > (6C)) _then _(
+    putNchars( space, l2v64z );
+    putNchars( up, (1C) );
+    TTOUT;
+  _); (* 11040 *)
+  l2v77z :=   ticks;
+  TTIN(false);
+  spentThinking := (ticks  - l2v77z);
+  _if (spentThinking < (0C)) _then spentThinking := (62C);
+% 11052
+  (* ... *)
+  _); (* 11122 *)
+  _); (* 12032 *)
   writeln(F5206(unpState,unpState,0));
-  12341:; 11252:;
+  11225:; 12341:; 11252:;
   phrase
 _);
 (* main program *)
