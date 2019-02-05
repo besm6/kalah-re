@@ -61,10 +61,8 @@ i,j:integer;b:bitset;ls:largeset;aa:alfa;
 _procedure filler; 
 _(
 
- (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
+(q) _exit q;
 
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
@@ -623,7 +621,7 @@ _( (* saveLog *)
   _)
 _);
 _procedure playKalah;
-_label 10266, 999, 12341, 11531, 11225, 11252, 11772, 11142, 12244, 10773;
+_label 10266, 999, 12341, 11616, 11531, 11225, 11252, 11772, 11142, 12244, 10773;
 _const caa = 7346545000B; cab = 575360400B;
 cac = 37777202417400C; cad = 303240B;
 cae = 37777777474540C; caf = 3641100B;
@@ -2462,8 +2460,49 @@ _( (* playKalah *)
   l2v63z := (l2v55z + (1C));
   l2v55z := ;
 11531:;
+  _if (l2v63z > (210)) _then  l2v10z := false
+  _else _(
+    l2v10z := true;
+    bufptr@[1].i := l2v55z;
+    l2v41z := 1008 - l2v63z;
+    _if l2v13z _then _goto 11616;
+    jinnScore := (jinnScore + l2v48z);
+    userScore := (userScore + l2v49z);
+    _if (Level = (1C)) _and (userScore > jinnScore) _then _(
+      Level := (2C);
+      jinnScore := (0C);
+      userScore := ;
+      writeln('ПЕРЕХОД В КАНДИДАТЫ - СЧЕТ ОБНУЛЕН':52);
+    _);
+    _if (Level = (2C)) _and (userScore > jinnScore) _then _(
+      Level := (3C);
+      jinnScore := (0C);
+      userScore := ;
+      writeln('ПЕРЕХОД В УЧАСТНИКИ - СЧЕТ ОБНУЛЕН':52);
+    _);
+    _if ((userScore + jinnScore) >= (31C))
+      _and (Level = (3C)) _and (userScore > jinnScore) _then _(
+        Level := (4C);
+        writeln('ПЕРЕХОД В "ЭФЕНДИ"':45);
+    _);
+    _if (Level = (4C)) _and (jinnScore > userScore) _then _(
+      Level := (3C);
+      writeln('ПЕРЕХОД В УЧАСТНИКИ':45);
+    _);
+% 11611
+    _if l2v11z _then l2v32z := l2v32z + 1
+    _else l2v30z.b := _not l2v30z.b;
+11616:
+    NgameToday := (NgameToday + (1C));
+    _if l2v13z _then _(
+      NgameToday := (NgameToday + (1C));
+      Level := l2v37z;
+    _);
+    _if (NgameToday > (5C)) _then NgameToday := (5C);
+% 11626
 
   (* ... *)
+     _) (* 11712 *)
     _) (* 11767 *)
    _)_) (* 11770 *)
   _); (* 12032 *)
