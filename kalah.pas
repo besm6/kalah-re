@@ -40,10 +40,9 @@ gender = integer;
 
 _var
 gl10z,
-gl11z:integer;
-gl12z:alfa;
-gl13z,gl14z,gl15z,logidx,charidx,gl18z:integer;night,gl20z:boolean;
-gl21z,gl22z,gl23z,gl24z,gl25z,gl26z,gl27z,gl28z:integer;bufptr:@zone;
+entered, gl12z:alfa;
+gl13z,gl14z,gl15z,logidx,charidx,gl18z:integer;night,gl20z, gl21z:boolean;
+gl22z,gl23z,gl24z,gl25z,gl26z,gl27z,gl28z:integer;bufptr:@zone;
 gl29z:_array[1..5] _of word; gl35z: integer;
 curLogWord:sixchars; 
 logPacked:_array [1..30] _of alfa;
@@ -62,11 +61,7 @@ i,j:integer;b:bitset;ls:largeset;aa:alfa;
 _procedure filler; 
 _(
 
-(q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
+ (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
 (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
@@ -422,7 +417,7 @@ _(
   night := (l2v2z < 13) _or (l2v2z > 41); (* < 6:30 or > 20:30 *)
 _);
 
-_function F2573B(_var a:alfa; b:integer):integer;
+_function F2573B(_var a:alfa; b:integer):boolean;
 _var l:_array[1..7] _of word;
 _( code(=14ПВ77400,) _);
 
@@ -628,7 +623,7 @@ _( (* saveLog *)
   _)
 _);
 _procedure playKalah;
-_label 10266, 999, 12341, 11225, 11252;
+_label 10266, 999, 12341, 11531, 11225, 11252, 11772, 11142, 12244, 10773;
 _const caa = 7346545000B; cab = 575360400B;
 cac = 37777202417400C; cad = 303240B;
 cae = 37777777474540C; caf = 3641100B;
@@ -639,12 +634,10 @@ Position = _array [jinn..user] _of OneSide;
 pckboth = _array [jinn..user] _of word;
 eightwords = _record f0, f1, f2, f3, f4, f5, f6, f7:integer _end;
 _var l2v1z, l2v2z, l2v3z, l2v4z:alfa;
-l2v5z:word; l2v6z:integer;
-l2v7z:alfa;
-l2v8z:alfa;
+l2v5z, l2v6z, l2v7z, l2v8z:alfa;
 l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z,
 l2v15z, l2v16z, l2v17z: boolean; l2v18z: boolean;
-l2v19z, efendi:boolean; l2v21z, l2v22z:word;
+l2v19z, efendi, l2v21z, l2v22z:boolean;
 wrongGender, l2v24z, l2v25z, l2v26z, l2v27z:boolean;   l2v28z: integer;
 l2v29z:boolean; l2v30z:word; level : integer; l2v32z,
 userScore, jinnScore, NgameToday, l2v36z, l2v37z, l2v38z: integer;
@@ -663,7 +656,9 @@ l2v124z:@sixchars; l2v125z, l2v126z:integer; l2v127z:bitset; l2v128z:bitset; l2v
 oneOverLN2:real; (* 131 *)
 l2v132z:@rec1;
 l2v133z:eightwords;
-l2v141z, l2v142z, l2v143z, l2v144z, l2v145z, l2v146z, l2v147z, l2v148z, l2v149z, l2v150z, l2v151z, l2v152z, l2v153z, l2v154z, l2v155z, l2v156z, l2v157z, l2v158z, l2v159z, l2v160z, l2v161z, l2v162z, l2v163z:integer;
+l2v140z:_array[1..12] _of char;
+l2v153z:@zone; (* for simplicity *)
+l2v154z: _array [1..10] _of char;
 l2v164z:eightwords;
 x172z:integer;
 l2v172z:_array [1..6] _of integer;  xx179z:integer;
@@ -1014,9 +1009,11 @@ _(
   _for l4v2z := 1 _to 7 _do _(
     l4v1z := l4a1z[l4v3z].pits[l4v2z].val + l4v1z - l4a1z[l4v4z].pits[l4v2z].val;
   _);
-  _if l4v1z > 0 _then diff := 100000 
-  _else _if l4v1z < 0 _then diff := 37777777474540C (* !!! -100000 remains an expression *)
-  _else _( diff := 0; (q) _exit q _)
+  _select
+    l4v1z > 0: diff := 100000;
+    l4v1z < 0: diff := 37777777474540C; (* !!! -100000 remains an expression *)
+    true: diff := 0
+  _end
 _);
 
 _function estimate(_var l4a1z: Position):integer;
@@ -1195,15 +1192,14 @@ _(
     _);
     l4v44z := l4v28z;
     l4v19z :=   F3475(l4v44z, l4v4z );
-    _if (l4v19z = (1C)) _then _(
-      l4v9z := - F4612(l4v44z, l4a2z-1, l4v16z, l4v12z, l4v11z);
-    _) _else _if (l4v19z = (2C)) _then _(
-      l4v13z := l4v12z;
-      l4v9z :=   F4612(l4v44z, l4a2z, l4a3z, l4v11z, l4v13z);
-    _) _else _if (l4v19z = (0C)) _then _(
-        _goto 999; (* a potential hack: could be something + fall through to 5025 *)
-        (q) _exit q;
-    _); (* 5025 *)
+    _select
+      l4v19z = 1: l4v9z := - F4612(l4v44z, l4a2z-1, l4v16z, l4v12z, l4v11z);
+      l4v19z = 2: _(
+        l4v13z := l4v12z;
+        l4v9z := F4612(l4v44z, l4a2z, l4a3z, l4v11z, l4v13z)
+      _);
+      l4v19z = 0: _goto 999
+    _end; (* 5025 *)
     _if (l4v9z > l4v10z) _then _(
       l4v10z := l4v9z;
       l4v14z := l4v4z;
@@ -1522,14 +1518,13 @@ _);
 _function countEnding(number:integer):integer;
 
 _(
- _if (number >= 20) _then
-   number := number _MOD 10;
-  _if (number = (1C)) _then _(_) _else
-  _if (number > (1C)) _and (number < (5C)) _then
-    number := 2
-  _else _(
-    number := (3C); (q) _exit q;
-  _); 
+  _if (number >= 20) _then
+    number := number _MOD 10;
+  _select 
+    number = 1:;
+    (number > 1) _and (number < 5): number := 2;
+    true: number := 3
+  _end; 
   countEnding := number;
 _);
 _( (* phrase *)
@@ -1551,20 +1546,20 @@ _( (* phrase *)
     _);
     pckName[0] := ogchezk;
     getName(pckName[0], pckName[1]);
-    _if NgameToday = 0 _then
-      write(' ПРИВЕТСТВУЮ ТЕБЯ, ')
-    _else _if NgameToday = 1 _then
-      write(' САЛАМ АЛЕЙКУМ, ')
-    _else _(
-      write(' САЛАМ, '); (q) _exit q
-    _);
+    _select
+      NgameToday = 0: write(' ПРИВЕТСТВУЮ ТЕБЯ, ');
+      NgameToday = 1: write(' САЛАМ АЛЕЙКУМ, ');
+      true:           write(' САЛАМ, ')
+    _end;
     unpck(unpName[1], pckName[0]);
     unpck(unpName[7], pckName[1]);
     wrongGender := false;
     _if ((knownGender = MASC) _or (knownGender = FEM)) _and (age > 0) _then _(
-      _if (age < 20) _then write('ЮН')
-      _else _if (age < 50) _then write('УВАЖАЕМ')
-      _else _( write('ПОЧТЕНН'); (q) _exit q _);
+      _select
+        (age < 20): write('ЮН');
+        (age < 50): write('УВАЖАЕМ');
+        true: write('ПОЧТЕНН')
+      _end;
       _if (knownGender = MASC) _then write('ЫЙ ')
       _else write('АЯ ');
     _);
@@ -1591,8 +1586,10 @@ _( (* phrase *)
         checkEnding( 'ИН   3') _or
         checkEnding( 'ИЙ   3'); 
     _);
-    _if (knownGender = MASC) _then write('-ХАН')
-    _else _if (knownGender = FEM) _then _( write('-ХАНУМ'); (q) _exit q _);
+    _select
+      knownGender = MASC: write('-ХАН');
+      knownGender = FEM: write('-ХАНУМ')
+    _end;
     efendi := Level = 4;
     _if efendi _and (knownGender = MASC) _then write(', ЭФЕНДИ');
     write('  !!');
@@ -1601,12 +1598,14 @@ _( (* phrase *)
 % L6367  
   _if l2v17z _then _(
     l3v4z :=   randint(8);
-    _if l3v4z = 0 _then write('ПРОДОЛЖАТЬ НЕТ СМЫСЛА.')
-    _else _if l3v4z = 1 _then write('ДАВАЙ КОНЧИМ.')
-    _else _if l3v4z = 2 _then write('ТЕПЕРЬ УЖЕ НИЧЕГО НЕ ИЗМЕНИШЬ.')
-    _else _if l3v4z = 3 _then _( write('НЕ БУДЕМ ТЕРЯТЬ ВРЕМЕНИ.'); (q) _exit q _);
+    _select
+      l3v4z = 0: write('ПРОДОЛЖАТЬ НЕТ СМЫСЛА.');
+      l3v4z = 1: write('ДАВАЙ КОНЧИМ.');
+      l3v4z = 2: write('ТЕПЕРЬ УЖЕ НИЧЕГО НЕ ИЗМЕНИШЬ.');
+      l3v4z = 3: write('НЕ БУДЕМ ТЕРЯТЬ ВРЕМЕНИ.')
+    _end;
     _goto 7660;
-   _) _else _( (* 6414 *)
+  _) _else _( (* 6414 *)
      _if (jstones > 36) _or (ustones > 36) _then _(
        l2v17z := true;
        _if (jstones > 36 ) _then _(
@@ -2198,16 +2197,16 @@ _( (* playKalah *)
       l2v65z := (1C);
     _); (* 10624 *)
     _for l2v63z := (1C) _to l2v55z _do _(
-      l2v5z := bufptr@[1008 - l2v63z];
+      l2v5z := bufptr@[1008 - l2v63z].a;
       code(2ЛУ4=2ЗЧ11,);
       _if (l2v7z = l2v4z) _then _(
         l2v10z := true;
         code(2сч7=пбнашел,);
       _);
     _);
-    l2v5z.i := (100000000C);
+    l2v5z := '001000';
     code(нашел:сд/-20/=2зч10,2рб5=2зч7,);
-    unpck(l2v124z@[1], l2v5z.a);
+    unpck(l2v124z@[1], l2v5z);
     l2v37z := Level;
     l2v53z := l2v30z.i;
     NgameToday := l2v53z _div 2;
@@ -2264,7 +2263,8 @@ _( (* playKalah *)
       writeln('ИСПОРЧЕНЫ ДЕБЮТЫ - "ЧП" !!');
       _GOTO 12561;
     _)
-  _); (* 10773 *) 
+  _); (* 10773 *)
+10773:
   _if checkTime _then _if l2v13z _then _(
       _goto 12341;
     _) _else _( (* 11000 *)
@@ -2297,11 +2297,178 @@ _( (* playKalah *)
   spentThinking := (ticks  - l2v77z);
   _if (spentThinking < (0C)) _then spentThinking := (62C);
 % 11052
+  l2v14z :=   F2573B( entered, (3C) );
+  l2v21z := (entered = 'SLЕ   ') _and  (47 _IN gl87z);
+  reset(tempfile);
+  _if l2v21z _then _(
+    _if l2v13z _then _goto 12341 _else _goto 11225;
+  _);
+  userTicks := (userTicks + spentThinking);
+  l2v78z := (0C);
+% 11076
+  _while (tempfile@ _in digit) _and (l2v78z < 10) _do _( 
+    l2v78z := (l2v78z + (1C));
+    l2v154z[l2v78z] := tempfile@;
+    code(16ПВ76312=,);
+    _if (tempfile@ = ',') _or (tempfile@ = space) _then code(16ПВ76312=,);
+  _); (* 11115 *)
+  _if (l2v78z = (0C)) _then _(
+    l2v78z := (1C);
+    l2v154z[1] := chr(0);
+  _);
+  _) _else _goto 11772; (* 11123 *)
+  _if F2573B(l2v8z, 3) _then _(
+    _if (eqstr( 'СДА   ')) _then _(
+      l2v57z := unpState[jinn].pits[7].val;
+      l2v56z := unpState[user].pits[7].val;
+      _if (l2v57z > l2v56z) _or (l2v57z > (44C)) _or
+          (l2v56z > (44C)) _or l2v13z _then _(
+11142:
+        putNchars(down, (2C) );
+        write('ИГРА ОКОНЧЕНА');
+        _goto 12244;
+      _) _else _(
+        _goto 11225;
+      _);
+    _); (* 11150 *)
+    _if (eqstr( 'ПОВ   ')) _then _(
+      write(chr(162B)); (* erase *)
+      packBoth(unpState, currentState);
+      P7743;
+      l2v78z := (0C);
+      l2v64z := ;
+      gl15z := ;
+      _goto 10773;
+    _); (* 11164 *)
+    _if eqstr( 'ОТЛ   ') _or eqstr( 'КОН   ') _then _(
+      _if l2v13z _then _(
+      _if eqstr( 'ОТЛ   ') _then _(
+        write('ТРЕНИРОВОЧНЫЕ НЕ ОТКЛАДЫВАЮТСЯ');
+        TTOUT;
+      _);
+      _goto 12244; (* must be  -> 12240 *)
+    _);
+    _if (l2v65z < (5C)) _then _(
+      _if l2v22z _then _(
+        write('НЕСЕРЬЕЗНО !');
+        TTOUT;
+        gl85z := (gl85z + [30]);
+        exit
+      _) _else _(
+        l2v22z := true;
+        write('МЫ ЖЕ ТОЛЬКО НАЧАЛИ !');
+        l2v78z := (0C);
+        _goto 12244 (* must be -> 12013 *)
+      _)
+    _); (* 11216 *)
+    l2v57z := unpState[jinn].pits[7].val;
+    l2v56z := unpState[user].pits[7].val;
+    _if (l2v57z > (44C)) _or (l2v56z > (44C)) _then _goto 11142;
+11225:
+    putNchars(down, (2C) );
+    TTOUT;
+    gl90z := l2v29z;
+    _if gl90z _then _(
+      l2v56z := (2C);
+      code(ЗЧ76013=,);
+      packBoth(unpState, currentState);
+      drawField(currentState);
+      l2v56z := (3C);
+      code(ЗЧ76013=,);
+  _); (* 11246 *)
+  write('ИГРА ОТЛОЖЕНА');
+  TTOUT;
+11252:
+  l2v11z := true;
+  enq66;
+  readZone( (66C), (523) );
+  l2v127z := bufptr@[3].s;
+  l2v55z := bufptr@[1].i;
+  l2v128z := l2v127z _mod [0..47];
+  _if getMinel(l2v51z, l2v128z) _then _(
+  _if l2v51z > 43C_then _(
+    deq66;
+    write('ОТЛОЖИТЬ ИГРУ НЕ УДАЛОСЬ');
+    TTOUT;
+  _goto 12341;
+  _); (* 11300 *)
+  l2v132z := ptr((l2v51z * (25C)) + (64004C));
+  l2v127z := l2v127z + [l2v51z];
+  bufptr@[3] := ;
+  l2v132z@.i := (7C);
+  P2023( l2v132z@.ls );
+  toLargeSet( gl72z, l2v132z@.ls );
+  l2v51z := F2112(   getDate  );
+  l2v132z@.f7 := ;
+  l2v51z := F2355( l2v51z, (7C) );
+  l2v132z@.f8 := ;
+  l2v53z := (0C);
+% 11335
+  _while (l2v53z <= (1C)) _do _(
+    _for l2v52z := (1C) _to (10C) _do _(
+      l2v140z[l2v52z] := chr(unpState[l2v53z].pits[l2v52z-1].val);
+    _);
+    _for l2v52z := (11C) _to (14C) _do _(
+      l2v140z[l2v52z] := space;
+    _);
+    l2v140z[11] := chr(l2v65z);
+    pck(l2v140z[1], l2v132z@.f13[l2v53z*2+1]);
+    pck(l2v140z[7], l2v132z@.f13[l2v53z*2+2]);
+    l2v53z := (l2v53z + (1C));
+   _);
+% 11374
+   _for l2v52z := (5C) _to (14C) _do _(
+     l2v132z@.f13[l2v52z] := spaces;
+   _);
+   _if l2v27z _then _(
+   _while charidx <> (1C) _do logChar(space);
+   _if (logidx < (16C)) _then _(
+     _for l2v52z := (5C) _to (logidx - (1C)) _do _(
+       l2v132z@.f13[l2v52z] := logPacked[l2v52z];
+     _)
+   _) _else
+   l2v132z@.f13[5] := 'ПРОД: ';
+  _);
+% 11426
+  l2v153z := ptr((Level * (14C)) + (65354C));
+  _if _not l2v11z _and _not l2v12z _and _not l2v13z _then _(
+    l2v153z@[0].i := l2v153z@[0].i + 1;
+    l2v153z@[1].i := ((  remTime  + l2v153z@[1].i) - l2v60z);
+    l2v153z@[2].i := (l2v153z@[2].i + jinnTicks);
+    l2v153z@[3].i := (l2v153z@[3].i + userTicks);
+    l2v153z@[4].i := round(l2v129z * oneOverLn2) + l2v153z@[4].i;
+    l2v153z@[5].i := (l2v153z@[5].i + l2v73z);
+    l2v153z@[6].i := (l2v153z@[6].i + l2v65z);
+    l2v153z@[7].i := (l2v153z@[7].i + l2v44z);
+    l2v153z@[8].i := (l2v153z@[8].i + l2v45z);
+    l2v153z@[9].i := (l2v153z@[9].i + l2v48z);
+    l2v153z@[10].i := (l2v153z@[10].i + l2v49z);
+  _); (* 11473 *)
+  _if l2v13z _then l2v153z@[11].i := l2v153z@[11].i + 1;
+  _for l2v63z := (1C) _to l2v55z _do _(
+    l2v5z := bufptr@[1008 - l2v63z].a;
+    code(2ЛУ4=2ЗЧ11,); (* l2v7z := l2v5z & l2v2z *) 
+    _if (l2v7z = l2v4z) _then _(
+      code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,2ЗЧ7=);
+      unpck(l2v124z@[1], l2v5z);
+      l2v53z := l2v30z.i;
+      NgameToday := l2v53z _div 2;
+      l2v30z.i := l2v53z _mod 2;
+      _if (l2v7z <> l2v6z) _then NgameToday := (5C);
+      _goto 11531;
+    _) 
+  _);
+% 11527
+  l2v63z := (l2v55z + (1C));
+  l2v55z := ;
+11531:;
+
   (* ... *)
-  _); (* 11122 *)
+    _) (* 11767 *)
+   _)_) (* 11770 *)
   _); (* 12032 *)
   writeln(F5206(unpState,unpState,0));
-  11225:; 12341:; 11252:;
+  11772:; 12244:; 12341:; 
   phrase
 _);
 (* main program *)
@@ -2310,7 +2477,7 @@ _(
   i := remTime; i := ticks; writeJinn; writeUser; ttin(true); gl90z := checkTime;
   checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); readZone(0,0); writeZone(0,0);
   enq66; deq66; gl90z := getminel(i, b); P2023(ls); toLargeSet(1, ls); gl90z := inLargeSet(1, ls);
-  i := getDays + F2355(0,0) + zeller(0,0,0) + F2573B(gl12z,0);
+  i := getDays + F2355(0,0) + zeller(0,0,0);
   checkOpen; playKalah; 
   TTOUT; P2747;
   12561 :; 12633 :
