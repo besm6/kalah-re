@@ -7,7 +7,7 @@ z600 = 660600B; z611 = 660611B; c4 = 4; c5 = 5; c25 = 25;
 etx = '{377'; c62 = 62; c1008 = 1008; space = ' '; dot = '.';
 c13 = 13; c10 = 10; c11 = 11; lf = '{214'; cr = '{175'; c212 = 21;
 spaces = '      '; arrow = ' =++> '; admin = '417700'; sleep = 'sle   ';
-fin = '(FIN){175'; c31 = 31; oparen = '('; cparen = ')'; excl = '!'; qmark = '?';
+fin = '(FIN){175'; colon = ':'; oparen = '('; cparen = ')'; excl = '!'; qmark = '?';
 c49 = 49; c45 = 45; c47 = 47; c36 = 36; c50 = 50; femEnding = 'A'; c61 = 61;
 K = 'K'; c51 = 51; c60 = 60; z = 'z'; c9 = 9; e10p1 = 1777B; c6 = 6;
 c7 = 7; c2 = 2; c12=12; c30=30; c39=39;
@@ -58,19 +58,6 @@ gl121z,gl122z,gl123z,gl124z,gl125z,gl126z,gl127z,gl128z,gl129z,gl130z:integer;
 gl131z,gl132z,gl133z:integer;
 tempfile:text;
 i,j:integer;b:bitset;ls:largeset;aa:alfa;
-_procedure filler; 
-_(
-
-(q) _exit q;
-
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-(q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q; (q) _exit q;
-
-_);
 _function remTime:integer;
 _( code(Э0634=,); remTime := ; _);
 
@@ -621,7 +608,8 @@ _( (* saveLog *)
   _)
 _);
 _procedure playKalah;
-_label 10266, 999, 12341, 11616, 11531, 11225, 11252, 11772, 11142, 12244, 10773;
+_label 10266, 999, 12341, 11616, 11531, 11027, 12032, 12162,
+11225, 11252, 11772, 11142, 12013, 12240, 12244, 10773;
 _const caa = 7346545000B; cab = 575360400B;
 cac = 37777202417400C; cad = 303240B;
 cae = 37777777474540C; caf = 3641100B;
@@ -636,7 +624,7 @@ l2v5z, l2v6z, l2v7z, l2v8z:alfa;
 l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z,
 l2v15z, l2v16z, l2v17z: boolean; l2v18z: boolean;
 l2v19z, efendi, l2v21z, l2v22z:boolean;
-wrongGender, l2v24z, l2v25z, l2v26z, l2v27z:boolean;   l2v28z: integer;
+wrongGender, l2v24z, l2v25z, l2v26z, l2v27z, l2v28z:boolean;
 l2v29z:boolean; l2v30z:word; level : integer; l2v32z,
 userScore, jinnScore, NgameToday, l2v36z, l2v37z, l2v38z: integer;
 l2v39z, l2v40z, l2v41z, l2v42z, l2v43z, l2v44z, l2v45z, l2v46z, l2v47z, l2v48z: integer;
@@ -647,9 +635,10 @@ l2v66z, l2v67z, l2v68z, oldHandler, l2v70z, l2v71z, l2v72z, l2v73z,
 l2v74z, jinnTicks, userTicks, l2v77z, l2v78z, l2v79z, l2v80z: integer;
 age, spentThinking: integer;
 unpState:Position;
-l2v99z, l2v100z, l2v101z, l2v102z, l2v103z, l2v104z, l2v105z, l2v106z, l2v107z, l2v108z, l2v109z, l2v110z, l2v111z, l2v112z, l2v113z, l2v114z:integer; currentState:_array [0..1] _of word;
+l2v99z:Position;
+currentState:_array [0..1] _of word;
 knownGender:gender;
-l2v118z, l2v119z, l2v120z, l2v121z:integer; l2v122z, l2v123z:integer;
+l2v118z:sixchars;
 l2v124z:@sixchars; l2v125z, l2v126z:integer; l2v127z:bitset; l2v128z:bitset; l2v129z, l2v130z: real;
 oneOverLN2:real; (* 131 *)
 l2v132z:@rec1;
@@ -988,7 +977,7 @@ _(
   U4273 := l3v4z;
 _);
 
-_function F5206(_var l3a1z, l3a2z: Position; l3a3z:integer):integer;
+_function F5206(_var l3a1z:Position; _var l3a2z: eightwords; l3a3z:integer):integer;
 _label 5250, 5655;
 _var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z: integer;
 l3v6z, l3v7z, l3v8z, l3v9z:integer;
@@ -1267,13 +1256,13 @@ _( (* F5206 *)
   _for l3v2z := (1C) _to (36C) _do 
    haveSaid[l3v2z] := [];
 
-  l3v71z := l3a2z[jinn].pits[1].val;
-  l3v72z := l3a2z[jinn].pits[2].val;
-  l3v73z := l3a2z[jinn].pits[3].val;
-  l3v74z := l3a2z[jinn].pits[4].val;
-  l3v75z := l3a2z[jinn].pits[5].val;
-  l3v76z := l3a2z[jinn].pits[6].val;
-  l3v77z := l3a2z[jinn].pits[7].val;
+  l3v71z := l3a2z.f1;
+  l3v72z := l3a2z.f2;
+  l3v73z := l3a2z.f3;
+  l3v74z := l3a2z.f4;
+  l3v75z := l3a2z.f5;
+  l3v76z := l3a2z.f6;
+  l3v77z := l3a2z.f7;
  l3v10z := l3a1z;
  l3v2z := (37777202417400C);
  l3v3z := (575360400C);
@@ -1284,7 +1273,7 @@ _( (* F5206 *)
    _if (l2v25z) _then _(
      _if (l2v70z > (8415)) _then _(
        l2v25z := false;
-       l2v28z := 1;
+       l2v28z := true;
        _goto 5250;
      _);
      _if (l2v70z > (1547)) _then l3v64z := (l2v70z - (224))
@@ -1460,7 +1449,7 @@ _(
     _)
   _); (* 5771 *)
   _if (l2v67z > l2v68z) _then _(
-    l2v28z := (0C);
+    l2v28z := false;
     exit
   _); (* 5774 *)
   l3v3z := (l3v3z - (3C));
@@ -2283,7 +2272,7 @@ _( (* playKalah *)
   _); (* 11024 *)
   l2v56z := (0C);
   _if (l2v53z = (1C)) _then _(
-% 11027
+11027:
   _if (l2v78z < (1C)) _then _(
   _if (l2v64z > (6C)) _then _(
     putNchars( space, l2v64z );
@@ -2344,7 +2333,7 @@ _( (* playKalah *)
         write('ТРЕНИРОВОЧНЫЕ НЕ ОТКЛАДЫВАЮТСЯ');
         TTOUT;
       _);
-      _goto 12244; (* must be  -> 12240 *)
+      _goto 12240;
     _);
     _if (l2v65z < (5C)) _then _(
       _if l2v22z _then _(
@@ -2356,7 +2345,7 @@ _( (* playKalah *)
         l2v22z := true;
         write('МЫ ЖЕ ТОЛЬКО НАЧАЛИ !');
         l2v78z := (0C);
-        _goto 12244 (* must be -> 12013 *)
+        _goto 12013
       _)
     _); (* 11216 *)
     l2v57z := unpState[jinn].pits[7].val;
@@ -2480,14 +2469,15 @@ _( (* playKalah *)
       userScore := ;
       writeln('ПЕРЕХОД В УЧАСТНИКИ - СЧЕТ ОБНУЛЕН':52);
     _);
-    _if ((userScore + jinnScore) >= (31C))
-      _and (Level = (3C)) _and (userScore > jinnScore) _then _(
+    _if ((userScore + jinnScore) >= (31C)) _then _(
+      _if (Level = (3C)) _and (userScore > jinnScore) _then _(
         Level := (4C);
         writeln('ПЕРЕХОД В "ЭФЕНДИ"':45);
-    _);
-    _if (Level = (4C)) _and (jinnScore > userScore) _then _(
-      Level := (3C);
-      writeln('ПЕРЕХОД В УЧАСТНИКИ':45);
+      _);
+      _if (Level = (4C)) _and (jinnScore > userScore) _then _(
+        Level := (3C);
+        writeln('ПЕРЕХОД В УЧАСТНИКИ':45);
+      _);
     _);
 % 11611
     _if l2v11z _then l2v32z := l2v32z + 1
@@ -2500,24 +2490,182 @@ _( (* playKalah *)
     _);
     _if (NgameToday > (5C)) _then NgameToday := (5C);
 % 11626
-
+    l2v53z := l2v30z.i;
+    l2v30z.i := NgameToday * 2 + l2v53z;
+    pck(l2v124z@[1], l2v5z);
+    code(2сч7=2сб5,сд/20/=2лс6,17зч=2сч53,1ас35=17зч,17ик=иа,);
+    code(15па=17сч,15зч=);
+    l2v42z := ((1008) - (2C));
+    (loop) _for l2v53z := l2v41z _to l2v42z _do _(
+      _if _not F10100( l2v53z, (l2v53z + (1C))) _then _exit loop;
+    _); (* 11655 *)
+    _if ((34C) _IN gl85z) _then _(
+      _repeat
+        gl21z := true;
+        _for l2v53z := ((1008) - l2v55z) _to l2v42z _do _(
+          _if F10100( l2v53z, (l2v53z + (1C))) _then gl21z := false;
+        _);
+      _until gl21z;
+      gl85z := (gl85z - [28]);
+    _) _else _(
+       l2v42z := (((1008) - l2v55z) + (1C));
+       (loop) _for l2v53z := l2v41z _downto l2v42z _do _(
+         _if _not F10100( (l2v53z - (1C)), l2v53z) _then _exit loop;
+       _);
+     _)
+    _); (* 11712 *)
+    _if (l2v10z _or l2v11z) _and _not l2v16z _then 
+      writeZone( (66C), (523) );
+% 11721
+    _if l2v27z _and _not l2v11z _and ((13C) _IN gl87z) _then _(
+      _while charidx <> 1 _do logChar(space);
+      unpck(l2v118z[1], logPacked[5]);
+      l2v118z[2] := chr(ord(l2v9z));
+      pck(l2v118z[1], logPacked[5]);
+      saveLog;
+    _); (* 11741 *)
+    deq66;
+    _if _not l2v13z _then _(
+    _if _not l2v10z _then 
+      write('БУДЕМ ИГРАТЬ БЕЗ СЧЕТА')
+    _else _(
+      write('СЧЕТ ');
+      _if (l2v57z = l2v56z) _or l2v11z_then write('ОСТАЛСЯ  ')
+      _else write('СТАЛ  ');
+      write(jinnScore:1, userScore:4);
+       _);
+       TTOUT;
+      _)
+    _); (* 11767 *)
+    _goto 12341;
+   _)_); (* 11770 *)
+  P7674;
+  l2v126z := (0C);
+11772:
+   nextMove := ord(l2v154z[1]);
+   l2v78z := (l2v78z - (1C));
+   _for l2v51z := (1C) _to l2v78z _do 
+     l2v154z[l2v51z] := l2v154z[(l2v51z + (1C))];
+   _if (nextMove = (0C)) _or (nextMove > (6C)) _then _(
+     write('ОШИБКА - ПОВТОРИ');
+12013:
+     putNchars(up, (2C) );
+     TTOUT;
+     _goto 11027;
+  _);
+  _if (unpState[user].pits[nextMove].val = (0C)) _then _(
+    write(nextMove:1, ' ЛУНКА ПУСТАЯ');
+    l2v78z := (0C);
+    _goto 12013;
+  _);
+  putNchars(up, l2v79z );
+  _) _else 12032: _( (* 12032 *)
+    l2v56z := (l2v56z + (1C));
+    l2v80z := l2v73z;
+    _if l2v17z _then l2v61z := (2C);
+    l2v62z := l2v61z;
+    nextMove :=   F5206(unpState, l2v133z, l2v62z );
+    l2v80z := (l2v73z - l2v80z);
+    l2v46z := (0C);
+    l2v47z := ;
+% 12051
+    _while (Level > (2C)) _and _not l2v17z _and _not l2v25z _and (l2v80z > l2v47z) _and
+       (((l2v62z = (2C)) _and (l2v80z < (24C))) _or
+       ((l2v62z = (3C)) _and (l2v80z < (60C))) _or
+       ((l2v62z >= (4C)) _and  (l2v80z < (122C)))) _do _(
+      l2v47z := l2v80z;
+      l2v80z := l2v73z;
+      l2v46z := (l2v46z + (1C));
+      l2v129z := l2v129z - l2v130z;
+      nextMove :=   F5206(unpState, l2v133z, l2v62z + l2v46z);
+      l2v45z := (l2v45z + (1C));
+      l2v80z := (l2v73z - l2v80z);
+    _); (* 12111 *)
+    l2v78z := (0C);
+  _); (* 12112 *)
+  _if l2v28z _and (l2v66z < (17C)) _then
+    nextMove := correction( nextMove );
+  l2v99z := unpState;
+  _if (l2v53z = (0C)) _then _(
+    write(arrow, nextMove:1);
+    phrase;  write(lf);
+    putNchars(down, (2C) );
+  _);
+  _if l2v27z _then logChar( chr(nextMove) );
+  l2v125z :=   performMove(unpState, nextMove );
+  putNchars(down, (1C) );
+  _if (l2v125z <> (0C)) _then _goto 12162;
+  _if (l2v56z = (14C)) _and F4210(unpState) _then
+    _goto 12240
+  _else
+    _goto 12032;
+12162:
+  _if l2v25z _then _(
+    _if (l2v70z <= (8415)) _then _(
+      l2v70z := ((l2v70z * (6C)) + nextMove);
+      _if (l2v66z < (6C)) _then l2v71z := ((l2v71z * 8) + nextMove);
+    _) _else _(
+      l2v25z := false;
+      l2v28z := true;
+    _)
+  _); (* 12176 *)
+  l2v38z := ((144) - ((unpState[jinn].pits[7].val + unpState[user].pits[7].val) * 4));
+  _if (l2v38z < (12C)) _then l2v38z := (12C);
+   l2v66z := (l2v66z + (1C));
+   _if (l2v125z = (1C)) _then _(
+     l2v65z := (l2v65z + (1C));
+     _if l2v27z _then logChar(space);
+  _); (* 12214 *)
+  _if F4210(unpState) _then _(
+    l2v56z := (l2v53z + (1C));
+    _if (l2v125z = (2C)) _then  l2v56z := ((l2v56z + (1C)) - (l2v53z * 2));
+    putNchars(up, l2v56z );
+    l2v125z :=   performMove(unpState, (0C) );
+    putNchars(down, (3C) );
+    TTOUT;
+  _) _else
+    _goto 10773;
+12240:
+  putNchars(down, (2C) );
+  write('ИГРА КОНЧИЛАСЬ');
+12244:
+  TTOUT;
+  gl90z := l2v29z;
+  _if gl90z _then _( 
+    l2v56z := (3C);
+    code(зч76013=);
+  _);
+% 12252
+  l2v57z := unpState[jinn].pits[7].val;
+  l2v56z := unpState[user].pits[7].val;
   (* ... *)
-     _) (* 11712 *)
-    _) (* 11767 *)
-   _)_) (* 11770 *)
-  _); (* 12032 *)
-  writeln(F5206(unpState,unpState,0));
-  11772:; 12244:; 12341:; 
-  phrase
+  write('ПАРТИЯ НЕДОИГРАНА');
+  write('НИЧЬЯ');
+  writeJinn;
+  write('ВЫИГРАЛ ', l2v57z:1, colon, l2v56z:1);
+  writeUser;
+  write('ВЫИГРАЛ ', l2v56z:1, colon, l2v57z:1);
+12341:;
+  write(tempfile,'СОN  {377':6);
+  _GOTO 12633;
+% 12356
+  writeJinn;
+  write('ДУМАЛ ', (jinnTicks + (31C)) _DIV 50:1, ' СЕК');
+  TTOUT;
+  writeUser;
+  write('ДУМАЛ ', (userTicks + (31C)) _DIV 50:1, ' СЕК');
+  TTOUT;
+  write('ПРОТОКОЛ ПАРТИИ:');
+  TTOUT;
+
 _);
 (* main program *)
 
-_(      
-  i := remTime; i := ticks; writeJinn; writeUser; ttin(true); gl90z := checkTime;
-  checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); readZone(0,0); writeZone(0,0);
-  enq66; deq66; gl90z := getminel(i, b); P2023(ls); toLargeSet(1, ls); gl90z := inLargeSet(1, ls);
-  i := getDays + F2355(0,0) + zeller(0,0,0);
-  checkOpen; playKalah; 
-  TTOUT; P2747;
+_(
+  i := 200000000000B; i := 500; i := 250;
+  write('ТАМБОВ', 'ИГР   ','КАЛ   ','ТУР   ','ПЕЧ   ','ЭКР   ','ШКО   ',
+  'В БЛОКЕ НЕТ ПРИКАЗА ', 'НЕ ПОНИМАЮ');
+  checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); 
+  playKalah; 
   12561 :; 12633 :
 _).     
