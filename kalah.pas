@@ -1,5 +1,5 @@
 (*=p-,t-,l+*)_program КАЛАХ;
-_label 12561, 12633;
+_label 12561, 12566, 12633;
 _const list = 64000B; jinn = 0; user = 1;
 c54 = 54; z236 = 2400236B; c517 = 517; c523 = 523;
 z730 = 1660730B; z153 = 400153B; z635 = 660635B; c522 = 522;
@@ -608,7 +608,7 @@ _( (* saveLog *)
   _)
 _);
 _procedure playKalah;
-_label 10266, 999, 12341, 11616, 11531, 11027, 12032, 12162,
+_label 10266, 999, 12341, 11426, 11616, 11531, 11027, 12032, 12162,
 11225, 11252, 11772, 11142, 12013, 12240, 12244, 10773;
 _const caa = 7346545000B; cab = 575360400B;
 cac = 37777202417400C; cad = 303240B;
@@ -621,7 +621,7 @@ pckboth = _array [jinn..user] _of word;
 eightwords = _record f0, f1, f2, f3, f4, f5, f6, f7:integer _end;
 _var l2v1z, l2v2z, l2v3z, l2v4z:alfa;
 l2v5z, l2v6z, l2v7z, l2v8z:alfa;
-l2v9z, l2v10z, l2v11z, l2v12z, l2v13z, l2v14z,
+l2v9z:char; l2v10z, l2v11z, l2v12z, l2v13z, l2v14z,
 l2v15z, l2v16z, l2v17z: boolean; l2v18z: boolean;
 l2v19z, efendi, l2v21z, l2v22z:boolean;
 wrongGender, l2v24z, l2v25z, l2v26z, l2v27z, l2v28z:boolean;
@@ -2416,7 +2416,7 @@ _( (* playKalah *)
    _) _else
    l2v132z@.f13[5] := 'ПРОД: ';
   _);
-% 11426
+11426:
   l2v153z := ptr((Level * (14C)) + (65354C));
   _if _not l2v11z _and _not l2v12z _and _not l2v13z _then _(
     l2v153z@[0].i := l2v153z@[0].i + 1;
@@ -2520,7 +2520,7 @@ _( (* playKalah *)
     _if l2v27z _and _not l2v11z _and ((13C) _IN gl87z) _then _(
       _while charidx <> 1 _do logChar(space);
       unpck(l2v118z[1], logPacked[5]);
-      l2v118z[2] := chr(ord(l2v9z));
+      l2v118z[2] := l2v9z;
       pck(l2v118z[1], logPacked[5]);
       saveLog;
     _); (* 11741 *)
@@ -2638,26 +2638,57 @@ _( (* playKalah *)
 % 12252
   l2v57z := unpState[jinn].pits[7].val;
   l2v56z := unpState[user].pits[7].val;
-  (* ... *)
-  write('ПАРТИЯ НЕДОИГРАНА');
-  write('НИЧЬЯ');
-  writeJinn;
-  write('ВЫИГРАЛ ', l2v57z:1, colon, l2v56z:1);
-  writeUser;
-  write('ВЫИГРАЛ ', l2v56z:1, colon, l2v57z:1);
-12341:;
-  write(tempfile,'СОN  {377':6);
-  _GOTO 12633;
-% 12356
+  _select
+    (l2v57z <= 36) _and (l2v56z <= 36) _and ((l2v57z + l2v56z) < 72) _and l2v13z:
+      write('ПАРТИЯ НЕДОИГРАНА');
+    (l2v57z = l2v56z): _(
+      write('НИЧЬЯ');
+      l2v9z := 'Н';
+    _);
+    (l2v57z > l2v56z): _(
+      writeJinn;
+      write('ВЫИГРАЛ ', l2v57z:1, colon, l2v56z:1);
+      _if (l2v57z > (44C)) _then l2v9z := '+'
+      _else l2v9z := 'C';
+      l2v48z := (1C);
+    _);
+    true:_(
+      writeUser;
+      write('ВЫИГРАЛ ', l2v56z:1, colon, l2v57z:1);
+      l2v9z := '-';
+      l2v49z := (1C);
+    _)
+  _end; (* 12326 *)
+  TTOUT;
+  l2v11z := false;
+  _if l2v16z _then _goto 12341;
+  enq66;
+  readZone( (66C), (523) );
+  l2v55z := bufptr@[1].i;
+  _goto 11426;
+12341:
+  sigrestore;
+  _if l2v24z _then _(
+    gl18z := (0C);
+    rewrite(tempfile);
+    gl87z := (gl87z + [47]);
+    write(tempfile,'СОN  {377');
+    _GOTO 12633;
+  _); (* 12356 *)
   writeJinn;
   write('ДУМАЛ ', (jinnTicks + (31C)) _DIV 50:1, ' СЕК');
   TTOUT;
   writeUser;
   write('ДУМАЛ ', (userTicks + (31C)) _DIV 50:1, ' СЕК');
   TTOUT;
-  write('ПРОТОКОЛ ПАРТИИ:');
-  TTOUT;
-
+  _if l2v27z _then _(
+    write('ПРОТОКОЛ ПАРТИИ:');
+    TTOUT;
+    _for l2v53z := (2C) _to (logidx - (1C)) _do
+      write(logPacked[l2v53z]);
+    TTOUT;
+  _); 
+  _if l2v21z _then _goto 12566;
 _);
 (* main program *)
 
@@ -2667,5 +2698,5 @@ _(
   'В БЛОКЕ НЕТ ПРИКАЗА ', 'НЕ ПОНИМАЮ');
   checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); 
   playKalah; 
-  12561 :; 12633 :
+  12561 :; 12566:; 12633 :
 _).     
