@@ -1,12 +1,12 @@
 (*=p-,t-,l+*)_program КАЛАХ;
-_label 12561, 12566, 12633;
+_label 12561, 12566, 12633, 12636;
 _const list = 64000B; jinn = 0; user = 1;
 c54 = 54; z236 = 2400236B; c517 = 517; c523 = 523;
 z730 = 1660730B; z153 = 400153B; z635 = 660635B; c522 = 522;
 z600 = 660600B; z611 = 660611B; c4 = 4; c5 = 5; c25 = 25;
 etx = '{377'; c62 = 62; c1008 = 1008; space = ' '; dot = '.';
 c13 = 13; c10 = 10; c11 = 11; lf = '{214'; cr = '{175'; c212 = 21;
-spaces = '      '; arrow = ' =++> '; admin = '417700'; sleep = 'sle   ';
+spaces = '      '; arrow = ' =++> '; admID = '417700'; sleep = 'sle   ';
 fin = '(FIN){175'; colon = ':'; oparen = '('; cparen = ')'; excl = '!'; qmark = '?';
 c49 = 49; c45 = 45; c47 = 47; c36 = 36; c50 = 50; femEnding = 'A'; c61 = 61;
 K = 'K'; c51 = 51; c60 = 60; z = 'z'; c9 = 9; e10p1 = 1777B; c6 = 6;
@@ -41,9 +41,9 @@ gender = integer;
 _var
 gl10z,
 entered, gl12z:alfa;
-gl13z,gl14z,gl15z,logidx,charidx,gl18z:integer;night,gl20z, gl21z:boolean;
-gl22z,gl23z,gl24z,gl25z,gl26z,gl27z,gl28z:integer;bufptr:@zone;
-gl29z:_array[1..5] _of word; gl35z: integer;
+gl13z,gl14z,gl15z,logidx,charidx:integer;gl18z,night,admin, gl21z:boolean;
+startRemTime,startWallClock,gl24z,gl25z,gl26z,gl27z,gl28z:integer;bufptr:@zone;
+gl30z:sixchars;
 curLogWord:sixchars; 
 logPacked:_array [1..30] _of alfa;
 gl72z:integer;gl73z:bitset;gl74z,gl75z,gl76z,gl77z,gl78z,gl79z,gl80z:integer;
@@ -56,8 +56,7 @@ gl102z,gl103z,gl104z,gl105z,gl106z,gl107z,gl108z,gl109z,gl110z:integer;
 gl111z,gl112z,gl113z,gl114z,gl115z,gl116z,gl117z,gl118z,gl119z,gl120z:integer;
 gl121z,gl122z,gl123z,gl124z,gl125z,gl126z,gl127z,gl128z,gl129z,gl130z:integer;
 gl131z,gl132z,gl133z:integer;
-tempfile:text;
-i,j:integer;b:bitset;ls:largeset;aa:alfa;
+tempfile:text;gl420z:integer;
 _function remTime:integer;
 _( code(Э0634=,); remTime := ; _);
 
@@ -70,7 +69,7 @@ _( write('ДЖИН ') _);
 _procedure writeUser;
 _var i:integer;
 _(
- _for i := 1 _to 5 _do write(gl29z[i].c);
+ _for i := 1 _to 5 _do write(gl30z[i]);
 _);
 
 _procedure TTIN(top:boolean);
@@ -91,7 +90,7 @@ _(
     v2 := v2 + 1;
     _if v2 > 128 _then _(
       rewrite(tempfile);
-      gl18z := 0;
+      gl18z := false;
       write(tempfile,'SLЕ  {377');
       gl87z := gl87z + [47];
       _goto 1570
@@ -118,7 +117,7 @@ _(
     rewrite(output);
     rewrite(tempfile);
     writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
-    gl18z := 0;
+    gl18z := false;
     write(tempfile,'КОН  {377');
     checkTime := true; exit 
   _)
@@ -392,7 +391,7 @@ _(
 2:
         rewrite(tempfile);
         write(tempfile,'ВЫХ  {377');
-        gl18z := (0C);
+        gl18z := false;
         _GOTO 12633;
       _);
     _until (l2v2z >= 47);
@@ -525,7 +524,7 @@ _);
 
 _procedure checkAdmin;
 _(
-  _if _not gl20z _then _(
+  _if _not admin _then _(
     writeln('ВАМ НЕЛЬЗЯ');
     _GOTO 12561;
   _)
@@ -2669,7 +2668,7 @@ _( (* playKalah *)
 12341:
   sigrestore;
   _if l2v24z _then _(
-    gl18z := (0C);
+    gl18z := false;
     rewrite(tempfile);
     gl87z := (gl87z + [47]);
     write(tempfile,'СОN  {377');
@@ -2690,13 +2689,93 @@ _( (* playKalah *)
   _); 
   _if l2v21z _then _goto 12566;
 _);
+
+_procedure P12424;
+_var l2v1z, l2v2z: integer;
+_(
+  code(Э0634=,);
+  l2v1z := ;
+  l2v1z := (l2v1z - startRemTime);
+  _if (l2v1z < (0C)) _then exit;
+  code(Э05310=,);
+  l2v2z := ;
+  l2v2z := (l2v2z - startWallClock);
+  _if l2v2z < 0 _then exit;
+  gl24z := l2v1z _div 4;
+  P1634( (37C) );
+  gl24z := shift(l2v2z, 9);
+  (q) P1634( (41C) ); 
+_);
+_procedure exec(arg:integer);
+_procedure P12450(_var f:text; _var i:integer; j:integer); _( code(ПБ76022=,); _);
+_(
+  _if gl18z _then _goto 12636;
+  gl87z := (gl87z + [13]);
+  P12424;
+  P12450(tempfile, gl72z, (76C) );
+_);
+_procedure P12501;
+_var l2v1z, l2v2z: integer;
+_procedure P12473(_var f:text; _var i:integer; j:integer); _( code(ПБ76021=); _);
+_(
+  P12473(tempfile, gl72z, (76C) );
+  unpck(gl30z[1], ogchezk );
+  gl30z[5] := space;
+  admin := (ogchezk = admID);
+  l2v1z := sel(gl75z, 16, 8);
+  l2v2z := sel(gl75z, 24, 8);
+  gl26z := (500);
+  gl27z := trunc((gl26z - 250) / 500);
+  _GOTO 12566;
+_);
 (* main program *)
 
 _(
-  i := 200000000000B; i := 500; i := 250;
-  write('ТАМБОВ', 'ИГР   ','КАЛ   ','ТУР   ','ПЕЧ   ','ЭКР   ','ШКО   ',
-  'В БЛОКЕ НЕТ ПРИКАЗА ', 'НЕ ПОНИМАЮ');
-  checkNo; i := F1631(1); P1634(0); write(getTime); printTenths(54); 
-  playKalah; 
-  12561 :; 12566:; 12633 :
+  gl24z := 1;
+  code(Э0634=,);
+  startRemTime := ;
+  code(Э05310=,);
+  startWallClock := ;
+  bufptr := ptr(64000C);
+  gl18z := true;
+  night := false;
+  code(СЧ76421=); gl420z := ;
+  code(СЧ76233=); gl12z := ;
+  _if gl12z <> 'ТАМБОВ' _then _(
+    code(СЧ=Э0620,);
+    _goto 12561
+  _);
+  P12501;
+12561:
+  _if checkTime _then _goto 12633;
+  TTIN(true);
+  gl18z := false;
+12566:
+  _if F2573B(entered, (3C)) _then _(
+    _if ('ИГР   ' = entered) _then _(
+      _if (tempfile@ = etx) _then _goto 12561 _else _goto 12566;
+    _) _else _( 
+      _if ('КАЛ   ' = entered) _then playKalah
+      _else _if ('ТУР   ' = entered) _or
+                ('ПЕЧ   ' = entered) _or
+                ('ЭКР   ' = entered) _then _(
+         gl18z := false;
+         exec( (2400236C) );
+      _)
+      _else _if ('ШКО   ' = entered) _then _(
+        gl18z := false;
+        gl21z :=   F2573B(entered, (3C) );
+        _if (entered = 'КАЛ   ') _or (entered = 'ТУР   ') _then exec( (2400236C) );
+        _goto 12633;
+      _) _else _if ('КОН   ' = entered) _then _(
+12633:
+        exec( (1660730C) );
+      _) _else _if gl18z _then _(
+12636:
+        writeln('В БЛОКЕ НЕТ ПРИКАЗА ', entered);
+      _) _else _goto 12633;
+    _); (* 12647 *) (q) _exit q
+  _) _else  (* 12650 *) 
+     writeln('НЕ ПОНИМАЮ');
+  _goto 12561;
 _).     
