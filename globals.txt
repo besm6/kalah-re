@@ -1,0 +1,15 @@
+19	night
+11	entered
+16	logidx
+134	tempfile
+20	admin
+22	startRemTime
+23	startWallClock
+29	bufptr
+83	ogchezk
+35	curLogWord
+41	logPacked
+42	logPacked[1]
+43	logPacked[2]
+44	logPacked[3]
+45	logPacked[4]

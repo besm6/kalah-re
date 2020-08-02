@@ -1,0 +1,71 @@
+12473 P12473 p
+12501 P12501 p
+4612 F4612 f
+5104 consult f
+5206 F5206 f
+4273 U4273 f
+1477 writeJinn
+1503 writeUser
+1470 ticks f
+1464 remTime f
+1515 TTIN p
+1576 checkTime f
+1622 checkNo p
+1672 getTime f
+1732 printTenths p
+1764 enq66 p
+1772 deq66 p
+2000 getMinel f
+2035 toLargeSet p
+2055 inLargeSet f
+2075 getDate f
+2141 getDays f
+2147 months f
+2367 zeller f
+2416 checkOpen p
+2573 F2573B f
+2601 packPits p
+2654 getName p
+2731 TTOUT p
+3135 logWord
+3145 logChar
+3162 initLog
+3275 random f
+2355 F2355 f
+2625 unpackPits p
+2767 drawPits
+3006 drawField
+3113 title p
+3125 checkAdmin
+3315 RAND0
+3326 randint f
+3336 checkEnding f
+3362 eqstr f
+3404 F3404 f
+3421 putNchars p
+3435 packBoth p
+3455 unpckBoth p
+3475 F3475 f
+3606 drawMove p
+3742 F3742B f
+6070 Dear
+6101 maybeFeminine
+6111 countEnding
+6132 phrase p
+10100 F10100 f
+10212 playKalah
+12457 exec
+1750 readZone p
+1756 writeZone p
+7674 P7674B p
+7735 sigrestore
+10432 onIntr
+5072 assertOpenings
+3222 saveLog p
+12424 P12424 p
+4363 estimate f
+4327 diff f
+6034 chkRandom f
+5663 correction f
+3742 performMove f
+12450 P12450 p
