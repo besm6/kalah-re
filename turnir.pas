@@ -1,4 +1,5 @@
-(*=p-,t-,m-*)
+(*=p-,t-,m-,д+*)
+(* д+ = get(INP) -> code(=16ПВ76312,) *)
 _program ШККАЛ;
 _label 3606,3613,3652,3655;
 _const c54=54;c1013=1013B;
@@ -14,7 +15,7 @@ t2=0..6;t3=0..7;t4=1..2;t5=0..39;
 contents = _record val:integer _end;
 OneSide = _record move:integer; pits:_array [1..7] _of contents _end;
 _var cmd, tambov: alfa;
-g12z:boolean;
+topBlock:boolean;
 admin:boolean;
 startRemTime,startWallClock, g16z, g17z:integer;
 pptr:@page;
@@ -29,7 +30,7 @@ g41z, g42z: integer;
 prnEnable, g44z, dpyEnable:boolean;
 g46z: integer;
 g47z:_array [0..39] _of integer;
-tempfile:text;
+INP:text;
 
 _procedure L1321; _( code(=14ПВ76255,) _); (* ???? *)
 
@@ -41,8 +42,8 @@ _);
 
 _proced putCmd(cmd:alfa);
 _(
- rewrite(tempfile);
- write(tempfile, cmd);
+ rewrite(INP);
+ write(INP, cmd);
 _);
 
 _procedure TTIN(top:boolean);
@@ -52,45 +53,45 @@ _(
   _if top _then  BIND(' ==* {172') _else  BIND(' =-* {172');
   _if prnEnable  _then _(
     code(СЧ76013=УИ7,);
-    v1 := (2); code(ЗЧ76013=,);
+    v1 := 2; code(ЗЧ76013=,);
     _if top _then write(' ==* ')
     _else write(' =-* ');
   _);
-  rewrite(tempfile);
-  v2 := (0);
-  _while input@ <> chr(255) _do _(
+  rewrite(INP);
+  v2 := 0;
+  _while input@ <> etx _do _(
     _if prnEnable _then write(input@);
     v2 := v2 + 1;
     _if v2 > 128 _then _(
-      g12z := false;
+      topBlock := false;
       putCmd('SLЕ  {377');
       g40z := g40z + [47];
       _goto 1
     _);
-    write(tempfile,input@);
+    write(INP,input@);
     get(input);
   _); (* while *)
-  write(tempfile, etx);
+  write(INP, etx);
   1:
-  reset(tempfile);
+  reset(INP);
   _if prnEnable _then _(
     writeLN;
     code(ВИ7=ЗЧ76013,);
   _);
 _);
 
-_function L1423:boolean;
+_function timeout:boolean;
 _var i:integer;
 _(
- L1423 := false;
+ timeout := false;
  code(Э0634=,);
  i := ;
  _if g33z - i < 170B _then _(
    rewrite(output);
    writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
-   g12z := false;
+   topBlock := false;
    putCmd( 'КОН  {377' );
-   L1423 := true;
+   timeout := true;
   _);
 _);
 
@@ -256,7 +257,7 @@ _);
 _proced schKalah;
 _var l2v1z: _array [0..1] _of integer;
 _(
- L1451( (2) );
+ L1451( 2 );
  write(sp);
  L2037;
  write('
@@ -268,7 +269,7 @@ _(
  TTOUT;
  write(lf, 'И Г Р О В О Е   П О Л Е':44, lf);
  TTOUT;
- l2v1z[0] := (60606060606000C);
+ l2v1z[0] := 60606060606000C;
  l2v1z[1] := ;
  drawField( l2v1z );
  write('
@@ -374,7 +375,7 @@ _label 1, 2;
 _var l2v1z:integer;
 _(
   _select
-  tempfile@ = 'Д': 1: _(
+  INP@ = 'Д': 1: _(
     l2v1z := 2; code(ЛС76013=ЗЧ76013,);
     writeln('ВКЛЮЧЕНА ПЕЧАТЬ АЦПУ');
     prnEnable := true;
@@ -383,12 +384,12 @@ _(
       g44z := false;
     _);
   _);
-  tempfile@  = 'Н': 2: _(
+  INP@  = 'Н': 2: _(
     prnEnable := false;
     writeln('ВЫКЛЮЧЕНА ПЕЧАТЬ АЦПУ');
     code(СЧ76013=ЛУ13,ЗЧ76013=);
   _);
-  tempfile@ = etx: _if prnEnable _then _goto 2 _else _goto 1;
+  INP@ = etx: _if prnEnable _then _goto 2 _else _goto 1;
   true: writeln('НЕПОНЯТНО')
   _end
  _);
@@ -398,33 +399,33 @@ _label 1, 2;
 _var l2v1z:integer;
 _(
   _select
-  tempfile@ = 'Д': 1: _(
+  INP@ = 'Д': 1: _(
     code(СЧ13=ЛС76013,ЗЧ76013=);
     writeln('ВКЛЮЧЕНА АЧА НА ЭКРАН');
     dpyEnable := true;
   _);
-  tempfile@  = 'Н': 2: _(
+  INP@  = 'Н': 2: _(
     dpyEnable := false;
     writeln('ВЫКЛЮЧЕНА АЧА НА ЭКРАН');
     l2v1z := 2; code(ЛУ76013=ЗЧ76013,СЧ=ЗЧ77015,);
   _);
-  tempfile@ = etx: _if dpyEnable _then _goto 2 _else _goto 1;
+  INP@ = etx: _if dpyEnable _then _goto 2 _else _goto 1;
   true: writeln('НЕПОНЯТНО')
   _end
  _);
 _procedure exec(arg:integer);
 _procedure L2340(_var f:text; _var i:integer; j:integer); _( code(ПБ76022=,); _);
 _(
-  _if g12z _then _GOTO 3655;
+  _if topBlock _then _GOTO 3655;
   g40z := (g40z + [13]);
   L2214;
-  L2340(tempfile, g25z, (76C) );
+  L2340(INP, g25z, 62);
 _);
 
 _procedure L2371;
 _procedure L2363(_var f:text; _var i:integer; j:integer); _( code(ПБ76021=); _);
 _(
-  L2363(tempfile, g25z, 62);
+  L2363(INP, g25z, 62);
   unpck(userID[1], pckUID);
   userID[5] := sp;
   admin := pckUID = admID;
@@ -447,9 +448,9 @@ _(
    l2v1z = 'ШКО   ': _goto 2413;
    (l2v1z = 'КОН   ') | (l2v1z = 'ВЫХ   '): exit;
    true: _( putCmd( 'ШКО   ' );
-     write(tempfile, l2v1z);
-     tempfile@ := etx;
-     put(tempfile);
+     write(INP, l2v1z);
+     INP@ := etx;
+     put(INP);
      _GOTO 3652;
    _)
  _end
@@ -458,39 +459,39 @@ _);
 _proced tournament;
 _label 3275;
 _const c12=12;c50=50;c41=41;
-_var l2v1z:alfa; l2v2z, l2v3z, i, l2v5z, l2v6z, l2v7z:integer;
-l2v8z, l2v9z:integer;
-l2v10z, l2v11z, l2v12z, l2v13z, l2v14z, l2v15z:integer;
+_var mask:alfa; unus1, n, i, nEnt, totDjin, totHomo:integer;
+uidDigs, pos:integer;
+categ, curCat, totDispl, Homo, Djin, l2v15z:integer;
 l2v16z, l2v17z, l2v18z:integer;
-l2v19z:integer;
-l2v20z:alfa;
-l2v21z:integer;
-l2v22z:alfa;
-l2v23z:sixchars;
-l2v29z:sixchars;
-l2v35z,l2v36z,l2v37z,l2v38z:boolean;
-l2v39z:bitset;
-l2v40z:char;
+curRec:integer;
+curUID:alfa;
+unus2:integer;
+name2:alfa;
+got:sixchars;
+want:sixchars;
+aboveDots,good,stats,delete:boolean;
+catSet:bitset;
+ch:char;
 curptr:@page;
-(* Level 3 *) _proced L2457(l3a1z: integer);
+(* Level 3 *) _proced wrStat(l3a1z: integer);
 _var l3v1z, l3v2z:integer;
 _(
   l3v1z := curptr@[l3a1z];
-  _if (l3a1z < (4)) _then _(
+  _if l3a1z < 4 _then _(
     l3v1z := round(l3v1z / 50);
   _);
-  _if (l2v7z > (0)) _then _(
-    l3v1z := round(l3v1z*10 / l2v7z);
+  _if totHomo > 0 _then _(
+    l3v1z := round(l3v1z*10 / totHomo);
   _);
   l3v2z := l3v1z _div 10;
   l3v1z := l3v1z - l3v2z * 10;
   write(l3v2z:5, dot, l3v1z:1);
 _);
-(* Level 3 *) _proced L2515(l3a1z:alfa);
+(* Level 3 *) _proced wrDate(l3a1z:alfa);
 _(
-  unpck(l2v23z[1], l3a1z );
-  write(l2v23z[1]:2 );
-  write(l2v23z[2], dot, l2v23z[3], l2v23z[4], dot, l2v23z[5], l2v23z[6], sp);
+  unpck(got[1], l3a1z );
+  write(got[1]:2 );
+  write(got[2], dot, got[3], got[4], dot, got[5], got[6], sp);
  _);
 
 (* Level 3 *) _proced drawLine(l3a1z:char);
@@ -502,19 +503,19 @@ _(
  TTOUT;
  _);
 
-(* Level L2630 *) _function L2630(l3a1z, l3a2z, l3a3z:integer):integer;
+(* Level fora *) _function fora(l3a1z, l3a2z, l3a3z:integer):integer;
 _label 2644;
 _var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z, l3v6z:integer; 
 (* Level L2561 *) _function L2561(l4a1z:integer):boolean;
 _var l4v1z, l4v2z, l4v3z:integer;
 _(
-  l4v3z := (l4a1z + l3a2z);
-  _if (l4v3z = (0)) _then _(  L2561 := false; EXIT _);
-  _if (l3v5z = (0)) _then _(  L2561 := true;  EXIT _);
+  l4v3z := l4a1z + l3a2z;
+  _if l4v3z = 0 _then _(  L2561 := false; EXIT _);
+  _if l3v5z = 0 _then _(  L2561 := true;  EXIT _);
   l4v1z := l4a1z * l3v5z;
   l4v2z := l2v15z * l4v3z;
-  _if (l4v1z = l4v2z) _then _(
-    _if (l4v1z = (0)) _then _(
+  _if l4v1z = l4v2z _then _(
+    _if l4v1z = 0 _then _(
       L2561 := l3a2z < l2v16z;
     _) _else _(
       L2561 := (l4a1z > l3a2z) _and (l4a1z > l2v15z) _or (l4a1z < l3a2z) _and (l4a1z < l2v15z);
@@ -523,225 +524,225 @@ _(
     L2561 := l4v1z > l4v2z;
   _)
 _);
-_( (* L2630 *)
-  _if (l2v12z = (1)) _then _(  L2630 := (0); EXIT _);
+_( (* fora *)
+  _if totDispl = 1 _then _(  fora := 0; EXIT _);
   l3v2z := 255 - l3a1z - l3a2z;
-  _if (l3v2z = (0)) _then 2644: _( L2630 := (256); EXIT _);
-  l3v3z := (0);
-  l3v5z := (l2v15z + l2v16z);
-  _while (l3a3z < l2v18z) _do _(
+  _if l3v2z = 0 _then 2644: _( fora := 256; EXIT _);
+  l3v3z := 0;
+  l3v5z := l2v15z + l2v16z;
+  _while l3a3z < l2v18z _do _(
     _select
-    (l3a3z < (3)) : _(
-      l3v4z := ((l3a2z - l3a1z) + (1));
-      _if (l3v4z > l3v2z) _then _goto 2644;     
-      l3v2z := (l3v2z - l3v4z);
-      l3v3z := (l3v3z + l3v4z);
-      l3a1z := (0);
+    l3a3z < 3: _(
+      l3v4z := l3a2z - l3a1z + 1;
+      _if l3v4z > l3v2z _then _goto 2644;     
+      l3v2z := l3v2z - l3v4z;
+      l3v3z := l3v3z + l3v4z;
+      l3a1z := 0;
       l3a2z := ;
-      l3a3z := (l3a3z + (1));
+      l3a3z := l3a3z + 1;
     _);
     true: l3a3z := l3a3z + 1 
     _end;
  _);
- _if (l3a3z = (3)) & ((l3a1z + l3a2z) < 25) & (l3v5z >= 25) _then _(
-   l3v4z := ((25 - l3a1z) - l3a2z);
-   l3v3z := (l3v3z + l3v4z);
-   l3a1z := (l3a1z + l3v4z);
-   l3v2z := (l3v2z - l3v4z);
+ _if (l3a3z = 3) & (l3a1z + l3a2z < 25) & (l3v5z >= 25) _then _(
+   l3v4z := 25 - l3a1z - l3a2z;
+   l3v3z := l3v3z + l3v4z;
+   l3a1z := l3a1z + l3v4z;
+   l3v2z := l3v2z - l3v4z;
  _);
- _if (l3v5z < 25) _then l3v6z := ((25 - l3a1z) - l3a2z)
+ _if l3v5z < 25 _then l3v6z := 25 - l3a1z - l3a2z
  _else l3v6z := l3v2z;
  _for l3v1z := 0 _to l3v6z _do _(
-   _if (L2561( (l3a1z + l3v1z))) _then _(  L2630 := (l3v3z + l3v1z); EXIT _);
+   _if L2561(l3a1z + l3v1z) _then _(  fora := l3v3z + l3v1z; EXIT _);
  _);
- _if (l3a3z = (3)) & (l3v5z < 25) _then L2630 := (((l3v3z + 25) - l3a1z) - l3a2z)
- _else L2630 := (256);
+ _if (l3a3z = 3) & (l3v5z < 25) _then fora := l3v3z + 25 - l3a1z - l3a2z
+ _else fora := 256;
 _);
 _( (* tournament *)
- l2v1z := '    00';
- l2v6z := (0);
- l2v7z := ;
- l2v8z := ;
- l2v12z := ;
- l2v37z := ;
+ mask := '    00';
+ totDjin := 0;
+ totHomo := ;
+ uidDigs := ;
+ totDispl := ;
+ stats := ;
  L1451(11);
  _for i := 1 _to 4 _do _(;
-  _if tempfile@ _in digit _then _(
-    l2v29z[i] := tempfile@;
-    l2v8z := (l2v8z + (1));
-    code(=16ПВ76312,);
+  _if INP@ _in digit _then _(
+    want[i] := INP@;
+    uidDigs := uidDigs + 1;
+    get(INP);
   _);
  _);
  L1321;
- l2v38z := tempfile@ = 'И';
- _if l2v38z _then _(
+ delete := INP@ = 'И';
+ _if delete _then _(
    checkAdmin;
    enq66;
  _);
   readZone(66B, 1013B);
-  l2v5z := pptr@[1];
-  _if l2v38z  _then _(
-    _if (l2v8z <> (4)) _then _(
+  nEnt := pptr@[1];
+  _if delete  _then _(
+    _if uidDigs <> 4 _then _(
       writeln('ОШ ШИФ');
     _) _else _(
-      _for l2v3z := 1 _to l2v5z _do _(
-        l2v19z := pptr@[1008 - l2v3z];
+      _for n := 1 _to nEnt _do _(
+        curRec := pptr@[1008 - n];
         code(2РБ3=);
-        l2v20z := ;
-        unpck(l2v23z[1], l2v20z);
-        l2v36z := true;
+        curUID := ;
+        unpck(got[1], curUID);
+        good := true;
         (a) _for i := 1 _to 4 _do _(
-          _if (l2v29z[i] <> l2v23z[i]) _then _(
-            l2v36z := false;
+          _if (want[i] <> got[i]) _then _(
+            good := false;
             _exit a
           _);
         _);
-        _if l2v36z _then _(
-          l2v5z := (l2v5z - (1));
-          l2v38z := false;
-          _for i := l2v3z _to l2v5z _do _(
+        _if good _then _(
+          nEnt := nEnt - 1;
+          delete := false;
+          _for i := n _to nEnt _do _(
             pptr@[1008 - i] := pptr@[1008 - i - 1];
           _);
-          pptr@[1] := l2v5z;
+          pptr@[1] := nEnt;
         _);
       _);
     _); (* 3055 *)
     writeZone( 66B, 1013B );
     deq66;
-    _for i := 1 _to 4 _do write(l2v29z[i]);
-    _if l2v38z  _then  write(' НЕ НАЙДЕН') _else  write(' ИСКЛЮЧЕН');
+    _for i := 1 _to 4 _do write(want[i]);
+    _if delete  _then  write(' НЕ НАЙДЕН') _else  write(' ИСКЛЮЧЕН');
     writeln;
     _GOTO 3606;
   _); (* 3101 *)
-  _if (tempfile@ = 'Q') _then _(
+  _if INP@ = 'Q' _then _(
     checkAdmin;
     enq66;
-    readZone( (54), (523) );
-    l2v5z := pptr@[1];
-    _for l2v3z := 1 _to l2v5z _do _(
-      ins(pptr@[1008-l2v3z], 0, 29, 3);
+    readZone( 66B, 1013B );
+    nEnt := pptr@[1];
+    _for n := 1 _to nEnt _do _(
+      ins(pptr@[1008-n], 0, 29, 3);
     _);
-    writeZone( (54), (523) );
+    writeZone( 66B, 1013B );
     deq66;
     _GOTO 3606;
   _); (* 3133 *)
   L1321;
-  _if (tempfile@ = etx) _then l2v39z := [1:4]
+  _if INP@ = etx _then catSet := [1:4]
   _else _(
-    l2v39z := [];
-   _while (tempfile@ <> etx) _do _(
-   l2v3z := (0);
+    catSet := [];
+   _while INP@ <> etx _do _(
+   n := 0;
    _select
-    tempfile@ = 'Ю': l2v3z := (4);
-    tempfile@ = 'К': l2v3z := (3);
-    tempfile@ = 'У': l2v3z := (2);
-    tempfile@ = 'Э': l2v3z := (1);
-    tempfile@ = 'С': l2v37z := true
+    INP@ = 'Ю': n := 4;
+    INP@ = 'К': n := 3;
+    INP@ = 'У': n := 2;
+    INP@ = 'Э': n := 1;
+    INP@ = 'С': stats := true
   _end;
-  l2v39z := [l2v3z] | l2v39z;
-  code(=16ПВ76312,);
+  catSet := [n] | catSet;
+  get(INP);
  _);
- l2v39z := l2v39z - [0];
+ catSet := catSet - [0];
   _); (* 3177 *)
   write('    ТУРНИР  " Д Ж И Н Н - Ч Е Л О В Е К "');
   TTOUT;
   write('С ':6);
-  (*=c-*)L2515(pptr@[1008] ); (*=c+*)
+  (*=c-*)wrDate(pptr@[1008] ); (*=c+*)
   write(' ПО ');
-  L2515(   getDate  );
+  wrDate(   getDate  );
   write('  НА ', getTime );
   TTOUT;
   drawLine( '=' );
- _if _not l2v37z | (l2v39z <> []) _then _(
+ _if _not stats | (catSet <> []) _then _(
     write('  IМЕСТО ШИФР  ФАМИЛИЯ      НОМО  ДЖИН ФОРI');
    _if admin  _then  write(' ОТЛ');
    TTOUT;
    drawLine( '-' );
-   l2v35z := true;
-   _while l2v39z <> [] _do _(
-  l2v3z := minel(l2v39z);
-  l2v39z := l2v39z - [l2v3z];
-  l2v10z := 5 - l2v3z;
+   aboveDots := true;
+   _while catSet <> [] _do _(
+  n := minel(catSet);
+  catSet := catSet - [n];
+  categ := 5 - n;
   l2v17z := ;
-  l2v9z := 0;
+  pos := 0;
   _select
-  l2v10z = 4: write('  I^^^^^^^^^^^ Э Ф Е Н Д И ^^^^^^^^^^^^^^^I');
-  l2v10z = 3: write('  I^^^^^^^^ У Ч А С Т Н И К И ^^^^^^^^^^^^I');
-  l2v10z = 2: write('  I^^^^^^^^ К А Н Д И Д А Т Ы ^^^^^^^^^^^^I');
-  l2v10z = 1: write('  I^^^^^^^^^^^ Ю Н И О Р Ы ^^^^^^^^^^^^^^^I')
+  categ = 4: write('  I^^^^^^^^^^^ Э Ф Е Н Д И ^^^^^^^^^^^^^^^I');
+  categ = 3: write('  I^^^^^^^^ У Ч А С Т Н И К И ^^^^^^^^^^^^I');
+  categ = 2: write('  I^^^^^^^^ К А Н Д И Д А Т Ы ^^^^^^^^^^^^I');
+  categ = 1: write('  I^^^^^^^^^^^ Ю Н И О Р Ы ^^^^^^^^^^^^^^^I')
   _end;
  TTOUT;
 3275:
- _for l2v3z := 1 _to l2v5z _do _(
-  l2v19z := pptr@[1008 - l2v3z];
+ _for n := 1 _to nEnt _do _(
+  curRec := pptr@[1008 - n];
   code(2РБ3=);
-  l2v20z := ;
-  l2v11z := sel(l2v19z, 24, 4);
-  l2v14z := sel(l2v19z, 0, 8);
-  l2v13z := sel(l2v19z, 8, 8);
- _if l2v11z > 2 _then_(
-   _if (l2v11z = 3) & _not l2v35z  & (l2v14z + l2v13z >= 25) _then  l2v11z := 0;
-   _if (l2v11z = 3) & l2v35z  & (l2v14z + l2v13z < 25) _then  l2v11z := 0;
+  curUID := ;
+  curCat := sel(curRec, 24, 4);
+  Djin := sel(curRec, 0, 8);
+  Homo := sel(curRec, 8, 8);
+  _if curCat > 2 _then_(
+   _if (curCat = 3) & _not aboveDots  & (Djin + Homo >= 25) _then  curCat := 0;
+   _if (curCat = 3) & aboveDots  & (Djin + Homo < 25) _then  curCat := 0;
   _); (* 3327 *)
-  _if l2v10z = l2v11z _then _(
-    l2v9z := l2v9z + 1;
-    unpck( l2v23z[1], l2v20z );
-    l2v36z := true;
-    (a) _for i := 1 _to l2v8z _do _(
-      _if l2v29z[i] <> l2v23z[i] _then _(
-        l2v36z := false;
+  _if categ = curCat _then _(
+    pos := pos + 1;
+    unpck( got[1], curUID );
+    good := true;
+    (a) _for i := 1 _to uidDigs _do _(
+      _if want[i] <> got[i] _then _(
+        good := false;
        _exit a;
      _);
     _);
-    _if l2v36z _then _(
-      l2v12z := l2v12z + 1;
-      write(bar:3, l2v9z:4, sp:2);
-      _for i := 1 _to 4  _do write(l2v23z[i]);
-      getName( l2v20z, l2v22z );
-      write(sp:2, l2v20z, l2v22z, l2v13z:5, l2v14z:5);
-      i :=   L2630( l2v13z, l2v14z, l2v17z );
-      _if (l2v12z > 1) & (i = 0) _then  g38z := g38z + [28];
+    _if good _then _(
+      totDispl := totDispl + 1;
+      write(bar:3, pos:4, sp:2);
+      _for i := 1 _to 4  _do write(got[i]);
+      getName( curUID, name2 );
+      write(sp:2, curUID, name2, Homo:5, Djin:5);
+      i :=   fora( Homo, Djin, l2v17z );
+      _if (totDispl > 1) & (i = 0) _then  g38z := g38z + [28];
       _select
         i < 256: write( i:4 );
         true:    write('  >>')
       _end;
-      l2v15z := l2v13z;
-      l2v16z := l2v14z;
+      l2v15z := Homo;
+      l2v16z := Djin;
       l2v18z := l2v17z;
       write(bar:2 );
-      l2v6z := l2v14z + l2v6z;
-      l2v7z := l2v13z + l2v7z;
-      _if admin _then  write(sel(l2v19z, 16, 8): 4);
+      totDjin := Djin + totDjin;
+      totHomo := Homo + totHomo;
+      _if admin _then  write(sel(curRec, 16, 8): 4);
       TTOUT;
     _);
   _); (* 3446 *)
   _); (* 3450 *)
-  _if (l2v10z = 3) & l2v35z _then _(
-    l2v35z := false;
+  _if (categ = 3) & aboveDots _then _(
+    aboveDots := false;
     drawLine( '.' );
     _goto 3275;
   _);
   _); (* 3457 *)
   drawLine( '-' );
-  write('  I', l2v12z:4, '   И Т О Г', l2v7z:15, l2v6z:5, bar:6 );
+  write('  I', totDispl:4, '   И Т О Г', totHomo:15, totDjin:5, bar:6 );
   TTOUT;
   drawLine( '=' );
   _); (* 3477 *)
-  _if admin | l2v37z _then _(
+  _if admin | stats _then _(
     write(' ТРЕН ПАРТ ВЫИГ СДАЛ');
     write('    ВЦП    ДУМ   СЕАН   ЭНТР    ПОЗ    ХОД   СРЕЗ   УСИЛ');
     TTOUT;
-    _for l2v10z := 1 _to 4 _do _(
-      curptr := ptr(l2v10z * 12 + 27372);
-      l2v7z := curptr@[0];
+    _for categ := 1 _to 4 _do _(
+      curptr := ptr(categ * 12 + 27372);
+      totHomo := curptr@[0];
       _select
-      l2v10z = 1: l2v40z := 'Ю';
-      l2v10z = 2: l2v40z := 'К';
-      l2v10z = 3: l2v40z := 'У';
-      true: l2v40z := 'Э'
+      categ = 1: ch := 'Ю';
+      categ = 2: ch := 'К';
+      categ = 3: ch := 'У';
+      true: ch := 'Э'
       _end;
-      write(l2v40z, curptr@[11]:4, l2v7z:5, curptr@[9]:5, curptr@[10]:5 );
-      _for i := 1 _to 8 _do L2457( i );  
+      write(ch, curptr@[11]:4, totHomo:5, curptr@[9]:5, curptr@[10]:5 );
+      _for i := 1 _to 8 _do wrStat( i );  
       TTOUT;
     _); (* 3561 *) 
   _);
@@ -753,27 +754,27 @@ _(
  code(Э05310=,);
  startWallClock := ;
  pptr := ptr(64000B);
- g12z := true;
+ topBlock := true;
  code(СЧ76233=);
  tambov := ;
  _if tambov <> 'ТАМБОВ' _then code(СЧ0=Э0620,) _else L2371;
  3606:
- _if L1423 _then _goto 3652;
+ _if timeout _then _goto 3652;
  TTIN(true);
- g12z := false;
+ topBlock := false;
  3613:
  _if getCmd(cmd, 3) _then _(
    _if 'ИГР   ' = cmd _then _(
-     _if tempfile@ = etx _then _goto 3606 _else _goto 3613;
+     _if INP@ = etx _then _goto 3606 _else _goto 3613;
    _) _else _( (* 3626 *)
     _select
-  ('КАЛ   ' = cmd): exec(loc2 _mod 1000000B + 3 * 1000000B);
-  ('ПЕЧ   ' = cmd): modePrint;
-  ('ЭКР   ' = cmd): modeScreen;
-  ('ТУР   ' = cmd): tournament;
-  ('ШКО   ' = cmd): school;
-  ('КОН   ' = cmd): 3652: exec(loc1);
-  true: _if g12z _then 3655: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', cmd) _else _goto 3652
+  'КАЛ   ' = cmd: exec(loc2 _mod 1000000B + 3 * 1000000B);
+  'ПЕЧ   ' = cmd: modePrint;
+  'ЭКР   ' = cmd: modeScreen;
+  'ТУР   ' = cmd: tournament;
+  'ШКО   ' = cmd: school;
+  'КОН   ' = cmd: 3652: exec(loc1);
+  true: _if topBlock _then 3655: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', cmd) _else _goto 3652
   _end;  
   _);
   _) _else writeln('НЕ ПОНИМАЮ');
