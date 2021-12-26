@@ -15,9 +15,9 @@ t2=0..6;t3=0..7;t4=1..2;t5=0..39;
 contents = _record val:integer _end;
 OneSide = _record move:integer; pits:_array [1..7] _of contents _end;
 _var cmd, tambov: alfa;
-topBlock:boolean;
+ЗАПРЕТ:boolean;
 admin:boolean;
-startRemTime,startWallClock, g16z, g17z:integer;
+startCpuTime,startWallClock, g16z, g17z:integer;
 pptr:@page;
 userID:sixchars;
 g25z, g26z, g27z, g28z, g29z, g30z, g31z, g32z, g33z, g34z, g35z:integer;
@@ -63,7 +63,7 @@ _(
     _if prnEnable _then write(input@);
     v2 := v2 + 1;
     _if v2 > 128 _then _(
-      topBlock := false;
+      ЗАПРЕТ := false;
       putCmd('SLЕ  {377');
       g40z := g40z + [47];
       _goto 1
@@ -89,7 +89,7 @@ _(
  _if g33z - i < 170B _then _(
    rewrite(output);
    writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
-   topBlock := false;
+   ЗАПРЕТ := false;
    putCmd( 'КОН  {377' );
    timeout := true;
   _);
@@ -359,7 +359,7 @@ _var l2v1z, l2v2z: integer;
 _(
   code(Э0634=,);
   l2v1z := ;
-  l2v1z := l2v1z - startRemTime;
+  l2v1z := l2v1z - startCpuTime;
   _if l2v1z < 0 _then exit;
   code(Э05310=,);
   l2v2z := ;
@@ -416,7 +416,7 @@ _(
 _procedure exec(arg:integer);
 _procedure L2340(_var f:text; _var i:integer; j:integer); _( code(ПБ76022=,); _);
 _(
-  _if topBlock _then _GOTO 3655;
+  _if ЗАПРЕТ _then _GOTO 3655;
   g40z := (g40z + [13]);
   L2214;
   L2340(INP, g25z, 62);
@@ -750,18 +750,18 @@ _);
 _(
  g16z := 1;
  code(Э0634=,);
- startRemTime := ;
+ startCpuTime := ;
  code(Э05310=,);
  startWallClock := ;
  pptr := ptr(64000B);
- topBlock := true;
+ ЗАПРЕТ := true;
  code(СЧ76233=);
  tambov := ;
  _if tambov <> 'ТАМБОВ' _then code(СЧ0=Э0620,) _else L2371;
  3606:
  _if timeout _then _goto 3652;
  TTIN(true);
- topBlock := false;
+ ЗАПРЕТ := false;
  3613:
  _if getCmd(cmd, 3) _then _(
    _if 'ИГР   ' = cmd _then _(
@@ -774,7 +774,7 @@ _(
   'ТУР   ' = cmd: tournament;
   'ШКО   ' = cmd: school;
   'КОН   ' = cmd: 3652: exec(loc1);
-  true: _if topBlock _then 3655: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', cmd) _else _goto 3652
+  true: _if ЗАПРЕТ _then 3655: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', cmd) _else _goto 3652
   _end;  
   _);
   _) _else writeln('НЕ ПОНИМАЮ');
