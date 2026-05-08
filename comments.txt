@@ -1,0 +1,413 @@
+ANALYSIS OF kalah.pas - KALAH GAME IMPLEMENTATION
+================================================
+
+## PROGRAM OVERVIEW
+
+This is a complete implementation of Kalah (Mancala variant) for BESM-6 mainframe computer.
+The program features a human player competing against an AI opponent called "ДЖИН" (Djinn/Genie).
+Written in a special Pascal dialect with:
+- _( instead of begin
+- _) instead of end  
+- % for comments
+- Extensive use of Cyrillic text for all user interaction
+
+## GAME MECHANICS
+
+### Board Representation
+- Each player has 6 regular pits (лунки) + 1 kalah/store
+- Type OneSide: represents one player's side (7 pits total)
+- Type Position: array[jinn..user] of OneSide for complete board state
+- Packed representation using bitfields for efficient storage
+
+### Game Rules Implementation
+- F3475: Core move logic - distributes stones counter-clockwise
+- performMove: Animated version with cursor movement for display
+- F4210: Checks if game is over (one side empty)
+- Move result codes:
+  - 0: Invalid move (empty pit)
+  - 1: Normal move, turn switches
+  - 2: Landed in kalah, extra turn
+
+## AI ENGINE
+
+### Search Algorithm (F4612)
+- Implements minimax search with alpha-beta pruning
+- Variable depth search based on difficulty level
+- Iterative deepening when time permits
+- Handles both maximizing (jinn) and minimizing (user) perspectives
+- Cutoff optimization to reduce search tree
+
+### Position Evaluation (estimate)
+Key evaluation factors (22 local variables):
+- Material balance (stones in kalahs)
+- Stone distribution and mobility
+- Capture potential (empty pit opposite occupied pit)
+- Distance to kalah (closer is better)
+- Extra turn opportunities (landing in kalah)
+- Weighted coefficients from l3a2z parameter (eightwords structure)
+
+Evaluation components:
+- l3v71z: Kalah stone weight
+- l3v72z: Bonus for moves landing in kalah
+- l3v73z: Empty pit value (capture setup)
+- l3v74z: Multiple-lap stone bonus
+- l3v75z: Capture threat value
+- l3v76z: Mobile stone weight
+- l3v77z: Distance-to-kalah metric
+
+### Opening Book System
+- consult(): Recursively queries pre-computed opening database
+- Stored at zone (0, 400153C) 
+- Database verified with signature '!ДЕБЮТ'
+- Tree structure indexed by move sequences
+- Bitsets encode legal moves at each position
+- Supports up to move 8415 in opening theory
+
+### Difficulty Levels
+1. Ю (Юноша/Youth - Novice):
+   - Search depth: 2 ply
+   - Node limit: 45
+   - No opening book
+   
+2. К (Кандидат/Candidate):
+   - Search depth: 2 ply
+   - Node limit: 600
+   - No opening book
+   
+3. У (Участник/Participant):
+   - Search depth: 4 ply
+   - Node limit: 2500
+   - Uses opening book
+   
+4. Э (Эфенди/Efendi - Master):
+   - Search depth: 4 ply
+   - Node limit: 2500
+   - Uses opening book
+   - Full features enabled
+
+### Adaptive Play
+- correction(): Learning system that adjusts moves based on past games
+- Stored corrections at zone (0, 660635C) with signature '!СОRR!'
+- Tracks position type and move adjustments
+- l2v28z flag enables correction system
+- Random move selection weighted by evaluation scores
+- Entropy calculation (l2v129z, l2v130z) for move diversity
+
+## CONVERSATION SYSTEM
+
+### Phrase Generation (phrase procedure)
+Extensive natural language generation with 30+ different contexts:
+- Greetings personalized by name and gender
+- Age-aware comments (юный, уважаемый, почтенный)
+- Game state commentary (winning/losing position)
+- Move suggestions and warnings
+- Cultural references (намаз, махабба, печать Соломона)
+- Gender-appropriate dialogue (дорогой/дорогая)
+- Time-of-day awareness (night mode references)
+- Strategic advice and psychological pressure
+
+### Conversation Triggers
+- l3v4z = chkRandom(36): Selects phrase category
+- haveSaid array prevents repetition within same game
+- Context-sensitive triggers:
+  - Night time (lines 1644-1649)
+  - Winning/losing positions (1650+)
+  - Extra turns in kalah (1655+)
+  - Silent player (1627-1642)
+  - Long thinking time (1715-1721)
+  - Multiple captures possible (1799-1821)
+
+### Personalization
+- knownGender: UNKSEX(0), MASC(1), FEM(2)
+- wrongGender: Detects surname mismatch with declared gender
+- age: Calculated from user data
+- efendi: Special recognition for level 4 players
+- Name formatting with title suffixes (-хан/-ханум)
+
+## TOURNAMENT SYSTEM
+
+### Scoring
+- jinnScore, userScore: Track wins across games
+- NgameToday: Limits to 5 games per day
+- Level progression:
+  - Ю → К: Win with positive score
+  - К → У: Win with positive score (score resets)
+  - У → Э: Win with total ≥31
+  - Э → У: Lose with total ≥31
+
+### Game Results
+- '+': Decisive win (>44 stones)
+- 'C': Normal win
+- '-': Loss
+- 'Н': Draw (equal stones)
+
+### Persistent Storage (Zone 66C, 523)
+Record structure for each player:
+- Current game state (if postponed)
+- Tournament score
+- Game history (last 210 games)
+- Sorted by performance metrics
+
+## FILE I/O AND PERSISTENCE
+
+### Zone System
+Uses readZone/writeZone for disk I/O:
+- (66C, 517): Schedule data (opening hours)
+- (66C, 522): Game log storage
+- (66C, 523): Player records and saved games
+- (0, 660635C): Correction database
+- (0, 400153C): Opening book database
+
+### Saved Game Format (rec1)
+- i: Game state marker (7 = valid)
+- ls: Large bitset for player identification
+- f7, f8: Date fields
+- f9-f12: Packed board position
+- f13[5..12]: Move history protocol
+
+### Game Protocol Logging
+When l2v27z is true:
+- initLog: Creates header with date/time
+- logChar: Records each move
+- saveLog: Writes to zone (66C, 522)
+- Format: Character-packed move sequence
+
+## UI AND DISPLAY
+
+### Terminal Control
+- TTIN: Input with timeout (128 char limit)
+- TTOUT: Output with cursor positioning
+- P2747: Smart spacing based on terminal state
+- Special characters:
+  - '{172': Terminal binding
+  - '{377': ETX terminator
+  - '{142': Delay character
+  - '{171': Right arrow
+  - '{146': Left arrow
+  - '{176': Up arrow
+  - '{177': Down arrow
+
+### Board Display (drawField)
+ASCII art layout showing:
+- ДЖИН name at top
+- Pit numbers 6-1 left to right (jinn's side)
+- Stone counts in parentheses format: (n)
+- Kalah stores marked with К
+- Pit numbers 1-6 left to right (user's side)
+- User name at bottom
+
+### Animated Moves (performMove)
+- Cursor movement to each pit
+- Delay characters for animation pacing
+- gl28z: Animation speed (adjusted by level)
+- Real-time stone distribution visualization
+
+## SPECIAL FEATURES
+
+### Time Management
+- remTime: Remaining CPU time quota
+- checkTime: 120-tick warning before timeout
+- startRemTime, startWallClock: Session tracking
+- jinnTicks, userTicks: Thinking time per player
+- spentThinking: Current move time
+
+### Schedule System (checkOpen)
+- Reads time-of-day schedule from zone
+- Day-of-week checking via Zeller's algorithm
+- Time slots encoded in bitset (30-minute intervals)
+- night flag: Set if playing before 6:30 or after 20:30
+- Displays next opening time if currently closed
+
+### Date/Time Functions
+- getDate: Returns current date as alfa
+- getTime: Returns time as "HH.MM.SS"
+- F2112: Converts date string to YYMMDD integer
+- F2211: Days since epoch calculation
+- F2227: Inverse - epoch days to YYMMDD
+- months: Month-to-days conversion with leap year support
+- zeller: Day of week calculation
+
+### Administrative Features
+- admin flag: Set if ogchezk = '417700'
+- checkAdmin: Aborts if not admin
+- 'B' command: Generate random test position
+- Special access to closed tournaments
+
+### Signal Handling
+- oldHandler: Saves previous signal handler
+- sigrestore: Restores handler
+- Signal interception for graceful shutdown
+- Automatic game saving on interrupt
+
+## STATISTICS TRACKING (Zone at 65354C + Level*14C)
+
+Per-level statistics (14 words):
+- [0]: Game count
+- [1]: Total wall-clock time
+- [2]: Total jinn thinking time
+- [3]: Total user thinking time  
+- [4]: Entropy sum (decision quality metric)
+- [5]: Total nodes searched
+- [6]: Total moves in games
+- [7]: Unknown stat (l2v44z)
+- [8]: Unknown stat (l2v45z)
+- [9]: Jinn wins
+- [10]: User wins
+- [11]: Training games count
+
+## TECHNICAL IMPLEMENTATION DETAILS
+
+### Bit Manipulation
+Extensive use of sel() and ins() for bit fields:
+- sel(word, position, length): Extract bits
+- ins(target, value, position, length): Insert bits
+- Used for packed board state and move encoding
+
+### Random Number Generation
+- RANDOM: Real in (0,1) using linear congruential generator
+- RAND0: Initialize with time-based seed
+- randint(n): Integer in [0, n-1]
+- Used for phrase selection and probabilistic move choice
+
+### Memory Management
+- bufptr: Points to zone at 64000C (octal)
+- Zone = array[0..1023] of word
+- Direct pointer arithmetic with ptr() and ref()
+- Type punning via variant records (word type)
+
+### Performance Optimizations
+- l2v38z: Randomness factor decreases as endgame approaches
+  Formula: 144 - (total_stones_in_kalahs * 4), min 12
+- l2v43z: Node search limit per move
+- Iterative deepening only when l2v80z shows time available
+- Opening book bypasses search entirely
+
+### Game Flow Control
+Main loop structure:
+1. 12561: Entry point, check time
+2. 12566: Command dispatch
+3. 10266: Setup training/tournament mode
+4. 10773: Main game loop start
+5. 11027: User input
+6. 12032: AI move generation
+7. 12162: Move execution
+8. 12240: Game over
+9. 12244: Result display
+10. 11426: Statistics update
+11. 12341: Clean exit
+
+### Error Handling
+Multiple ЧП (emergency/bug) messages:
+- "ЧП" ДЕРЦЕН: Search algorithm failure
+- "ЧП" ДЕБЮТОВ: Opening book corrupted
+- ИСПОРЧЕНЫ ДЕБЮТЫ: Opening signature mismatch
+- ИСПОРЧЕНЫ КОРРЕКЦИИ: Correction signature mismatch
+- ПУСТАЯ ЛУНКА В ДЕБЮТАХ: Invalid opening move
+
+## CULTURAL CONTEXT
+
+### Russian/Soviet Computer Game Design
+- Extensive narrative/personality in AI opponent
+- Educational tone (level progression as achievement)
+- Limited play sessions (5 games/day quota)
+- Tournament formalization of casual play
+- Multi-user mainframe environment (shared zones)
+
+### Islamic Cultural References
+Throughout the dialogue:
+- Салам алейкум (Peace be upon you)
+- Намаз (Islamic prayer)
+- Аллах (Allah)
+- Печать Соломона (Seal of Solomon)
+- Махабба (Arabic love talisman)
+- Тамрид, тетвиф (Arabic magical terms)
+- Бисмилла рахман рахим (Bismillah)
+- Character names: Лалла Мира, Айша Кадеша
+- Titles: Эфенди, Имам
+
+Reflects Central Asian Islamic culture in Soviet computing.
+
+## CODE QUALITY OBSERVATIONS
+
+### Strengths
+- Well-structured modular design
+- Comprehensive feature set
+- Sophisticated AI with multiple techniques
+- Careful state management and persistence
+- Rich user interaction
+
+### Archaic Patterns
+- Heavy use of goto (labeled jumps)
+- Minimal structured loop constructs
+- Global variable proliferation (gl* prefix)
+- Obfuscated variable names (l2v1z, l3v4z patterns)
+- Machine code injection via code() statements
+
+### Platform Dependencies
+- BESM-6 specific opcodes in code() blocks
+- Octal constants (C suffix)
+- Zone/disk addressing scheme
+- Character encoding (likely GOST or KOI-7)
+- 48-bit word architecture
+
+## REVERSE ENGINEERING CHALLENGES
+
+The program demonstrates several anti-analysis characteristics:
+1. Systematic variable renaming (all locals named l*v*z)
+2. Mixed octal/decimal numbering
+3. Inline assembly via code() blocks
+4. Complex control flow with many goto statements
+5. Variant record type punning
+6. Bit-level operations obscuring intent
+
+However, the overall structure remains clear due to:
+- Meaningful procedure names (playKalah, phrase, checkTime)
+- Consistent naming patterns
+- Natural language strings providing context
+- Logical grouping of functionality
+
+## ESTIMATED DEVELOPMENT ERA
+
+Based on features and style:
+- Likely mid-1970s to early 1980s
+- BESM-6 operational period: 1968-1987
+- Sophisticated AI suggests later period (post-1975)
+- Multi-user features indicate institutional setting
+- Tournament persistence suggests long-term deployment
+
+## GAMEPLAY ALGORITHM SUMMARY
+
+1. Initialize board (6 stones per pit)
+2. Load saved game or start fresh
+3. Determine starting player
+4. Display board state
+5. If AI turn:
+   a. Check opening book (levels 3-4)
+   b. Search game tree with minimax
+   c. Apply corrections if available
+   d. Select move probabilistically
+6. If human turn:
+   a. Accept input with timeout
+   b. Validate move legality
+7. Execute move with animation
+8. Check for extra turn (landed in kalah)
+9. Check for captures (empty pit opposite stones)
+10. Check game over (one side empty)
+11. Collect remaining stones
+12. Display result
+13. Update statistics
+14. Save game state
+15. Update tournament scores
+
+## CONCLUSION
+
+This is a sophisticated, production-quality implementation of Kalah with:
+- Strong AI opponent using classical game tree search
+- Rich conversational personality
+- Persistent tournament system
+- Multi-user shared environment
+- Cultural localization for Soviet Central Asian users
+- Professional software engineering despite archaic patterns
+
+The program represents significant software engineering effort, likely
+developed for educational/recreational use on a shared mainframe system.
