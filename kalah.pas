@@ -1,10 +1,10 @@
-(*=p-,t-,l+*)_program КАЛАХ;
+(*=p-,t-,l+,Д+*)_program КАЛАХ;
 _label 12561, 12566, 12633, 12636;
 _const list = 64000B; jinn = 0; user = 1;
 nu = 66B; z236 = 2400236B; zoneSchedule = 1005B; zonePlayers = 1013B;
 z730 = 1660730B; zoneOpeningBook = 400153B; zoneCorrections = 660635B; zoneLog = 1012B;
 z600 = 660600B; z611 = 660611B; c4 = 4; c5 = 5; c25 = 25;
-charEtx = '{377'; c62 = 62; c1008 = 1008; space = ' '; dot = '.';
+charEtx = '{377'; userEntryLen = 62; c1008 = 1008; space = ' '; dot = '.';
 c13 = 13; c10 = 10; c11 = 11; lf = '{214'; cr = '{175'; c212 = 21;
 spaces = '      '; arrow = ' =++> '; adminId = '417700'; sleep = 'sle   ';
 fin = '(FIN){175'; colon = ':'; oparen = '('; cparen = ')'; excl = '!'; qmark = '?';
@@ -17,7 +17,7 @@ bitset = _set _of 0..47;
 letter = 'a' .. 'z';
 digit = '0' .. '9';
 sixchars = _array[1..6] _of char;
-word = _record _case integer _of 
+word = _record _case integer _of
 0:(i:integer);
 1:(c:char);
 2:(b:boolean);
@@ -44,7 +44,7 @@ commandEntered, gl12z:alfa;
 gl13z,gl14z,cursorCol,logIndex,charIndex:integer;gameActive,isNightTime,isAdmin, cmdResult:boolean;
 startRemTime,startWallClock,gl24z,gl25z,gl26z,animSpeed,animDelay:integer;zoneBuffer:@zone;
 userName:sixchars;
-curLogWord:sixchars; 
+curLogWord:sixchars;
 logPacked:_array [1..30] _of alfa;
 userId:integer;tempSet:bitset;gl74z,gl75z,gl76z,gl77z,gl78z,gl79z,timeoutTicks:integer;
 userBirthDate,gl82z,userAccount:alfa;userGender:gndr;permFlags,gl86z:bitset;
@@ -55,7 +55,7 @@ gl102z,gl103z,gl104z,gl105z,gl106z,gl107z,gl108z,gl109z,gl110z:integer;
 gl111z,gl112z,gl113z,gl114z,gl115z,gl116z,gl117z,gl118z,gl119z,gl120z:integer;
 gl121z,gl122z,gl123z,gl124z,gl125z,gl126z,gl127z,gl128z,gl129z,gl130z:integer;
 gl131z,gl132z,gl133z:integer;
-inputBuffer:text;gl420z:integer;
+INP:text;gl420z:integer;
 _function remainingCPUTime:integer;
 _( code(Э0634=,); remainingCPUTime := ; _);
 
@@ -82,24 +82,24 @@ _(
     code(ЗЧ76013=,);
     _if top _then write(' ==* ') _else write(' =-* ');
   _);
-  rewrite(inputBuffer);
+  rewrite(INP);
   v2 := 0;
   _while input@ <> chr(255) _do _(
     _if gl90z _then write(input@);
     v2 := v2 + 1;
     _if v2 > 128 _then _(
-      rewrite(inputBuffer);
+      rewrite(INP);
       gameActive := false;
-      write(inputBuffer,'SLЕ  {377');
+      write(INP,'SLЕ  {377');
       systemFlags := systemFlags + [47];
       _goto 1570
     _);
-    write(inputBuffer,input@);
+    write(INP,input@);
     get(input);
   _); (* while *)
-  write(inputBuffer, chr(255));
+  write(INP, chr(255));
   1570:
-  reset(inputBuffer);
+  reset(INP);
   _if gl90z _then _(
     writeLN;
     code(ВИ7=ЗЧ76013,);
@@ -114,11 +114,11 @@ _(
   l2v1z := ;
   _if timeoutTicks - l2v1z < 120 _then _(
     rewrite(output);
-    rewrite(inputBuffer);
+    rewrite(INP);
     writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
     gameActive := false;
-    write(inputBuffer,'КОН  {377');
-    checkRemainingTime := true; exit 
+    write(INP,'КОН  {377');
+    checkRemainingTime := true; exit
   _)
 _);
 _procedure checkNegativeResponse;
@@ -157,7 +157,7 @@ _);
 _function getTimeStr:alfa;
 _var tickCount, tensDigit:integer;
 timeChars:sixchars; packedTime:alfa;
-_( 
+_(
   code(Э05310=,);
   tickCount := ;
   tickCount := tickCount _div 3000;
@@ -179,12 +179,12 @@ _);
 
 _procedure printDecimal(a:integer);
 _var v:integer;
-_( 
+_(
   v := trunc(a/10); write(v:1, (a - v*10):1);
   _);
 
 _procedure readDiskZone(a, b: integer);
-_( code(=14ПВ77451,) _); 
+_( code(=14ПВ77451,) _);
 
 _procedure writeDiskZone(a, b: integer);
 _( code(=14ПВ77457,) _);
@@ -243,7 +243,7 @@ _);
 
 _function dateStringToInt(a:alfa):integer;
 _type date = _record d10, d1, m10, m1, y10, y1: integer _end;
-_var datePtr:@date; dateChars:sixchars; 
+_var datePtr:@date; dateChars:sixchars;
 _(
   unpck(dateChars[1], a);
   datePtr := ref(dateChars);
@@ -302,14 +302,14 @@ _(
  _if v2 = 3 _then v4 := true _else v4 := false;
 
  v3 := v3 + v2;
-  
+
  _if (a = 60) _and v4 _then _(
  v2 := 2;
  v1 := 35C;
   _) _else _(
  _if (a > 74C) _and  v4 _then a := a - 1;
 
-  _select 
+  _select
   a > 334: _(v2 := 12; v1 := 334; _);
   a > 304: _(v2 := 11; v1 := 304; _);
   a > 273: _(v2 := 10; v1 := 273; _);
@@ -349,7 +349,7 @@ l2v6z:alfa;
 t:sixchars;
 isTrainingGame:bitset;
 _(
-  _if 32 _IN permFlags _then _( permFlags := permFlags - [32]; exit _); 
+  _if 32 _IN permFlags _then _( permFlags := permFlags - [32]; exit _);
   _if tempSet * [3] = [3] _then exit;
 
   _if 26 _IN systemFlags _then _(
@@ -357,7 +357,7 @@ _(
     writeln('КАЛАХ ЗАКРЫТ');
     _GOTO 12561;
   _);
-  _if (tempSet * [2] = [2]) _then _( 
+  _if (tempSet * [2] = [2]) _then _(
     write('ДЛЯ ВАС '); _goto 1;
   _);
   _if 30 _IN permFlags _then _(
@@ -388,8 +388,8 @@ _(
         printDecimal( l2v2z );
         writeln(' - СЕЙЧАС', getTimeStr);
 2:
-        rewrite(inputBuffer);
-        write(inputBuffer,'ВЫХ  {377');
+        rewrite(INP);
+        write(INP,'ВЫХ  {377');
         gameActive := false;
         _GOTO 12633;
       _);
@@ -407,9 +407,9 @@ _( code(=14ПВ77400,) _);
 _procedure packPitState(_var side:OneSide; _var packedWord:word);
 _var pitIndex:integer;
 _( code(2ИК3=СЧ,СД/-6/=17ЗЧ,);
-  _for pitIndex := 1 _to 6 _do 
+  _for pitIndex := 1 _to 6 _do
     code(2СЧ5=УИ7,2ИК3=7СЧ,17ЛС=СД/-6/,17ЗЧ=);
-  
+
   code(17СЧ=СД/-3/,2ИК3=ЛС7,);
   packedWord :=;
 _);
@@ -457,19 +457,17 @@ _(
     rewrite(output); exit;
     code(С;ИСЭ71:3000000024000321,К;)
   _);
-_);  
+_);
 
 _procedure flushOutput;
-_var l2v1z, l2v2z, l2v3z: integer;
+_var len, cnt, l2v3z: integer;
 _(
   code(СЧ75224=АВ75205,);
   l2v3z := ;
-  l2v1z := ((cursorCol - l2v3z) + 1);
-  _for l2v2z := 1 _to l2v1z _do _(
-    write(spaces);
-  _);
- cursorCol := l2v3z;
- writeTerminalOutput;
+  len := cursorCol - l2v3z + 1;
+  _for cnt := 1 _to len _do write(spaces);
+  cursorCol := l2v3z;
+  writeTerminalOutput;
 _);
 _procedure dsplBoard(_var pckPits:_array [0..1] _of word);
 _var pitIndex, stoneCount:integer;unpackedSide:OneSide;
@@ -482,12 +480,12 @@ _(
   _else
     write(stoneCount:2);
   write(cparen);
-_);  
+_);
 _( (* dsplBoard *)
   write('ДЖИН':13);
   write(space:7);
   unpPitState(unpackedSide, pckpits[0]);
-  _for pitIndex := 6 _downto 1 _do 
+  _for pitIndex := 6 _downto 1 _do
     write(pitIndex:5);
   writeTerminalOutput;
   write(space:21);
@@ -882,7 +880,7 @@ _( (* exMvAnimated *)
     write(space:3);
     drawMove(l3v1z.i, l3a2z);
     (loop) _(
-     l3v8z.b := _not l3v1z.b; 
+     l3v8z.b := _not l3v1z.b;
     _if l3v1z.i = l3v5z.i _then _(
       l3v4z := 7;
     _) _else _(
@@ -926,7 +924,7 @@ _( (* exMvAnimated *)
         l3v1z.b := _not l3v1z.b;
         l3a2z := 0;
         _goto loop;
-      _); 
+      _);
 % L4167:
     _)
   _)
@@ -957,7 +955,7 @@ _);
 _procedure collectAllStones; (* unused *)
 _var l3v1z, l3v2z: integer;
 _(
-  _for l3v1z := 0 _to 1 _do 
+  _for l3v1z := 0 _to 1 _do
   _for l3v2z := 1 _to 6 _do _(
     curPosition[l3v1z].pits[7].val := curPosition[l3v1z].pits[7].val + curPosition[l3v1z].pits[l3v2z].val;
     curPosition[l3v1z].pits[l3v2z].val := 0;
@@ -1000,7 +998,7 @@ _(
   _);
   _select
     sum > 0: materialDifference := lakh;
-    sum < 0: materialDifference := minusLakh; 
+    sum < 0: materialDifference := minusLakh;
     true: materialDifference := 0
   _end
 _);
@@ -1059,14 +1057,14 @@ _(
       _if distToKalah < 7 _then _(
         jinnDistance := (jinnDistance + jinnStones) + 7;
       _) _else _(
-        _while distToKalah >= 20 _do 
+        _while distToKalah >= 20 _do
           distToKalah := distToKalah - 13;
         jinnDistance := (abs(13 - distToKalah) + jinnDistance) + tableIndex;
       _);
       _if distToKalah = 7 _then _(
          jinnScore := jinnScore + l3v72z;
       _) _else _(
-        _if jinnStones = 13 _then 
+        _if jinnStones = 13 _then
           jinnCaptureSetup := (userSidePtr@.pits[tableIndex].val + 3) + jinnCaptureSetup;
         _if distToKalah > 7 _then _(
           jinnScore := jinnScore + l3v74z;
@@ -1105,7 +1103,7 @@ _(
   _if (jinnMobile = 0) _or (userMobile = 0) _then _(
     evaluatePosition :=   materialDifference( pos );
     exit
-  _); 
+  _);
   jinnScore := (((((jinnEmptyOpp * l3v73z) + (jinnCaptureSetup * l3v75z)) + (jinnMobile * l3v76z)) + (jinnDistance * l3v77z)) + jinnScore);
   userScore := (((((userEmptyOpp * l3v73z) + (userCaptureSetup * l3v75z)) + (userMobile * l3v76z)) + (userDistance * l3v77z)) + userScore);
   evaluatePosition := jinnScore - userScore;
@@ -1116,7 +1114,7 @@ _var
 jinnPlayer, userPlayer, pitIndex, curPit, moveOrder, pitStones, legalMoves, oppMobile, evalScore, bestScore,
 localAlpha, localBeta, betaCopy, bestMove, startNodes, nodesBudget, orderEnd, testScore, moveResult, mvScArray:integer;
 mvSc:_array [1..7] _of integer;
-testPosition, newPosition:Position; 
+testPosition, newPosition:Position;
 _(
   _if depth = 0 _then _(
     bestScore :=   evaluatePosition( pos );
@@ -1158,7 +1156,7 @@ _(
     bestScore := materialDifference(testPosition);
     chosenMove := 0;
     _goto 5070;
-  _); 
+  _);
 
   _if (curPit > 1) _and (depth > 1) _then
     depth := depth - 1;
@@ -1202,7 +1200,7 @@ _(
   _); (* 5042 *)
   _if legalMoves = 0 _then _(
     bestScore := materialDifference(testPosition);
-  _); 
+  _);
 5050:
   _if bestScore < beta _then beta := bestScore;
 5054:
@@ -1211,7 +1209,7 @@ _(
     writeln('"ЧП" ДЕРЦЕН');
     _GOTO 12561;
   _);
-5070: 
+5070:
  minimax := bestScore;
 _);
 
@@ -1248,14 +1246,14 @@ _(
       _) _else _(
         continuations := consultOpeningBook(testPosition, bookIndex + moveNumber) + continuations;
         (q) _exit q
-      _); 
+      _);
     _)
   _); (* 5204 *)
   consultOpeningBook := continuations;
 _);
 _( (* selAIMove *)
   l3v9z :=   remainingCPUTime;
-  _for l3v2z := 1 _to 36C _do 
+  _for l3v2z := 1 _to 36C _do
    haveSaid[l3v2z] := [];
 
   l3v71z := l3a2z.f1;
@@ -1319,7 +1317,7 @@ _( (* selAIMove *)
       _); (* 5401 *)
       l3v4z := l3v4z + 1;
       l3v6z := l3v1z;
-      _if l3v42z = 2 _then 
+      _if l3v42z = 2 _then
         l3v63z :=   consultOpeningBook(l3v26z, openingBookIndex * 6 + l3v1z)
       _else
         l3v63z := 1;
@@ -1350,7 +1348,7 @@ _( (* selAIMove *)
         _);
         _if l3v7z < l3v3z _then l3v3z := l3v7z;
       _)
-    _); (* 5504 *)  
+    _); (* 5504 *)
   _); (* 5506 *)
   _if l3v4z < 2 _then _goto 5655;
   _if useOpeningBook _then
@@ -1368,7 +1366,7 @@ _( (* selAIMove *)
   _); (* 5541 *)
   l3v59z := 0;
   l3v60z := ;
-  _for l3v5z := 1 _to 6 _do 
+  _for l3v5z := 1 _to 6 _do
   _if (l2v179z[l3v5z] <> 0) _and (l2v172z[l3v5z] > l3v61z) _then _(
     l3v59z := l3v59z + 1;
     l3v1z := (l2v172z[l3v5z] - l3v61z);
@@ -1380,7 +1378,7 @@ _( (* selAIMove *)
   l3v62z := 0;
   _for l3v6z := 1 _to l3v59z _do _(
     l3v1z := l3v43z[l3v6z] * 100 _div l3v60z;
-    _if useOpeningBook _then 
+    _if useOpeningBook _then
       l3v63z := l3v1z
     _else
       l3v63z := l3v1z * l3v1z;
@@ -1473,7 +1471,7 @@ _(
 _);
 
 _procedure generateAIPhrase;
-_label 6553, 7650, 7660; 
+_label 6553, 7650, 7660;
 _var pckName:_array [0..1] _of alfa;pitNum, rndChoice, loopVar, oppositePit, jinnStones, userStones, phraseCategory, moveType: integer;
 l3v11z:boolean; l3v12z, l3v13z:boolean; suffixChar:char;
 l3v15z:Position;
@@ -1509,11 +1507,11 @@ _function countEnding(number:integer):integer;
 _(
   _if (number >= 20) _then
     number := number _MOD 10;
-  _select 
+  _select
     number = 1:;
     (number > 1) _and (number < 5): number := 2;
     true: number := 3
-  _end; 
+  _end;
   countEnding := number;
 _);
 _( (* generateAIPhrase *)
@@ -1564,8 +1562,8 @@ _( (* generateAIPhrase *)
     _if ((rndChoice - loopVar) > 0) _then
       l3v43z[loopVar] := unpName[(rndChoice - loopVar)];
     _);
-    _select 
-      knownGender = MASC : 
+    _select
+      knownGender = MASC :
       gndrMismatch := isAllZeros( 'ОВА  4') _or
         isAllZeros( 'ЕВА  4') _or
         isAllZeros( 'ИНА  4') _or
@@ -1574,7 +1572,7 @@ _( (* generateAIPhrase *)
       gndrMismatch := isAllZeros( 'ОВ   3') _or
         isAllZeros( 'ЕВ   3') _or
         isAllZeros( 'ИН   3') _or
-        isAllZeros( 'ИЙ   3') 
+        isAllZeros( 'ИЙ   3')
     _end;
     _select
       knownGender = MASC: write('-ХАН');
@@ -1585,7 +1583,7 @@ _( (* generateAIPhrase *)
     write('  !!');
     _goto 7650
   _);
-% L6367  
+% L6367
   _if gameIsDecided _then _(
     rndChoice :=   randint(8);
     _select
@@ -1594,8 +1592,7 @@ _( (* generateAIPhrase *)
       rndChoice = 2: write('ТЕПЕРЬ УЖЕ НИЧЕГО НЕ ИЗМЕНИШЬ.');
       rndChoice = 3: write('НЕ БУДЕМ ТЕРЯТЬ ВРЕМЕНИ.')
     _end;
-    _goto 7660;
-  _) _else _( (* 6414 *)
+  _) _else (* 6414 *)
      _if (jinnStones > 36) _or (userStones > 36) _then _(
        gameIsDecided := true;
        _if jinnStones > 36  _then _(
@@ -1633,10 +1630,10 @@ _( (* generateAIPhrase *)
        write('ВЫИГРАЕШЬ У МЕНЯ 12 РАЗ ПОДРЯД - ПОЛУЧИШЬ ВОЛШЕБНОЕ КОЛЬЦО !');
       _);
       true:  _(
-       write('О, ШАЙТАН !  ТЫ МЕНЯ ОБЫГРАЛ');  maybeFeminine; 
+       write('О, ШАЙТАН !  ТЫ МЕНЯ ОБЫГРАЛ');  maybeFeminine;
      _)
      _end; (q) _exit q;
-  _); _goto 7660 (* 6545 *)
+  _);  (* 6545 *)
   _) _else _( (* 6546 *)
   _if wordsSinceLastSpeak > 0 _then _(
     aiSilent := false;
@@ -1741,14 +1738,14 @@ _( (* generateAIPhrase *)
     write('НЕТ ТЕБЕ РАВНО');
     _if (knownGender = FEM) _then write('Й') _else write('ГО');
     write(' СРЕДИ ');
-    _select 
+    _select
       rndChoice = 1 : write('АРАБОВ');
       rndChoice = 2 : write('МАВРОВ');
       rndChoice = 3 : write('БЕДУИНОВ');
       rndChoice = 4 : write('ЧЕРНОКОЖИХ');
       rndChoice = 5 : write('ТУАРЕГОВ');
       true: write('ЭФИОПОВ')
-    _end;  
+    _end;
     write(excl:2);
   _); (* 7125 *)
   (rndChoice = 14) _and (moveType <> 2) _and bookIsActive _and  (uncertaintyBits > 0) : _(
@@ -1856,11 +1853,11 @@ _( (* generateAIPhrase *)
     rndChoice :=   chkRandom( 6 );
     _select
       rndChoice = 1 : write('СКАЖИ МНЕ, ЛАЛЛА МИРА');
-      rndChoice = 2 : write('СОЗНАЙСЯ, АЙША КАДЕША') 
+      rndChoice = 2 : write('СОЗНАЙСЯ, АЙША КАДЕША')
     _end;
-    _if rndChoice < 3 _then write(' С ТОБОЙ НЕ ВСТРЕЧАЛАСЬ ?'); 
+    _if rndChoice < 3 _then write(' С ТОБОЙ НЕ ВСТРЕЧАЛАСЬ ?');
   _); (* 7560 *)
-   true: _if moveType <> 2 _then _(
+  moveType <> 2 : _(
     oppositePit := 0;
     l3v12z := ;
     l3v13z := ;
@@ -1874,30 +1871,29 @@ _( (* generateAIPhrase *)
       _)
     _); (* 7605 *)
     rndChoice :=   chkRandom( 4 );
-   _select (* { *)
-    oppositePit = 1 : _select (* { *)
+   _select
+    oppositePit = 1 : _select
      rndChoice = 1 : write('НЕЧЕГО ДУМАТЬ - ХОДИ !');
      rndChoice = 2 : write('ТЕПЕРЬ ТЕБЕ ДУМАТЬ НЕЧЕГО - ХОДИ !');
      true: write('У ТЕБЯ ВСЕГО ОДИН ХОД.')
       (* 7624 *)
-     _end (* } *); 
-     l3v12z _and l3v13z : _select (* { *)
+     _end;
+     l3v12z _and l3v13z : _select
        rndChoice = 1 : write('НЕ СОВЕТУЮ ХОДИТЬ В КАЛАХ.');
        rndChoice = 2 : write('СОВЕТУЮ ПОЙТИ В КАЛАХ.');
        rndChoice = 3 : write('НА ХОД В КАЛАХ ОСОБЕННО НЕ НАДЕЙСЯ.');
        true: write('ПОСМОТРЮ, ПОЙДЕШЬ ЛИ В КАЛАХ ?')
-     _end (* } *)
-    (* 7647 *) 
-  _end (* } *)
+     _end
+    (* 7647 *)
   _end
-  _)
    _)
- _);
-7650:;
+  _end;
+7650:
   _if l3v11z _then _goto 7660;
   code(СЧ75205=3ЗЧ6,СЧ75224=3ЗЧ7,);
   l3v11z := true;
   _if rndChoice + 1 = loopVar _then _goto 6553;
+ _);
 7660:
  _if lastMoveResult = 2 _then writeCharNTimes( delay, animDelay * 4 );
  flushOutput;
@@ -1909,18 +1905,16 @@ _);
 _procedure procInputChars;
 _var l3v1z:integer;
 _(
-  reset(inputBuffer);
+  reset(INP);
   inputLength := 5;
-  _while (inputBuffer@ _in digit) _or (inputBuffer@ = ',') _or (inputBuffer@ = space) _do _(
-     code(16ПВ76312=,);
-%    get(inputBuffer);
+  _while (INP@ _in digit) _or (INP@ = ',') _or (INP@ = space) _do _(
+    get(INP);
     inputLength := inputLength + 1;
   _);
-  _while (inputBuffer@ <> charEtx) _do _(
-    _if (inputBuffer@ <> space) _then wordsSinceLastSpeak := wordsSinceLastSpeak + 1;
+  _while (INP@ <> charEtx) _do _(
+    _if (INP@ <> space) _then wordsSinceLastSpeak := wordsSinceLastSpeak + 1;
     inputLength := inputLength + 1;
-     code(=16ПВ76312,);
-%    get(inputBuffer);
+    get(INP);
   _);
   _if (inputLength = 7) _then inputLength := 8;
 _);
@@ -1942,7 +1936,7 @@ _(
   write(userTotalScore:7);
   write(space:3);
   writeUserName;
-  _select 
+  _select
     difficultyLevel = 1 : l3v1z := 'Ю';
     difficultyLevel = 2 : l3v1z := 'K';
     difficultyLevel = 3 : l3v1z := 'У';
@@ -1965,7 +1959,7 @@ _(
       write('СЕГОДНЯ ИГРАТЬ БОЛЬШЕ НЕ БУДУ':51);
       _goto 10017
     _)
-  _end;  
+  _end;
   _if isTrainingGame _then
     write('Т Р Е Н И Р О В О Ч Н А Я':49)
   _else _if (25 _IN systemFlags) _and (tempSet * [3,6] = []) _then _(
@@ -2011,7 +2005,7 @@ _(
     l3v5z := sel(l3v2z, 8, 8);
     l3v6z := sel(l3v2z, 0, 8);
     l3v10z := l3v6z + l3v5z;
-    _if (l3v10z = 0) _then 
+    _if (l3v10z = 0) _then
       l3v13z := true
     _else _( (* 10145 *)
       l3v7z := l3v3z * l3v10z;
@@ -2076,29 +2070,29 @@ _( (* playGameSession *)
   charIndex := 1;
   curMoveNumber := ;
   enableLogging := true;
-  isTrainingGame := inputBuffer@ = 'T';
+  isTrainingGame := INP@ = 'T';
 %   systemFlags := systemFlags + [33b];
   _if ((33C) _IN systemFlags) _then _(
   _if isTrainingGame _then _(
     levelChoice := 0;
     startPlayer := 2;
     cmdResult :=   readCommand(cmdString, 3 );
-    10266: _select 
-    inputBuffer@ _in letter : _select
-      inputBuffer@ = 'Ю' : levelChoice := 1;
-      inputBuffer@ = 'К' : levelChoice := 2;
-      inputBuffer@ = 'У' : levelChoice := 3;
-      inputBuffer@ = 'Э' : levelChoice := 4;
-      inputBuffer@ = 'Д' : startPlayer := 1;
-      inputBuffer@ = 'П' : startPlayer := 0;
+    10266: _select
+    INP@ _in letter : _select
+      INP@ = 'Ю' : levelChoice := 1;
+      INP@ = 'К' : levelChoice := 2;
+      INP@ = 'У' : levelChoice := 3;
+      INP@ = 'Э' : levelChoice := 4;
+      INP@ = 'Д' : startPlayer := 1;
+      INP@ = 'П' : startPlayer := 0;
       true: _goto 999
-    _end; 
-    inputBuffer@ = charEtx :;
+    _end;
+    INP@ = charEtx :;
     true : _( 999: writeln('НЕПОНЯТНО'); exit _)
     _end;
      (* 10331 *)
     cmdResult := readCommand(cmdString, 3);
-    _if inputBuffer@ <> charEtx _then _goto 10266;
+    _if INP@ <> charEtx _then _goto 10266;
     _if (levelChoice = 0) _or (startPlayer = 2) _then _(
       _select
         levelChoice = 0 : writeln('КАТЕГОРИЯ ? <Ю,К,У,Э>');
@@ -2128,9 +2122,9 @@ _( (* playGameSession *)
   gamesPlayedToday := 5;
   _if isTrainingGame _then _goto 12341 _else _goto 11252;
   code(ЧЕРЕЗ:);
-  _if inputBuffer@ = 'B' _then _(
+  _if INP@ = 'B' _then _(
     verifyAdminPrivileges;
-    code(=16ПВ76312,);
+    get(INP);
     isResumedGame := false;
     enableLogging := ;
     hasScore := ;
@@ -2138,7 +2132,7 @@ _( (* playGameSession *)
     userTotalScore := ;
     gamesPlayedToday := ;
     testMode := true;
-    _for currentPlayer := 0 _to 1 _do 
+    _for currentPlayer := 0 _to 1 _do
     _for loopIndex := 0 _to 7 _do
       curPosition[currentPlayer].pits[loopIndex].val := rndDigit(10);
     difficultyLevel :=   rndDigit( 10 );
@@ -2213,7 +2207,7 @@ _( (* playGameSession *)
   lastMoveResult := ;
   animDelay := ((animSpeed + 1) - (difficultyLevel _div 2));
   _if (animDelay < 0) _then animDelay := 0;
-  _select 
+  _select
     difficultyLevel = 1 : _( searchDepth := 2; maxNodesToSearch := 37 _);
     difficultyLevel = 2 : _( searchDepth := 2; maxNodesToSearch := 600 _);
     difficultyLevel > 2 : _( searchDepth := 4; maxNodesToSearch := 2500; useOpeningBook := true _)
@@ -2273,25 +2267,23 @@ _( (* playGameSession *)
   l2v77z :=   wallClockTicks;
   readTerminalInput(false);
   curThinkTime := wallClockTicks - l2v77z;
-  _if (curThinkTime < 0) _then curThinkTime := 62C;
+  _if (curThinkTime < 0) _then curThinkTime := 50;
 % 11052
   movesPending :=   readCommand( commandEntered, 3 );
   postponeFlag := (commandEntered = 'SLЕ   ') _and  (47 _IN systemFlags);
-  reset(inputBuffer);
+  reset(INP);
   _if postponeFlag _then _(
     _if isTrainingGame _then _goto 12341 _else _goto 11225;
   _);
   userThinkingTime := userThinkingTime + curThinkTime;
   movesInBuffer := 0;
 % 11076
-  _while (inputBuffer@ _in digit) _and (movesInBuffer < 10) _do _( 
+  _while (INP@ _in digit) _and (movesInBuffer < 10) _do _(
     movesInBuffer := movesInBuffer + 1;
-    moveBuffer[movesInBuffer] := inputBuffer@;
-%   get(inputBuffer);
-     code(16ПВ76312=,);
-    _if (inputBuffer@ = ',') _or (inputBuffer@ = space) _then 
-%    get(inputBuffer);
-      code(16ПВ76312=,);
+    moveBuffer[movesInBuffer] := INP@;
+    get(INP);
+    _if (INP@ = ',') _or (INP@ = space) _then
+    get(INP);
   _); (* 11115 *)
   _if (movesInBuffer = 0) _then _(
     movesInBuffer := 1;
@@ -2351,7 +2343,7 @@ _( (* playGameSession *)
     gl90z := l2v29z;
     _if gl90z _then _(
       userFinalKalah := 2;
-      code(ЗЧ76013=,);
+      code(ЗЧ76013=);
       packPosition(curPosition, pckPosition);
       dsplBoard(pckPosition);
       userFinalKalah := 3;
@@ -2428,7 +2420,7 @@ _( (* playGameSession *)
   _if isTrainingGame _then l2v153z@[11].i := l2v153z@[11].i + 1;
   _for entryIndex := 1 _to numScoreEntries _do _(
     l2v5z := zoneBuffer@[1008 - entryIndex].a;
-    code(2ЛУ4=2ЗЧ11,); (* cmdString := l2v5z & l2v2z *) 
+    code(2ЛУ4=2ЗЧ11,); (* cmdString := l2v5z & l2v2z *)
     _if (cmdString = l2v4z) _then _(
       code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,2ЗЧ7=);
       unpck(l2v124z@[1], l2v5z);
@@ -2437,7 +2429,7 @@ _( (* playGameSession *)
       packedData.i := currentPlayer _mod 2;
       _if (cmdString <> l2v6z) _then gamesPlayedToday := 5;
       _goto 11531;
-    _) 
+    _)
   _);
 % 11527
   entryIndex := numScoreEntries + 1;
@@ -2508,7 +2500,7 @@ _( (* playGameSession *)
        _);
      _)
     _); (* 11712 *)
-    _if (hasScore _or isResumedGame) _and _not testMode _then 
+    _if (hasScore _or isResumedGame) _and _not testMode _then
       writeDiskZone( nu, zonePlayers );
 % 11721
     _if enableLogging _and _not isResumedGame _and ((13C) _IN systemFlags) _then _(
@@ -2520,7 +2512,7 @@ _( (* playGameSession *)
     _); (* 11741 *)
     unlockZone66;
     _if _not isTrainingGame _then _(
-    _if _not hasScore _then 
+    _if _not hasScore _then
       write('БУДЕМ ИГРАТЬ БЕЗ СЧЕТА')
     _else _(
       write('СЧЕТ ');
@@ -2538,7 +2530,7 @@ _( (* playGameSession *)
 11772:
    seledMove := ord(moveBuffer[1]);
    movesInBuffer := movesInBuffer - 1;
-   _for savedGameSlot := 1 _to movesInBuffer _do 
+   _for savedGameSlot := 1 _to movesInBuffer _do
      moveBuffer[savedGameSlot] := moveBuffer[(savedGameSlot + 1)];
    _if (seledMove = 0) _or (seledMove > 6) _then _(
      write('ОШИБКА - ПОВТОРИ');
@@ -2625,7 +2617,7 @@ _( (* playGameSession *)
 12244:
   writeTerminalOutput;
   gl90z := l2v29z;
-  _if gl90z _then _( 
+  _if gl90z _then _(
     userFinalKalah := 3;
     code(ЗЧ76013=);
   _);
@@ -2661,9 +2653,9 @@ _( (* playGameSession *)
   sigrestore;
   _if allowExit _then _(
     gameActive := false;
-    rewrite(inputBuffer);
+    rewrite(INP);
     systemFlags := systemFlags + [47];
-    write(inputBuffer,'СОN  {377');
+    write(INP,'СОN  {377');
     _GOTO 12633;
   _); (* 12356 *)
   writeJinnName;
@@ -2678,7 +2670,7 @@ _( (* playGameSession *)
     _for currentPlayer := 2 _to (logIndex - 1) _do
       write(logPacked[currentPlayer]);
     writeTerminalOutput;
-  _); 
+  _);
   _if postponeFlag _then _goto 12566;
 _);
 
@@ -2694,9 +2686,9 @@ _(
   l2v2z := l2v2z - startWallClock;
   _if l2v2z < 0 _then exit;
   gl24z := l2v1z _div 4;
-  updateStatistics( 37C );
+  updateStatistics( 31 );
   gl24z := shift(l2v2z, 9);
-  (q) updateStatistics( 41C ); 
+  (q) updateStatistics( 33 );
 _);
 _procedure exec(arg:integer);
 _procedure P12450(_var f:text; _var i:integer; j:integer); _( code(ПБ76022=,); _);
@@ -2704,19 +2696,19 @@ _(
   _if gameActive _then _goto 12636;
   systemFlags := systemFlags + [13];
   P12424;
-  P12450(inputBuffer, userId, 76C );
+  P12450(INP, userId, userEntryLen );
 _);
 _procedure P12501;
 _var l2v1z, l2v2z: integer;
 _procedure P12473(_var f:text; _var i:integer; j:integer); _( code(ПБ76021=); _);
 _(
-  P12473(inputBuffer, userId, 76C );
+  P12473(INP, userId, userEntryLen );
   unpck(userName[1], userAccount );
   userName[5] := space;
-  isAdmin := (userAccount = adminId);
+  isAdmin := userAccount = adminId;
   l2v1z := sel(gl75z, 16, 8);
   l2v2z := sel(gl75z, 24, 8);
-  gl26z := (500);
+  gl26z := 500;
   animSpeed := trunc((gl26z - 250) / 500);
   _GOTO 12566;
 _);
@@ -2742,10 +2734,10 @@ _(
   _if checkRemainingTime _then _goto 12633;
   readTerminalInput(true);
   gameActive := false;
-; 12566:
+12566:
   _if readCommand(commandEntered, 3 ) _then _select
-    'ИГР   ' = commandEntered : 
-      _if inputBuffer@ = charEtx _then _goto 12561 _else _goto 12566;
+    'ИГР   ' = commandEntered :
+      _if INP@ = charEtx _then _goto 12561 _else _goto 12566;
     'КАЛ   ' = commandEntered :  playGameSession;
     ('ТУР   ' = commandEntered) _or
     ('ПЕЧ   ' = commandEntered) _or
@@ -2757,9 +2749,11 @@ _(
         _goto 12633;
       _);
      'КОН   ' = commandEntered :  12633: exec( 1660730C );
-     gameActive : 12636: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', commandEntered);
-     true: _( _goto 12633; (q) _)
-  _end _else  (* 12650 *) 
-     writeln('НЕ ПОНИМАЮ');
+     true: _if gameActive _then
+         12636: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', commandEntered)
+      _else
+        _goto 12633
+  _end _else  (* 12650 *)
+    writeln('НЕ ПОНИМАЮ');
   _goto 12561;
-_).     
+_).
