@@ -270,8 +270,8 @@ _(
   code(7ПА363=ПБВЫХ,);
   code(7ПА421=ПБВЫХ,);
   code(7ПА460=ПБВЫХ,);
-  code(7ПА516=,ВЫХ:ВИ7=2ЗЧ7,);
-
+  code(7ПА516=,ВЫХ:ВИ7=);
+  v1 := ;
   v2 := ord((y _mod 4 = 0) _and (m > 2));
   julianDate := (y-1) * 365 + (y-1) _div 4 + v2 + v1 + d;
 _);
@@ -307,7 +307,7 @@ _(
  v2 := 2;
  v1 := 35C;
   _) _else _(
- _if (a > 74C) _and  v4 _then a := a - 1;
+ _if (a > 60) _and  v4 _then a := a - 1;
 
   _select
   a > 334: _(v2 := 12; v1 := 334; _);
@@ -776,7 +776,7 @@ _(
   _)
 _);
 
-_functin exMvAnimated(_var l3a1z:Position; l3a2z:integer):integer;
+_functin exMvAnimated(_var pos:Position; l3a2z:integer):integer;
 _label 4171;
 _var l3v1z:word;
 l3v2z:integer; l3v3z:integer; l3v4z:integer;
@@ -785,18 +785,18 @@ l3v6z, l3v7z:integer;
 l3v8z:word;
 l3v9z, l3v10z: integer;
 l3v11z, l3v12z:integer; l3v13z:char;
-_procedure drawMove(l4a1z: player; l4a2z: integer);
+_procedure drawMove(p: player; l4a2z: integer);
 _var l4v1z, l4v2z, l4v3z,l4v4z,l4v5z,l4v6z,l4v7z:integer;
-l4v8z:char;
+dir:char;
 _(
   _if l4a2z = 7 _then _(
     l4v5z := 0;
-    _if l4a1z = user _then
+    _if p = user _then
       l4v4z := 18 + 36
     _else
       l4v4z := 18 - 1;
   _) _else _(
-    _if l4a1z = user _then _(
+    _if p = user _then _(
       l4v6z := l4a2z;
       l4v5z := -1;
     _) _else _(
@@ -807,11 +807,11 @@ _(
   _);
   _select
     l4v4z > l3v11z : _(
-      l4v8z := right;
+      dir := right;
       l4v3z := l4v4z - l3v11z;
     _);
     l4v4z < l3v11z : _(
-      l4v8z := left;
+      dir := left;
       l4v3z := l3v11z - l4v4z;
     _);
     true: l4v3z := 0
@@ -820,26 +820,25 @@ _(
     _for l4v1z := 1 _to animDelay _do _(
       write(delay);
     _);
-    write(l4v8z);
+    write(dir);
   _);
-  _if (l4v5z > l3v12z) _then _(
-    l4v8z := up;
+  _if l4v5z > l3v12z _then _(
+    dir := up;
     l4v3z := l4v5z - l3v12z;
   _) _else _(
-    _if (l3v12z > l4v5z) _then _(
-      l4v8z := down;
+    _if l3v12z > l4v5z _then _(
+      dir := down;
       l4v3z := l3v12z - l4v5z;
     _) _else _(
       l4v3z := 0; (q) _exit q
     _)
   _);
   _for l4v2z := 1 _to l4v3z _do _(
-    _for l4v1z := 1 _to animDelay _do _(
+    _for l4v1z := 1 _to animDelay _do
       write(delay);
-    _);
-    write(l4v8z);
+    write(dir);
   _);
-  l4v7z := l3a1z[l4a1z].pits[l4a2z].val;
+  l4v7z := pos[p].pits[l4a2z].val;
   _if l4v7z = 0 _then
     write(space:2)
   _else
@@ -850,31 +849,31 @@ _(
 _);
 _( (* exMvAnimated *)
   l3v12z := 0;
-  l3v1z := l3a1z[user].move;
+  l3v1z := pos[user].move;
   l3v5z := ;
   _if l3a2z = 0 _then _(
     l3v8z.i := 0;
     l3v6z := ;
     l3v11z := 0;
     _for l3v3z := 1 _to 6 _do _(
-      l3v8z.i := l3a1z[jinn].pits[l3v3z].val + l3v8z.i;
-      l3v6z := l3a1z[user].pits[l3v3z].val + l3v6z;
+      l3v8z.i := pos[jinn].pits[l3v3z].val + l3v8z.i;
+      l3v6z := pos[user].pits[l3v3z].val + l3v6z;
     _);
     (*=c-*)l3v3z := l3v8z.i = 0; (*=c+*)
     l3v6z := l3v6z + l3v8z.i;
     writeCharNTimes(up, l3v1z.i);
     _for l3v4z := 1 _to 6 _do _(
-      _if l3a1z[l3v3z].pits[l3v4z].val > 0 _then _(
-        l3a1z[l3v3z].pits[l3v4z].val := 0;
+      _if pos[l3v3z].pits[l3v4z].val > 0 _then _(
+        pos[l3v3z].pits[l3v4z].val := 0;
         drawMove(l3v3z, l3v4z);
       _)
     _);
-    l3a1z[l3v3z].pits[7].val := l3a1z[l3v3z].pits[7].val + l3v6z;
+    pos[l3v3z].pits[7].val := pos[l3v3z].pits[7].val + l3v6z;
     drawMove(l3v3z, 7);
   _) _else _( (* 4035 *)
     l3v11z := 7;
-    l3v6z := l3a1z[l3v1z.i].pits[l3a2z].val;
-    l3a1z[l3v1z.i].pits[l3a2z].val := 0;
+    l3v6z := pos[l3v1z.i].pits[l3a2z].val;
+    pos[l3v1z.i].pits[l3a2z].val := 0;
     writeCharNTimes(up, l3v1z.i);
     write(totalMovesPlayed:4);
     write(space:3);
@@ -890,7 +889,7 @@ _( (* exMvAnimated *)
     _for l3v3z := 1 _to l3v6z _do _(
       l3v2z := l3a2z + l3v3z;
       _if l3v2z <= l3v4z _then _(
-        l3a1z[l3v1z.i].pits[l3v2z].val := l3a1z[l3v1z.i].pits[l3v2z].val + 1;
+        pos[l3v1z.i].pits[l3v2z].val := pos[l3v1z.i].pits[l3v2z].val + 1;
         l3v7z := ;
         drawMove( l3v1z.i, l3v2z );
         _if l3v3z = l3v6z _then _(
@@ -898,18 +897,18 @@ _( (* exMvAnimated *)
             exMvAnimated := 2;
           _) _else _(
             exMvAnimated := 1;
-            l3a1z[jinn].move := l3v5z;
+            pos[jinn].move := l3v5z;
             code(ср13=);
-            l3a1z[user].move := ;
+            pos[user].move := ;
             _if (l3v7z = 1) _and (l3v1z.i = l3v5z.i) _then _(
               l3v10z := 7 - l3v2z;
-              l3v9z := l3a1z[l3v8z.i].pits[l3v10z].val;
+              l3v9z := pos[l3v8z.i].pits[l3v10z].val;
               _if l3v9z > 0 _then _(
-                l3a1z[l3v8z.i].pits[l3v10z].val := 0;
+                pos[l3v8z.i].pits[l3v10z].val := 0;
                 drawMove( l3v8z.i, l3v10z );
-                l3a1z[l3v1z.i].pits[l3v2z].val := 0;
+                pos[l3v1z.i].pits[l3v2z].val := 0;
                 drawMove( l3v1z.i, l3v2z );
-                l3a1z[l3v5z.i].pits[7].val := l3a1z[l3v5z.i].pits[7].val + l3v9z + 1;
+                pos[l3v5z.i].pits[7].val := pos[l3v5z.i].pits[7].val + l3v9z + 1;
                 drawMove( l3v5z.i, 7 );
               _);
 % L4160:
@@ -962,12 +961,12 @@ _(
   _)
 _);
 
-_function getExtraTurnMoves(_var l3a1z:Position; l3a2z:player):bitset; (* unused *)
+_function getExtraTurnMoves(_var pos:Position; p:player):bitset; (* unused *)
 _var l3v1z, l3v2z, l3v3z:integer; l3v4z:bitset;
 _(
   l3v4z := [];
   _for l3v3z := 1 _to 6 _do _(
-    l3v2z := l3a1z[l3a2z].pits[l3v3z].val;
+    l3v2z := pos[p].pits[l3v3z].val;
     _if (l3v2z > 0) _then _(
       l3v1z := l3v2z + l3v3z;
       _if (l3v1z = 7) _or (l3v1z = 20) _then
@@ -977,7 +976,7 @@ _(
   getExtraTurnMoves := l3v4z;
 _);
 
-_function selAIMove(_var l3a1z:Position; _var l3a2z: eightwords; l3a3z:integer):integer;
+_function selAIMove(_var pos:Position; _var weights: eightwords; l3a3z:integer):integer;
 _label 5250, 5655;
 _var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z: integer;
 l3v6z, l3v7z, l3v8z, l3v9z:integer;
@@ -1080,11 +1079,11 @@ _(
       distToKalah := userStones + pitIndex;
       distMinus13 := distToKalah - 13;
       _if distToKalah < 7 _then _(
-        userDistance := (userDistance + userStones) + 7;
+        userDistance := userDistance + userStones + 7;
       _) _else _(
         _while distToKalah >= 20 _do
           distToKalah := distToKalah - 13;
-        userDistance := (abs(13 - distToKalah) + userDistance) + tableIndex;
+        userDistance := abs(13 - distToKalah) + userDistance + tableIndex;
       _);
       _if distToKalah = 7 _then _(
         userScore := userScore + l3v72z;
@@ -1104,8 +1103,8 @@ _(
     evaluatePosition :=   materialDifference( pos );
     exit
   _);
-  jinnScore := (((((jinnEmptyOpp * l3v73z) + (jinnCaptureSetup * l3v75z)) + (jinnMobile * l3v76z)) + (jinnDistance * l3v77z)) + jinnScore);
-  userScore := (((((userEmptyOpp * l3v73z) + (userCaptureSetup * l3v75z)) + (userMobile * l3v76z)) + (userDistance * l3v77z)) + userScore);
+  jinnScore := jinnEmptyOpp * l3v73z + jinnCaptureSetup * l3v75z + jinnMobile * l3v76z + jinnDistance * l3v77z + jinnScore;
+  userScore := userEmptyOpp * l3v73z + userCaptureSetup * l3v75z + userMobile * l3v76z + userDistance * l3v77z + userScore;
   evaluatePosition := jinnScore - userScore;
 _);
 _function minimax(_var pos:Position; depth, maxNodes: integer; _var alpha, beta: integer):integer;
@@ -1118,9 +1117,8 @@ testPosition, newPosition:Position;
 _(
   _if depth = 0 _then _(
     bestScore :=   evaluatePosition( pos );
-    _goto 5070; (* a potential hack, could be something + goto 5054 *)
-    _goto 5054;
-  _);
+    _goto 5070;
+  _) _else _(
   testPosition := pos;
   bestScore := minusHundredMillion;
   localAlpha := alpha;
@@ -1141,7 +1139,7 @@ _(
     pitStones := pitStones + pitIndex;
     oppMobile := testPosition[jinnPlayer].pits[pitIndex].val + oppMobile;
     _select
-      (pitStones = 7) _or (pitStones = 24C) : _(
+      (pitStones = 7) _or (pitStones = 20) : _(
       mvSc[curPit] := pitIndex;
       curPit := curPit + 1;
     _);
@@ -1203,6 +1201,7 @@ _(
   _);
 5050:
   _if bestScore < beta _then beta := bestScore;
+  _);
 5054:
   chosenMove := bestMove;
   _if (bestMove = 0) _and _not isGameOver(testPosition) _then _(
@@ -1253,17 +1252,17 @@ _(
 _);
 _( (* selAIMove *)
   l3v9z :=   remainingCPUTime;
-  _for l3v2z := 1 _to 36C _do
+  _for l3v2z := 1 _to 30 _do
    haveSaid[l3v2z] := [];
 
-  l3v71z := l3a2z.f1;
-  l3v72z := l3a2z.f2;
-  l3v73z := l3a2z.f3;
-  l3v74z := l3a2z.f4;
-  l3v75z := l3a2z.f5;
-  l3v76z := l3a2z.f6;
-  l3v77z := l3a2z.f7;
-  l3v10z := l3a1z;
+  l3v71z := weights.f1;
+  l3v72z := weights.f2;
+  l3v73z := weights.f3;
+  l3v74z := weights.f4;
+  l3v75z := weights.f5;
+  l3v76z := weights.f6;
+  l3v77z := weights.f7;
+  l3v10z := pos;
   l3v2z := minusHundredMillion;
   l3v3z := hundredMillion;
   uncertaintyBits := 0;
@@ -1299,7 +1298,7 @@ _( (* selAIMove *)
   l3v4z := l3v10z[user].move.i;
   l3v68z := maxNodesToSearch;
   _for l3v1z := 1 _to 6 _do _(
-    _if l3a1z[l3v4z].pits[l3v1z].val > 0 _then l3v70z := l3v70z + 1;
+    _if pos[l3v4z].pits[l3v1z].val > 0 _then l3v70z := l3v70z + 1;
   _);
   l3v4z := 0;
   l3v6z := ;
@@ -1455,7 +1454,7 @@ _(
   bitPosition := bitPosition - 3;
   _if corrStartIdx = corrEndIdx _then _(
     entryPtr := ptr(corrStartIdx + ord(zoneBuffer));
-    _if (curMoveNumber = 16C) _or
+    _if (curMoveNumber = 14) _or
         (sel(entryPtr@.i,bitPosition, 3) = 0) _then _(
       applyLearningCorrection := entryPtr@.i _mod 8;
       lockZone66;
@@ -1785,7 +1784,7 @@ _( (* generateAIPhrase *)
       rndChoice :=   chkRandom( 6 );
       write('ТЫ ДУМАЛ');
       _if (knownGender = FEM) _then write(femending);
-      rndChoice := (curThinkTime + 31C) _DIV 50;
+      rndChoice := (curThinkTime + 25) _DIV 50;
       write(space, rndChoice:1, ' СЕКУНД');
       rndChoice :=   countEnding( rndChoice );
       _select
@@ -2071,8 +2070,7 @@ _( (* playGameSession *)
   curMoveNumber := ;
   enableLogging := true;
   isTrainingGame := INP@ = 'T';
-%   systemFlags := systemFlags + [33b];
-  _if ((33C) _IN systemFlags) _then _(
+  _if 27 _IN systemFlags _then _(
   _if isTrainingGame _then _(
     levelChoice := 0;
     startPlayer := 2;
@@ -2107,7 +2105,7 @@ _( (* playGameSession *)
   _)
   _); (* 10366 *)
   knownGender := shift(userGender, 46);
-  l2v164z := [0, 572, 136, 20C, 65C, 41C, 110, 120C];
+  l2v164z := [0, 572, 136, 16, 53, 33, 110, 80];
   l2v133z := l2v164z;
   l2v1z := '    00';
   l2v2z := '{377{3770000';
@@ -2149,7 +2147,7 @@ _( (* playGameSession *)
     isResumedGame := ;
     isNewGame := ;
     (loop) _while _not isTrainingGame _and extractMinElement(savedGameSlot, l2v127z) _do _(
-      l2v132z := ptr((savedGameSlot * 25C) + 64004C);
+      l2v132z := ptr(savedGameSlot * 21 + 64004C);
       _if (l2v132z@.i = 7) _and isInLargeSet( userId, l2v132z@.ls) _then _(
         l2v128z := l2v128z - [savedGameSlot];
         zoneBuffer@[3] := ;
@@ -2359,13 +2357,13 @@ _( (* playGameSession *)
   numScoreEntries := zoneBuffer@[1].i;
   l2v128z := l2v127z _mod [0..47];
   _if extractMinElement(savedGameSlot, l2v128z) _then _(
-  _if savedGameSlot > 43C_then _(
+  _if savedGameSlot > 35 _then _(
     unlockZone66;
     write('ОТЛОЖИТЬ ИГРУ НЕ УДАЛОСЬ');
     writeTerminalOutput;
   _goto 12341;
   _); (* 11300 *)
-  l2v132z := ptr((savedGameSlot * 25C) + 64004C);
+  l2v132z := ptr(savedGameSlot * 21 + 64004C);
   l2v127z := l2v127z + [savedGameSlot];
   zoneBuffer@[3] := ;
   l2v132z@.i := 7;
@@ -2395,27 +2393,27 @@ _( (* playGameSession *)
    _);
    _if enableLogging _then _(
    _while charIndex <> 1 _do logChar(space);
-   _if (logIndex < 16C) _then _(
-     _for loopIndex := 5 _to (logIndex - 1) _do _(
+   _if logIndex < 14 _then _(
+     _for loopIndex := 5 _to logIndex - 1 _do _(
        l2v132z@.f13[loopIndex] := logPacked[loopIndex];
      _)
    _) _else
-   l2v132z@.f13[5] := 'ПРОД: ';
+     l2v132z@.f13[5] := 'ПРОД: ';
   _);
 11426:
-  l2v153z := ptr((difficultyLevel * 12) + 65354C);
+  l2v153z := ptr(difficultyLevel * 12 + 65354C);
   _if _not isResumedGame _and _not isNewGame _and _not isTrainingGame _then _(
     l2v153z@[0].i := l2v153z@[0].i + 1;
-    l2v153z@[1].i := ((  remainingCPUTime  + l2v153z@[1].i) - startTickCount);
-    l2v153z@[2].i := (l2v153z@[2].i + jinnThinkingTime);
-    l2v153z@[3].i := (l2v153z@[3].i + userThinkingTime);
+    l2v153z@[1].i := remainingCPUTime  + l2v153z@[1].i - startTickCount;
+    l2v153z@[2].i := l2v153z@[2].i + jinnThinkingTime;
+    l2v153z@[3].i := l2v153z@[3].i + userThinkingTime;
     l2v153z@[4].i := round(totalEntropy * oneOverLn2) + l2v153z@[4].i;
-    l2v153z@[5].i := (l2v153z@[5].i + nodesSearched);
-    l2v153z@[6].i := (l2v153z@[6].i + totalMovesPlayed);
-    l2v153z@[7].i := (l2v153z@[7].i + alphaBetaCutoffs);
-    l2v153z@[8].i := (l2v153z@[8].i + deepenCount);
-    l2v153z@[9].i := (l2v153z@[9].i + jinnWins);
-    l2v153z@[10].i := (l2v153z@[10].i + userWins);
+    l2v153z@[5].i := l2v153z@[5].i + nodesSearched;
+    l2v153z@[6].i := l2v153z@[6].i + totalMovesPlayed;
+    l2v153z@[7].i := l2v153z@[7].i + alphaBetaCutoffs;
+    l2v153z@[8].i := l2v153z@[8].i + deepenCount;
+    l2v153z@[9].i := l2v153z@[9].i + jinnWins;
+    l2v153z@[10].i := l2v153z@[10].i + userWins;
   _); (* 11473 *)
   _if isTrainingGame _then l2v153z@[11].i := l2v153z@[11].i + 1;
   _for entryIndex := 1 _to numScoreEntries _do _(
@@ -2455,7 +2453,7 @@ _( (* playGameSession *)
       userTotalScore := ;
       writeln('ПЕРЕХОД В УЧАСТНИКИ - СЧЕТ ОБНУЛЕН':52);
     _);
-    _if ((userTotalScore + jinnTotalScore) >= 31C) _then _(
+    _if userTotalScore + jinnTotalScore >= 25 _then _(
       _if (difficultyLevel = 3) _and (userTotalScore > jinnTotalScore) _then _(
         difficultyLevel := 4;
         writeln('ПЕРЕХОД В "ЭФЕНДИ"':45);
@@ -2474,7 +2472,7 @@ _( (* playGameSession *)
       gamesPlayedToday := gamesPlayedToday + 1;
       difficultyLevel := savedLevel;
     _);
-    _if (gamesPlayedToday > 5) _then gamesPlayedToday := 5;
+    _if gamesPlayedToday > 5 _then gamesPlayedToday := 5;
 % 11626
     currentPlayer := packedData.i;
     packedData.i := gamesPlayedToday * 2 + currentPlayer;
@@ -2485,25 +2483,25 @@ _( (* playGameSession *)
     (loop) _for currentPlayer := insertPos _to scorePos _do _(
       _if _not compareScoreEntries( currentPlayer, (currentPlayer + 1)) _then _exit loop;
     _); (* 11655 *)
-    _if ((34C) _IN permFlags) _then _(
+    _if 28 _IN permFlags _then _(
       _repeat
         cmdResult := true;
-        _for currentPlayer := ((1008) - numScoreEntries) _to scorePos _do _(
+        _for currentPlayer := 1008 - numScoreEntries _to scorePos _do _(
           _if compareScoreEntries( currentPlayer, (currentPlayer + 1)) _then cmdResult := false;
         _);
       _until cmdResult;
       permFlags := permFlags - [28];
     _) _else _(
-       scorePos := (((1008) - numScoreEntries) + 1);
+       scorePos := 1008 - numScoreEntries + 1;
        (loop) _for currentPlayer := insertPos _downto scorePos _do _(
-         _if _not compareScoreEntries( (currentPlayer - 1), currentPlayer) _then _exit loop;
+         _if _not compareScoreEntries( currentPlayer - 1, currentPlayer) _then _exit loop;
        _);
      _)
     _); (* 11712 *)
     _if (hasScore _or isResumedGame) _and _not testMode _then
       writeDiskZone( nu, zonePlayers );
 % 11721
-    _if enableLogging _and _not isResumedGame _and ((13C) _IN systemFlags) _then _(
+    _if enableLogging _and _not isResumedGame _and (11 _IN systemFlags) _then _(
       _while charIndex <> 1 _do logChar(space);
       unpck(l2v118z[1], logPacked[5]);
       l2v118z[2] := resultChar;
@@ -2556,9 +2554,9 @@ _( (* playGameSession *)
     prevNodes := ;
 % 12051
     _while (difficultyLevel > 2) _and _not gameIsDecided _and _not useOpeningBook _and (nodesThisMove > prevNodes) _and
-       (((actualDepth = 2) _and (nodesThisMove < 24C)) _or
-       ((actualDepth = 3) _and (nodesThisMove < 60C)) _or
-       ((actualDepth >= 4) _and  (nodesThisMove < 122C))) _do _(
+       (((actualDepth = 2) _and (nodesThisMove < 20)) _or
+       ((actualDepth = 3) _and (nodesThisMove < 48)) _or
+       ((actualDepth >= 4) _and  (nodesThisMove < 82))) _do _(
       prevNodes := nodesThisMove;
       nodesThisMove := nodesSearched;
       extraDepth := extraDepth + 1;
@@ -2572,7 +2570,7 @@ _( (* playGameSession *)
   _if useCorrections _and (curMoveNumber < 15) _then
     seledMove := applyLearningCorrection( seledMove );
   posBeforeMove := curPosition;
-  _if (currentPlayer = 0) _then _(
+  _if currentPlayer = jinn _then _(
     write(arrow, seledMove:1);
     generateAIPhrase;  write(lf);
     writeCharNTimes(down, 2 );
@@ -2580,7 +2578,7 @@ _( (* playGameSession *)
   _if enableLogging _then logChar( chr(seledMove) );
   l2v125z :=   exMvAnimated(curPosition, seledMove );
   writeCharNTimes(down, 1 );
-  _if (l2v125z <> 0) _then _goto 12162;
+  _if l2v125z <> 0 _then _goto 12162;
   _if (userFinalKalah = 12) _and isGameOver(curPosition) _then
     _goto 12240
   _else
@@ -2588,23 +2586,23 @@ _( (* playGameSession *)
 12162:
   _if useOpeningBook _then _(
     _if openingBookIndex <= bookSize _then _(
-      openingBookIndex := ((openingBookIndex * 6) + seledMove);
-      _if (curMoveNumber < 6) _then posSignature := ((posSignature * 8) + seledMove);
+      openingBookIndex := openingBookIndex * 6 + seledMove;
+      _if curMoveNumber < 6 _then posSignature := posSignature * 8 + seledMove;
     _) _else _(
       useOpeningBook := false;
       useCorrections := true;
     _)
   _); (* 12176 *)
-  rndnessFactor := 144 - ((curPosition[jinn].pits[7].val + curPosition[user].pits[7].val) * 4);
-  _if (rndnessFactor < 10) _then rndnessFactor := 10;
+  rndnessFactor := 144 - (curPosition[jinn].pits[7].val + curPosition[user].pits[7].val) * 4;
+  _if rndnessFactor < 10 _then rndnessFactor := 10;
    curMoveNumber := curMoveNumber + 1;
-   _if (l2v125z = 1) _then _(
+   _if l2v125z = 1 _then _(
      totalMovesPlayed := totalMovesPlayed + 1;
      _if enableLogging _then logChar(space);
   _); (* 12214 *)
   _if isGameOver(curPosition) _then _(
     userFinalKalah := currentPlayer + 1;
-    _if (l2v125z = 2) _then  userFinalKalah := ((userFinalKalah + 1) - (currentPlayer * 2));
+    _if l2v125z = 2 _then  userFinalKalah := userFinalKalah + 1 - currentPlayer * 2;
     writeCharNTimes(up, userFinalKalah );
     l2v125z :=   exMvAnimated(curPosition, 0 );
     writeCharNTimes(down, 3 );
