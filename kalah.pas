@@ -118,18 +118,19 @@ _(
     writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
     gameActive := false;
     write(INP,'КОН  {377');
-    checkRemainingTime := true; exit
+    checkRemainingTime := true;
+    exit
   _)
 _);
 _procedure checkNegativeResponse;
 _var l2v1z:alfa;
 _(
   writeLN;
-  code(сч77015=2зч3,);
- _if (l2v1z = 'Н{3770000') _then _GOTO 12561;
+  code(сч77015=); l2v1z := ;
+ _if l2v1z = 'Н{3770000' _then _GOTO 12561;
 _);
 
-_function rndDigit(i:integer):integer;
+_function getDigit(i:integer):integer;
 _( code(=14ПВ77463,) _);
 
 _procedure updateStatistics(index:integer);
@@ -357,7 +358,7 @@ _(
     writeln('КАЛАХ ЗАКРЫТ');
     _GOTO 12561;
   _);
-  _if (tempSet * [2] = [2]) _then _(
+  _if tempSet * [2] = [2] _then _(
     write('ДЛЯ ВАС '); _goto 1;
   _);
   _if 30 _IN permFlags _then _(
@@ -379,7 +380,7 @@ _(
     writeln('ИГРА СЕЙЧАС ЗАКРЫТА');
     _repeat
       l2v2z := l2v2z + 1;
-      _if (l2v2z _IN isTrainingGame) _then _(
+      _if l2v2z _IN isTrainingGame _then _(
         write('ОТКРОЕТСЯ В ');
         l2v1z := (l2v2z _div 2);
         l2v2z := ((l2v2z - (l2v1z * 2)) * 30);
@@ -475,7 +476,7 @@ _procedure drawPit(pit:integer);
 _(
   write(oparen:2);
   stoneCount := unpackedSide.pits[pit].val;
-  _if (stoneCount = 0) _then
+  _if stoneCount = 0 _then
     write(space:2)
   _else
     write(stoneCount:2);
@@ -571,7 +572,7 @@ _(
   zoneBuffer@[l2v2z].a := l3a1z;
   l2v5z := ;
   l2v2z := l2v2z + 1;
-  _if (l2v5z = fin) _then _(
+  _if l2v5z = fin _then _(
 1:  code(2СЧ3=СД/-14/,2ЛС4=);
     zoneBuffer@[0].i := ;
     _GOTO 3247;
@@ -614,7 +615,7 @@ up = '{176'; down = '{177'; delay = '{142';
 _type
 Position = _array [jinn..user] _of OneSide;
 pckboth = _array [jinn..user] _of word;
-eightwords = _record f0, f1, f2, f3, f4, f5, f6, f7:integer _end;
+eightwords = _record f0, kalah, extraTurn, emptyOpp, multiLap, capture, mobility, distance:integer _end;
 _var l2v1z, l2v2z, l2v3z, l2v4z:alfa;
 l2v5z, l2v6z, cmdString, inputCmd:alfa;
 resultChar:char; hasScore, isResumedGame, isNewGame, isTrainingGame, movesPending,
@@ -677,13 +678,13 @@ _function matchesCommand(command:alfa):boolean;
 _var a: alfa; unpCommand,oneChar:sixchars;
 _(
   matchesCommand := false;
-  _if (command = inputCmd) _then _( matchesCommand := true; exit _);
+  _if command = inputCmd _then _( matchesCommand := true; exit _);
   unpck(unpCommand[1], command);
   a := '      ';
   unpck (oneChar[1], a);
   oneChar[1] := unpCommand[1];
   pck(oneChar[1], a);
-  _if (a = inputCmd) _then matchesCommand := true;
+  _if a = inputCmd _then matchesCommand := true;
 _);
 
 _function procStrings(l3a1z, l3a2z: alfa):alfa;
@@ -731,22 +732,22 @@ _(
   originalPlayer := ;
   boardPtr := ref(pos);
   stonesToMove := boardPtr@[curPlayer*8+pitIndex].val;
-  _if (stonesToMove = 0) _then _( exMvLogic := 0; exit _);
+  _if stonesToMove = 0 _then _( exMvLogic := 0; exit _);
   boardPtr@[curPlayer*8+pitIndex].val := 0;
 3520:
   code(3сч6=ср13,3зч15=); (* opponentPlayer := _not curPlayer *)
-  _if (curPlayer = originalPlayer) _then
+  _if curPlayer = originalPlayer _then
     maxPit := 7
   _else
     maxPit := 6;
 
   _for stoneIndex := 1 _to stonesToMove _do _(
     curPit := pitIndex + stoneIndex;
-    _if (curPit <= maxPit) _then _(
+    _if curPit <= maxPit _then _(
       pitPtr := ref(boardPtr@[curPlayer*8+curPit]);
       pitPtr@ := pitPtr@ + 1;
       pitValue := ;
-      _if (stoneIndex = stonesToMove) _then _(
+      _if stoneIndex = stonesToMove _then _(
         _if curPit = 7 _then _(
           exMvLogic := 2;
         _) _else _(
@@ -757,7 +758,7 @@ _(
           _if (pitValue = 1) _and (curPlayer = originalPlayer) _then _(
             oppositePitPtr := ref(boardPtr@[opponentPlayer*8+7-curPit]);
             capturedStones := oppositePitPtr@;
-            _if (capturedStones > 0) _then _(
+            _if capturedStones > 0 _then _(
               kalahPtr := ref(boardPtr@[originalPlayer*8+7]);
               kalahPtr@ := kalahPtr@ + capturedStones + 1;
               pitPtr@ := 0;
@@ -822,17 +823,17 @@ _(
     _);
     write(dir);
   _);
-  _if l4v5z > l3v12z _then _(
+  _select
+  l4v5z > l3v12z : _(
     dir := up;
     l4v3z := l4v5z - l3v12z;
-  _) _else _(
-    _if l3v12z > l4v5z _then _(
+  _);
+  l3v12z > l4v5z : _(
       dir := down;
       l4v3z := l3v12z - l4v5z;
-    _) _else _(
-      l4v3z := 0; (q) _exit q
-    _)
   _);
+  true: l4v3z := 0
+  _end;
   _for l4v2z := 1 _to l4v3z _do _(
     _for l4v1z := 1 _to animDelay _do
       write(delay);
@@ -967,7 +968,7 @@ _(
   l3v4z := [];
   _for l3v3z := 1 _to 6 _do _(
     l3v2z := pos[p].pits[l3v3z].val;
-    _if (l3v2z > 0) _then _(
+    _if l3v2z > 0 _then _(
       l3v1z := l3v2z + l3v3z;
       _if (l3v1z = 7) _or (l3v1z = 20) _then
         l3v4z := [l3v3z] + l3v4z;
@@ -1054,17 +1055,17 @@ _(
       distToKalah := jinnStones + pitIndex;
       distMinus13 := distToKalah - 13;
       _if distToKalah < 7 _then _(
-        jinnDistance := (jinnDistance + jinnStones) + 7;
+        jinnDistance := jinnDistance + jinnStones + 7;
       _) _else _(
         _while distToKalah >= 20 _do
           distToKalah := distToKalah - 13;
-        jinnDistance := (abs(13 - distToKalah) + jinnDistance) + tableIndex;
+        jinnDistance := abs(13 - distToKalah) + jinnDistance + tableIndex;
       _);
       _if distToKalah = 7 _then _(
          jinnScore := jinnScore + extraTurnBonus;
       _) _else _(
         _if jinnStones = 13 _then
-          jinnCaptureSetup := (userSidePtr@.pits[tableIndex].val + 3) + jinnCaptureSetup;
+          jinnCaptureSetup := userSidePtr@.pits[tableIndex].val + 3 + jinnCaptureSetup;
         _if distToKalah > 7 _then _(
           jinnScore := jinnScore + multiLapBonus;
           _if distMinus13 > 7 _then
@@ -1094,8 +1095,8 @@ _(
           userScore := userScore + multiLapBonus;
           _if distMinus13 > 7 _then
             userScore := userScore + multiLapBonus;
-        _);
-      _);
+        _)
+      _)
     _) _else
       userEmptyOpp := jinnSidePtr@.pits[tableIndex].val + userEmptyOpp;
   _);
@@ -1135,7 +1136,7 @@ _(
   jinnPlayer := testPosition[jinn].move.i;
   _for pitIndex := 6 _downto 1 _do _(
     pitStones := testPosition[userPlayer].pits[pitIndex].val;
-    _if (pitStones > 0) _then orderEnd := orderEnd + 1;
+    _if pitStones > 0 _then orderEnd := orderEnd + 1;
     pitStones := pitStones + pitIndex;
     oppMobile := testPosition[jinnPlayer].pits[pitIndex].val + oppMobile;
     _select
@@ -1150,7 +1151,7 @@ _(
     _end
   _);
 
-  _if (oppMobile = 0) _then _(
+  _if oppMobile = 0 _then _(
     bestScore := materialDifference(testPosition);
     chosenMove := 0;
     _goto 5070;
@@ -1162,15 +1163,15 @@ _(
     mvSc[pitIndex] := 0;
 % L4727
   _for pitIndex := 1 _to 6 _do _(
-    _if ((nodesSearched - startNodes) > maxNodes) _and (legalMoves <> 0) _then _(
+    _if (nodesSearched - startNodes > maxNodes) _and (legalMoves <> 0) _then _(
       alphaBetaCutoffs := alphaBetaCutoffs + 1;
       _goto 5050
     _); (* 4737 *)
     (*=m+ may be unnecessary, but helps matching code for mul/mod/div by powers of 2 *)
     curPit := mvSc[pitIndex];
-    _if (curPit = 0) _then _goto 999;
-    _if (depth > 1) _then _(
-      nodesBudget := trunc(((maxNodes - nodesSearched) + startNodes) * 2 / orderEnd);
+    _if curPit = 0 _then _goto 999;
+    _if depth > 1 _then _(
+      nodesBudget := trunc((maxNodes - nodesSearched + startNodes) * 2 / orderEnd);
       orderEnd := orderEnd - 1;
     _) _else _(
       nodesBudget := maxNodes;
@@ -1185,7 +1186,7 @@ _(
       _);
       moveResult = 0: _goto 999
     _end; (* 5025 *)
-    _if (evalScore > bestScore) _then _(
+    _if evalScore > bestScore _then _(
       bestScore := evalScore;
       bestMove := curPit;
     _); (* 5031 *)
@@ -1240,12 +1241,10 @@ _(
       moveNumber := moveNumber - 41;
       testPosition := pos;
       moveType := exMvLogic(testPosition, moveNumber );
-      _if moveType = 1 _then _(
-        continuations := continuations + 1;
-      _) _else _(
-        continuations := consultOpeningBook(testPosition, bookIndex + moveNumber) + continuations;
-        (q) _exit q
-      _);
+      _select
+      moveType = 1 : continuations := continuations + 1;
+      true : continuations := consultOpeningBook(testPosition, bookIndex + moveNumber) + continuations
+      _end;
     _)
   _); (* 5204 *)
   consultOpeningBook := continuations;
@@ -1255,13 +1254,13 @@ _( (* selAIMove *)
   _for bestScore := 1 _to 30 _do
    haveSaid[bestScore] := [];
 
-  kalahWeight := weights.f1;
-  extraTurnBonus := weights.f2;
-  emptyOppWeight := weights.f3;
-  multiLapBonus := weights.f4;
-  captureSetup := weights.f5;
-  mobilityWeight := weights.f6;
-  distanceWeight := weights.f7;
+  kalahWeight := weights.kalah;
+  extraTurnBonus := weights.extraTurn;
+  emptyOppWeight := weights.emptyOpp;
+  multiLapBonus := weights.multiLap;
+  captureSetup := weights.capture;
+  mobilityWeight := weights.mobility;
+  distanceWeight := weights.distance;
   curPos := pos;
   bestScore := minusHundredMillion;
   worstScore := hundredMillion;
@@ -1306,10 +1305,10 @@ _( (* selAIMove *)
   _for pitIndex := 1 _to 6 _do _(
     testPos := curPos;
     _if useOpeningBook _then _(
-    _if (pitIndex _IN l3v65z) _then _(
+    _if pitIndex _IN l3v65z _then _(
       moveType :=   exMvLogic(testPos, pitIndex );
       l2v179z[pitIndex] := ;
-      _if (moveType = 0) _then _(
+      _if moveType = 0 _then _(
         writeln('ПУСТАЯ ЛУНКА В ДЕБЮТАХ - "ЧП" !');
         writeln('ИСТОРИЯ ', openingBookIndex:1);
         _GOTO 12561;
@@ -1327,7 +1326,7 @@ _( (* selAIMove *)
       moveType :=   exMvLogic(testPos, pitIndex );
       l2v179z[pitIndex] := ;
       l2v74z := nodesSearched;
-      _if (moveType <> 0) _then _(
+      _if moveType <> 0 _then _(
         alpha := billion;
         beta := ;
         nodesPerMove := l3v68z * 2 _div legalMoveCount;
@@ -1434,7 +1433,7 @@ _(
     _)
   _); (* 5737 *)
   (loop) _for searchIndex := corrStartIdx _to corrEndIdx _do _(
-    _if (sel(zoneBuffer@[searchIndex], bitPosition, 3) = suggestedMove) _then _(
+    _if sel(zoneBuffer@[searchIndex], bitPosition, 3) = suggestedMove _then _(
       _exit loop;
     _) _else _(
       corrStartIdx := searchIndex + 1;
@@ -1454,8 +1453,7 @@ _(
   bitPosition := bitPosition - 3;
   _if corrStartIdx = corrEndIdx _then _(
     entryPtr := ptr(corrStartIdx + ord(zoneBuffer));
-    _if (curMoveNumber = 14) _or
-        (sel(entryPtr@.i,bitPosition, 3) = 0) _then _(
+    _if (curMoveNumber = 14) _or (sel(entryPtr@.i,bitPosition, 3) = 0) _then _(
       applyLearningCorrection := entryPtr@.i _mod 8;
       lockZone66;
       readDiskZone( 0, zoneCorrections );
@@ -1481,7 +1479,7 @@ _var try:integer;
 _(
   _if phraseCategory > 0 _then _(
    try := trunc(RANDOM * range) + 1;
-   _if (try _IN haveSaid[phraseCategory]) _then _GOTO 6553;
+   _if try _IN haveSaid[phraseCategory] _then _GOTO 6553;
    chkRandom := try;
    haveSaid[phraseCategory] := [try] + haveSaid[phraseCategory];
   _) _else _(
@@ -1504,7 +1502,7 @@ _);
 _function countEnding(number:integer):integer;
 
 _(
-  _if (number >= 20) _then
+  _if number >= 20 _then
     number := number _MOD 10;
   _select
     number = 1:;
@@ -1525,7 +1523,7 @@ _( (* generateAIPhrase *)
     isFirstGame := false;
     unpck(l3v43z[1], userBirthDate);
     userAge := ord(l3v43z[5]) * 10 + ord(l3v43z[6]);
-    _if (userAge > 0) _then _(
+    _if userAge > 0 _then _(
       pckName[1] :=   getDateStr;
       unpck(l3v43z[1], pckName[1]);
       userAge := ord(l3v43z[5]) * 10 + ord(l3v43z[6]) - userAge;
@@ -1546,7 +1544,7 @@ _( (* generateAIPhrase *)
         (userAge < 50): write('УВАЖАЕМ');
         true: write('ПОЧТЕНН')
       _end;
-      _if (knownGender = MASC) _then write('ЫЙ ')
+      _if knownGender = MASC _then write('ЫЙ ')
       _else write('АЯ ');
     _);
     (loop) _for rndChoice := 1 _to 12 _do _(
@@ -1558,8 +1556,8 @@ _( (* generateAIPhrase *)
     pckName[0] := '      ';
     unpck(l3v43z[1], pckName[0]);
     _for loopVar := 1 _to 3 _do _(
-    _if ((rndChoice - loopVar) > 0) _then
-      l3v43z[loopVar] := unpName[(rndChoice - loopVar)];
+    _if rndChoice - loopVar > 0 _then
+      l3v43z[loopVar] := unpName[rndChoice - loopVar];
     _);
     _select
       knownGender = MASC :
@@ -1594,7 +1592,8 @@ _( (* generateAIPhrase *)
   _) _else (* 6414 *)
      _if (jinnStones > 36) _or (userStones > 36) _then _(
        gameIsDecided := true;
-       _if jinnStones > 36  _then _(
+       _select
+       jinnStones > 36 : _(
        _if difficultyLevel = 1 _then _(
          write('ЛЮБЛЮ ОБЫГРЫВАТЬ НОВИЧКОВ !');
          _goto 7660;
@@ -1610,7 +1609,8 @@ _( (* generateAIPhrase *)
          rndChoice = 3 : write('НЕ ПЕЧАЛЬСЯ, УДАЧА БУДЕТ ЖДАТЬ ТЕБЯ ЗАВТРА !');
 	 true: _( write('СДАВАЙСЯ, ТЫ УЖЕ ПРОИГРАЛ'); maybeFeminine; _)
        _end
-  _) _else  (* 6465 *) _if userStones > 36 _then (again) _(
+  _);
+  (* 6465 *) userStones > 36 : (again) _(
     rndChoice :=   randint(8);
     _select
       rndChoice = 0 : write('СЛЕДУЮЩИЙ РАЗ ОБЯЗАТЕЛЬНО ВЫИГРАЮ !');
@@ -1620,19 +1620,19 @@ _( (* generateAIPhrase *)
       rndChoice = 4 :  write('ШАЙТАН ТЕБЕ ДРУГ !!');
       rndChoice = 5 : _(
       _if (knownGender <> MASC) _or
-         ((userTotalScore - jinnTotalScore) < 3) _or
+         (userTotalScore - jinnTotalScore < 3) _or
          (difficultyLevel < 4) _then _goto again;
         write('О, ЭФЕНДИ, ТЫ ДОСТОИН ЗВАНИЯ ИМАМА !');
       _);
       rndChoice = 6 : _(
-      _if (difficultyLevel < 4) _then _goto again;
+      _if difficultyLevel < 4 _then _goto again;
        write('ВЫИГРАЕШЬ У МЕНЯ 12 РАЗ ПОДРЯД - ПОЛУЧИШЬ ВОЛШЕБНОЕ КОЛЬЦО !');
       _);
       true:  _(
        write('О, ШАЙТАН !  ТЫ МЕНЯ ОБЫГРАЛ');  maybeFeminine;
      _)
-     _end; (q) _exit q;
-  _);  (* 6545 *)
+     _end;
+  _) _end  (* 6545 *)
   _) _else _( (* 6546 *)
   _if wordsSinceLastSpeak > 0 _then _(
     aiSilent := false;
@@ -1651,8 +1651,10 @@ _( (* generateAIPhrase *)
       _goto 7660;
     _);
     write('ПОЧЕМУ');
-    _if rndChoice < 4 _then write(' НИЧЕГО НЕ ГОВОРИШЬ')
-    _else _( write(' МОЛЧИШЬ'); (q) _exit q _);
+    _select
+      rndChoice < 4 : write(' НИЧЕГО НЕ ГОВОРИШЬ');
+      true :          write(' МОЛЧИШЬ')
+    _end;
     wordsSinceLastSpeak := 0;
     userSilent := true;
     Dear;
@@ -1712,7 +1714,7 @@ _( (* generateAIPhrase *)
   (rndChoice = 10) _and _not useOpeningBook : _(
     rndChoice :=   chkRandom( 3 );
     rndChoice := nodesThisMove;
-    _if (rndChoice = 0) _then rndChoice := 1;
+    _if rndChoice = 0 _then rndChoice := 1;
     write('Я ПРОСМОТРЕЛ ', rndChoice:1, ' ПОЗИЦИ');
     rndChoice :=   countEnding( rndChoice );
     _select
@@ -1735,7 +1737,7 @@ _( (* generateAIPhrase *)
   (rndChoice = 13) _and isMasterLevel _and ((knownGender = MASC) _or (knownGender = FEM)) : _(
     rndChoice :=   chkRandom( 6 );
     write('НЕТ ТЕБЕ РАВНО');
-    _if (knownGender = FEM) _then write('Й') _else write('ГО');
+    _if knownGender = FEM _then write('Й') _else write('ГО');
     write(' СРЕДИ ');
     _select
       rndChoice = 1 : write('АРАБОВ');
@@ -1757,17 +1759,19 @@ _( (* generateAIPhrase *)
   _); (* 7157 *)
   rndChoice = 17 : _(
     rndChoice :=   chkRandom( 9 );
-    _if (rndChoice = 1) _then write('ЗНАЙ НАШИХ !')
-    _else _if (rndChoice = 2) _then write('УФФ-УФФ !!')
-    _else _if (rndChoice = 3) _and (knownGender = FEM) _and (userAge < 25) _and (userAge > 0) _then
-      write('ТЫ, НАВЕРНОЕ, ТОНКА, КАК КИПАРИС !')
-    _else _if (rndChoice = 4) _then write('СОВЕРШИ МОЛИТВУ В ТРИ РАКАТА !')
-    _else _if (rndChoice = 5) _and  (knownGender = FEM) _and (userAge < 22) _and (userAge > 0) _then
-      write('ХОТЕЛ БЫ ПОСМОТРЕТЬ НА ТЕБЯ, ДОРОГАЯ !')
-    _else _if (rndChoice = 6) _then  write('Я ЗНАЮ ВЕЛИЧАЙШЕЕ ИЗ 99 ИМЕН АЛЛАХА !')
-    _else _if (rndChoice = 7) _then  write('ПЕЧАТЬ СОЛОМОНА МНЕ НЕ СТРАШНА !')
-    _else _if (rndChoice = 8) _then write('КУПИ СЕБЕ ВЕРБЛЮДА !')
-    _else _( write('АЛЛАХ ВЕЛИК !!!'); (q) _exit q _);
+    _select
+    rndChoice = 1 : write('ЗНАЙ НАШИХ !');
+    rndChoice = 2 : write('УФФ-УФФ !!');
+    (rndChoice = 3) _and (knownGender = FEM) _and (userAge < 25) _and (userAge > 0) :
+                    write('ТЫ, НАВЕРНОЕ, ТОНКА, КАК КИПАРИС !');
+    rndChoice = 4 : write('СОВЕРШИ МОЛИТВУ В ТРИ РАКАТА !');
+    (rndChoice = 5) _and  (knownGender = FEM) _and (userAge < 22) _and (userAge > 0) :
+                    write('ХОТЕЛ БЫ ПОСМОТРЕТЬ НА ТЕБЯ, ДОРОГАЯ !');
+    rndChoice = 6 : write('Я ЗНАЮ ВЕЛИЧАЙШЕЕ ИЗ 99 ИМЕН АЛЛАХА !');
+    rndChoice = 7 : write('ПЕЧАТЬ СОЛОМОНА МНЕ НЕ СТРАШНА !');
+    rndChoice = 8 : write('КУПИ СЕБЕ ВЕРБЛЮДА !');
+    true:           write('АЛЛАХ ВЕЛИК !!!')
+    _end
     _); (* 7241 *)
     (rndChoice = 18) _and (userStones - lastUserKalah > 10) : _(
       rndChoice := chkRandom( 1 );
@@ -1777,13 +1781,15 @@ _( (* generateAIPhrase *)
     _);
     (rndChoice = 19) _and gndrMismatch _and (totalMovesPlayed > 16) : _(
       rndChoice :=   chkRandom( 1 );
-      _if (knownGender = MASC) _then write('Я ДУМАЮ, ТЫ ВСЕ-ЖЕ ХАНУМ.')
-      _else _if (knownGender = FEM) _then _( write('Я ДУМАЮ, ВСЕ-ЖЕ ТЫ НЕ ХАНУМ.'); (q) _exit q _);
+      _select
+      knownGender = MASC : write('Я ДУМАЮ, ТЫ ВСЕ-ЖЕ ХАНУМ.');
+      knownGender = FEM  : write('Я ДУМАЮ, ВСЕ-ЖЕ ТЫ НЕ ХАНУМ.')
+      _end
     _); (* 7276 *)
     (rndChoice = 20) _and (curThinkTime > 300) : _(
       rndChoice :=   chkRandom( 6 );
       write('ТЫ ДУМАЛ');
-      _if (knownGender = FEM) _then write(femending);
+      _if knownGender = FEM _then write(femending);
       rndChoice := (curThinkTime + 25) _DIV 50;
       write(space, rndChoice:1, ' СЕКУНД');
       rndChoice :=   countEnding( rndChoice );
@@ -1794,29 +1800,30 @@ _( (* generateAIPhrase *)
       _end;
       write(suffixChar, excl:2);
     _); (* 7340 *)
-    (rndChoice = 21) _and ((userStones - jinnStones) > 10) _and  (difficultyLevel > 3) : _(
+    (rndChoice = 21) _and (userStones - jinnStones > 10) _and  (difficultyLevel > 3) : _(
       rndChoice :=   chkRandom( 1 );
       write('СДАВАЙСЯ, ПОДАРЮ ТЕБЕ ');
-      _if ((userStones - jinnStones) > 15) _then write('ВЕРБЛЮДА !')
+      _if userStones - jinnStones > 15 _then write('ВЕРБЛЮДА !')
       _else write('БУХАРСКУЮ ДЫНЮ !');
     _); (* 7361 *)
     (rndChoice = 22) _and (moveType <> 2) : _(
       rndChoice :=   chkRandom( 2 );
       (loop) _for loopVar := 1 _to 6 _do _(
         rndChoice := l3v15z[user].pits[loopVar].val;
-        _if (rndChoice > 0) _then _(
+        _if rndChoice > 0 _then _(
           pitNum := rndChoice + loopVar;
-          oppositePit := (7 - pitNum);
+          oppositePit := 7 - pitNum;
           _if (pitNum < 7) _and
               (l3v15z[user].pits[pitNum].val = 0) _and
               (l3v15z[jinn].pits[oppositePit].val <> 0) _then _(
             rndChoice :=   chkRandom( 4 );
-            _if (rndChoice < 1) _then write('НЕ БЕРИ МОЮ ', oppositePit:1, ' ЛУНКУ.')
-            _else _(
+            _select
+            rndChoice < 1: write('НЕ БЕРИ МОЮ ', oppositePit:1, ' ЛУНКУ.');
+            true: _(
               write('ВОЗЬМИ МОЮ ', oppositePit:1, ' ЛУНКУ - Я ');
-              _if (rndChoice = 2) _then write('НАРОЧНО ');
-              write('ПОДСТАВИЛ.'); (q) _exit q
-            _);
+              _if rndChoice = 2 _then write('НАРОЧНО ');
+              write('ПОДСТАВИЛ.') _)
+            _end;
             _exit loop
           _)
         _)
@@ -1835,7 +1842,7 @@ _( (* generateAIPhrase *)
       _select
        rndChoice = 1 : write('ПРОШУ ТЕБЯ, НЕ ГОВОРИ "БИСМИЛЛА РАХМАН РАХИМ" !');
        (rndChoice < 4) _and (userAge > 0) _and (userAge < 30) : _(
-        _if (rndChoice = 2) _then write('Я ДУМАЮ ') _else write('НАВЕРНОЕ ');
+        _if rndChoice = 2 _then write('Я ДУМАЮ ') _else write('НАВЕРНОЕ ');
         write('МАХАББА ТЕБЕ НЕ НУЖНА.');
        _);
        (rndChoice = 4) _and (userAge > 30) :
@@ -1911,11 +1918,11 @@ _(
     inputLength := inputLength + 1;
   _);
   _while (INP@ <> charEtx) _do _(
-    _if (INP@ <> space) _then wordsSinceLastSpeak := wordsSinceLastSpeak + 1;
+    _if INP@ <> space _then wordsSinceLastSpeak := wordsSinceLastSpeak + 1;
     inputLength := inputLength + 1;
     get(INP);
   _);
-  _if (inputLength = 7) _then inputLength := 8;
+  _if inputLength = 7 _then inputLength := 8;
 _);
 _procedure sigRestore;
 _(
@@ -1943,7 +1950,7 @@ _(
   _end;
   write(c:3);
   writeTerminalOutput;
-  _if ((jinnTotalScore + userTotalScore) >= (255)) _and  _not isTrainingGame _then _(
+  _if (jinnTotalScore + userTotalScore >= 255) _and  _not isTrainingGame _then _(
     writeTerminalOutput;
     write('В А Ш   Т У Р Н И Р   О К О Н Ч Е Н':54);
 10017:
@@ -1997,7 +2004,7 @@ _(
     l3v3z := sel(l3v1z, 8, 8);
     l3v4z := sel(l3v1z, 0, 8);
     l3v9z := l3v4z + l3v3z;
-    _if (l3v9z = 0) _then _(
+    _if l3v9z = 0 _then _(
       compareScoreEntries := false;
       exit
     _); (* 10135 *)
@@ -2132,9 +2139,9 @@ _( (* playGameSession *)
     testMode := true;
     _for currentPlayer := 0 _to 1 _do
     _for loopIndex := 0 _to 7 _do
-      curPosition[currentPlayer].pits[loopIndex].val := rndDigit(10);
-    difficultyLevel :=   rndDigit( 10 );
-    totalMovesPlayed :=   rndDigit( 10 );
+      curPosition[currentPlayer].pits[loopIndex].val := getDigit(10);
+    difficultyLevel := getDigit( 10 );
+    totalMovesPlayed := getDigit( 10 );
     packPosition(curPosition, pckPosition);
     dsplGameHeader;
   _) _else _( (* 10517 *)
@@ -2166,7 +2173,7 @@ _( (* playGameSession *)
       _for currentPlayer := 5 _to 12 _do _(
         logPacked[currentPlayer] := l2v132z@.f13[currentPlayer];
         cmdString := ;
-        _if (cmdString <> spaces) _then loopIndex := currentPlayer;
+        _if cmdString <> spaces _then loopIndex := currentPlayer;
       _);
     _) _else _(
       pckPosition[0].i := 60606060606000C;
@@ -2176,7 +2183,7 @@ _( (* playGameSession *)
     _for entryIndex := 1 _to numScoreEntries _do _(
       l2v5z := zoneBuffer@[1008 - entryIndex].a;
       code(2ЛУ4=2ЗЧ11,);
-      _if (cmdString = l2v4z) _then _(
+      _if cmdString = l2v4z _then _(
         hasScore := true;
         code(2сч7=пбнашел,);
       _);
@@ -2193,7 +2200,7 @@ _( (* playGameSession *)
       curPosition[jinn].move.b := packedData.b;
       curPosition[user].move.b := _not packedData.b;
     _);
-    _if isTrainingGame _and ((systemFlags * [27]) = [27]) _then _(
+    _if isTrainingGame _and (systemFlags * [27] = [27]) _then _(
       difficultyLevel := levelChoice;
       curPosition[jinn].move.i := startPlayer;
       curPosition[user].move.i := 1 - startPlayer;
@@ -2203,8 +2210,8 @@ _( (* playGameSession *)
   _); (* 10677 *)
   l2v125z := 0;
   lastMoveResult := ;
-  animDelay := ((animSpeed + 1) - (difficultyLevel _div 2));
-  _if (animDelay < 0) _then animDelay := 0;
+  animDelay := animSpeed + 1 - difficultyLevel _div 2;
+  _if animDelay < 0 _then animDelay := 0;
   _select
     difficultyLevel = 1 : _( searchDepth := 2; maxNodesToSearch := 37 _);
     difficultyLevel = 2 : _( searchDepth := 2; maxNodesToSearch := 600 _);
@@ -2222,14 +2229,14 @@ _( (* playGameSession *)
     _else _(
       logChar( chr(difficultyLevel) );
       logChar( space );
-      _if (curPosition[user].move.i = 0) _then logChar('Д')
+      _if curPosition[user].move.i = 0 _then logChar('Д')
       _else logChar('П');
       logChar( space );
     _)
   _); (* 10761 *)
   _if useOpeningBook _then _(
     readDiskZone( 0, zoneOpeningBook );
-    _if (zoneBuffer@[35].a <> '!ДЕБЮТ') _then _(
+    _if zoneBuffer@[35].a <> '!ДЕБЮТ' _then _(
       writeln('ИСПОРЧЕНЫ ДЕБЮТЫ - "ЧП" !!');
       _GOTO 12561;
     _)
@@ -2241,23 +2248,23 @@ _( (* playGameSession *)
     _goto 11225;
   _); (* 11001 *)
   currentPlayer := curPosition[user].move.i;
-  _if (currentPlayer = 0) _then _(
+  _if currentPlayer = jinn _then _(
     writeCharNTimes( up, 7 );
     write('МОЙ ХОД:');
     writeTerminalOutput;
-  _) _else _(
-    _if (movesInBuffer = 0) _then _(
-      writeCharNTimes( down, 2 ); (* this must cause scrolling if needed *)
-      write('ВАШ ХОД:');
-      l2v79z := 5;
-      writeTerminalOutput;
-    _) _else l2v79z := 1;
-  _); (* 11024 *)
+  _) _else _if movesInBuffer = 0 _then _(
+    writeCharNTimes( down, 2 ); (* this must cause scrolling if needed *)
+    write('ВАШ ХОД:');
+    l2v79z := 5;
+    writeTerminalOutput;
+  _) _else
+    l2v79z := 1;
+  (* 11024 *)
   userFinalKalah := 0;
-  _if (currentPlayer = 1) _then _(
+  _if currentPlayer = user _then _(
 11027:
-  _if (movesInBuffer < 1) _then _(
-  _if (inputLength > 6) _then _(
+  _if movesInBuffer < 1 _then _(
+  _if inputLength > 6 _then _(
     writeCharNTimes( space, inputLength );
     writeCharNTimes( up, 1 );
     writeTerminalOutput;
@@ -2265,10 +2272,10 @@ _( (* playGameSession *)
   l2v77z :=   wallClockTicks;
   readTerminalInput(false);
   curThinkTime := wallClockTicks - l2v77z;
-  _if (curThinkTime < 0) _then curThinkTime := 50;
+  _if curThinkTime < 0 _then curThinkTime := 50;
 % 11052
-  movesPending :=   readCommand( commandEntered, 3 );
-  postponeFlag := (commandEntered = 'SLЕ   ') _and  (47 _IN systemFlags);
+  movesPending := readCommand( commandEntered, 3 );
+  postponeFlag := (commandEntered = 'SLЕ   ') _and (47 _IN systemFlags);
   reset(INP);
   _if postponeFlag _then _(
     _if isTrainingGame _then _goto 12341 _else _goto 11225;
@@ -2283,13 +2290,13 @@ _( (* playGameSession *)
     _if (INP@ = ',') _or (INP@ = space) _then
     get(INP);
   _); (* 11115 *)
-  _if (movesInBuffer = 0) _then _(
+  _if movesInBuffer = 0 _then _(
     movesInBuffer := 1;
     moveBuffer[1] := chr(0);
   _);
   _) _else _goto 11772; (* 11123 *)
   _if readCommand(inputCmd, 3) _then _(
-    _if (matchesCommand( 'СДА   ')) _then _(
+    _if matchesCommand( 'СДА   ') _then _(
       jinnFinalKalah := curPosition[jinn].pits[7].val;
       userFinalKalah := curPosition[user].pits[7].val;
       _if (jinnFinalKalah > userFinalKalah) _or (jinnFinalKalah > 36) _or
@@ -2298,11 +2305,10 @@ _( (* playGameSession *)
         writeCharNTimes(down, 2 );
         write('ИГРА ОКОНЧЕНА');
         _goto 12244;
-      _) _else _(
+      _) _else
         _goto 11225;
-      _);
     _); (* 11150 *)
-    _if (matchesCommand( 'ПОВ   ')) _then _(
+    _if matchesCommand( 'ПОВ   ') _then _(
       write(chr(162B)); (* erase *)
       packPosition(curPosition, pckPosition);
       dsplGameHeader;
@@ -2319,7 +2325,7 @@ _( (* playGameSession *)
       _);
       _goto 12240;
     _);
-    _if (totalMovesPlayed < 5) _then _(
+    _if totalMovesPlayed < 5 _then _(
       _if hasWarned _then _(
         write('НЕСЕРЬЕЗНО !');
         writeTerminalOutput;
@@ -2419,21 +2425,21 @@ _( (* playGameSession *)
   _for entryIndex := 1 _to numScoreEntries _do _(
     l2v5z := zoneBuffer@[1008 - entryIndex].a;
     code(2ЛУ4=2ЗЧ11,); (* cmdString := l2v5z & l2v2z *)
-    _if (cmdString = l2v4z) _then _(
+    _if cmdString = l2v4z _then _(
       code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,2ЗЧ7=);
       unpck(l2v124z@[1], l2v5z);
       currentPlayer := packedData.i;
       gamesPlayedToday := currentPlayer _div 2;
       packedData.i := currentPlayer _mod 2;
-      _if (cmdString <> l2v6z) _then gamesPlayedToday := 5;
+      _if cmdString <> l2v6z _then gamesPlayedToday := 5;
       _goto 11531;
     _)
   _);
 % 11527
   entryIndex := numScoreEntries + 1;
   numScoreEntries := ;
-11531:;
-  _if (entryIndex > (210)) _then  hasScore := false
+11531:
+  _if entryIndex > 210 _then  hasScore := false
   _else _(
     hasScore := true;
     zoneBuffer@[1].i := numScoreEntries;
@@ -2479,15 +2485,15 @@ _( (* playGameSession *)
     pck(l2v124z@[1], l2v5z);
     code(2сч7=2сб5,сд/20/=2лс6,17зч=2сч53,1ас35=17зч,17ик=иа,);
     code(15па=17сч,15зч=);
-    scorePos := ((1008) - 2);
+    scorePos := 1008 - 2;
     (loop) _for currentPlayer := insertPos _to scorePos _do _(
-      _if _not compareScoreEntries( currentPlayer, (currentPlayer + 1)) _then _exit loop;
+      _if _not compareScoreEntries( currentPlayer, currentPlayer + 1) _then _exit loop;
     _); (* 11655 *)
     _if 28 _IN permFlags _then _(
       _repeat
         cmdResult := true;
         _for currentPlayer := 1008 - numScoreEntries _to scorePos _do _(
-          _if compareScoreEntries( currentPlayer, (currentPlayer + 1)) _then cmdResult := false;
+          _if compareScoreEntries( currentPlayer, currentPlayer + 1) _then cmdResult := false;
         _);
       _until cmdResult;
       permFlags := permFlags - [28];
@@ -2537,7 +2543,7 @@ _( (* playGameSession *)
      writeTerminalOutput;
      _goto 11027;
   _);
-  _if (curPosition[user].pits[seledMove].val = 0) _then _(
+  _if curPosition[user].pits[seledMove].val = 0 _then _(
     write(seledMove:1, ' ЛУНКА ПУСТАЯ');
     movesInBuffer := 0;
     _goto 12013;
@@ -2623,7 +2629,7 @@ _( (* playGameSession *)
   jinnFinalKalah := curPosition[jinn].pits[7].val;
   userFinalKalah := curPosition[user].pits[7].val;
   _select
-    (jinnFinalKalah <= 36) _and (userFinalKalah <= 36) _and ((jinnFinalKalah + userFinalKalah) < 72) _and isTrainingGame:
+    (jinnFinalKalah <= 36) _and (userFinalKalah <= 36) _and (jinnFinalKalah + userFinalKalah < 72) _and isTrainingGame:
       write('ПАРТИЯ НЕДОИГРАНА');
     jinnFinalKalah = userFinalKalah: _( write('НИЧЬЯ'); resultChar := 'Н' _);
     jinnFinalKalah > userFinalKalah: _(
@@ -2665,7 +2671,7 @@ _( (* playGameSession *)
   _if enableLogging _then _(
     write('ПРОТОКОЛ ПАРТИИ:');
     writeTerminalOutput;
-    _for currentPlayer := 2 _to (logIndex - 1) _do
+    _for currentPlayer := 2 _to logIndex - 1 _do
       write(logPacked[currentPlayer]);
     writeTerminalOutput;
   _);
