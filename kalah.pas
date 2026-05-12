@@ -976,24 +976,24 @@ _(
   getExtraTurnMoves := l3v4z;
 _);
 
-_function selAIMove(_var pos:Position; _var weights: eightwords; l3a3z:integer):integer;
+_function selAIMove(_var pos:Position; _var weights: eightwords; searchDepth:integer):integer;
 _label 5250, 5655;
-_var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z: integer;
-l3v6z, l3v7z, l3v8z, l3v9z:integer;
-l3v10z:Position;
-l3v26z:Position; l3v42z, l3x43z:integer; l3v43z:_array [1..6] _of integer; l3v50z,
-l3x51z:integer; l3v51z: _array[1..6] _of integer; l3v58z, l3v59z, l3v60z,
-l3v61z, l3v62z, l3v63z, l3v64z:integer; l3v65z: bitset; l3v66z, l3v67z, l3v68z, l3v69z, l3v70z,
-l3v71z, l3v72z, l3v73z, l3v74z, l3v75z, l3v76z, l3v77z: integer;
+_var pitIndex, bestScore, worstScore, l3v4z, l3v5z: integer;
+retVal, moveScore, l3v8z, startTime:integer;
+curPos, testPos:Position;
+moveType, l3x43z:integer; candWeight:_array [1..6] _of integer; l3v50z,
+l3x51z:integer; candMove: _array[1..6] _of integer; l3v58z, candCount, l3v60z,
+l3v61z, l3v62z, l3v63z, bookZoneIndex:integer; l3v65z: bitset; alpha, beta, l3v68z, nodesPerMove, legalMoveCount,
+kalahWeight, extraTurnBonus, emptyOppWeight, multiLapBonus, captureSetup, mobilityWeight, distanceWeight: integer;
 _function materialDifference(_var pos:Position):integer;
-_var sum, pit, l4v3z, l4v4z:integer;
+_var sum, pit, curPLayer, oppPlayer:integer;
 _(
-  l4v3z := pos[user].move.i;
+  curPlayer := pos[user].move.i;
   code(CP13=);
-  l4v4z := ;
+  oppPlayer := ;
   sum := 0;
   _for pit := 1 _to 7 _do _(
-    sum := pos[l4v3z].pits[pit].val + sum - pos[l4v4z].pits[pit].val;
+    sum := pos[curPlayer].pits[pit].val + sum - pos[oppPlayer].pits[pit].val;
   _);
   _select
     sum > 0: materialDifference := lakh;
@@ -1042,8 +1042,8 @@ _(
   userEmptyOpp := ;
   jinnDistance := ;
   userDistance := ;
-  jinnScore := jinnKalahVal * l3v71z;
-  userScore := userKalahVal * l3v71z;
+  jinnScore := jinnKalahVal * kalahWeight;
+  userScore := userKalahVal * kalahWeight;
   code(=7ПA7,);
   _for pitIndex := 1 _to 6 _do _(
     code(=7СА-1,ВИ7=);
@@ -1061,14 +1061,14 @@ _(
         jinnDistance := (abs(13 - distToKalah) + jinnDistance) + tableIndex;
       _);
       _if distToKalah = 7 _then _(
-         jinnScore := jinnScore + l3v72z;
+         jinnScore := jinnScore + extraTurnBonus;
       _) _else _(
         _if jinnStones = 13 _then
           jinnCaptureSetup := (userSidePtr@.pits[tableIndex].val + 3) + jinnCaptureSetup;
         _if distToKalah > 7 _then _(
-          jinnScore := jinnScore + l3v74z;
+          jinnScore := jinnScore + multiLapBonus;
           _if distMinus13 > 7 _then
-            jinnScore := jinnScore + l3v74z;
+            jinnScore := jinnScore + multiLapBonus;
         _);
       _);
     _) _else
@@ -1086,14 +1086,14 @@ _(
         userDistance := abs(13 - distToKalah) + userDistance + tableIndex;
       _);
       _if distToKalah = 7 _then _(
-        userScore := userScore + l3v72z;
+        userScore := userScore + extraTurnBonus;
       _) _else _(
         _if userStones = 13 _then
           userCaptureSetup := jinnSidePtr@.pits[tableIndex].val + 3 + userCaptureSetup;
         _if distToKalah > 7 _then _(
-          userScore := userScore + l3v74z;
+          userScore := userScore + multiLapBonus;
           _if distMinus13 > 7 _then
-            userScore := userScore + l3v74z;
+            userScore := userScore + multiLapBonus;
         _);
       _);
     _) _else
@@ -1103,8 +1103,8 @@ _(
     evaluatePosition :=   materialDifference( pos );
     exit
   _);
-  jinnScore := jinnEmptyOpp * l3v73z + jinnCaptureSetup * l3v75z + jinnMobile * l3v76z + jinnDistance * l3v77z + jinnScore;
-  userScore := userEmptyOpp * l3v73z + userCaptureSetup * l3v75z + userMobile * l3v76z + userDistance * l3v77z + userScore;
+  jinnScore := jinnEmptyOpp * emptyOppWeight + jinnCaptureSetup * captureSetup + jinnMobile * mobilityWeight + jinnDistance * distanceWeight + jinnScore;
+  userScore := userEmptyOpp * emptyOppWeight + userCaptureSetup * captureSetup + userMobile * mobilityWeight + userDistance * distanceWeight + userScore;
   evaluatePosition := jinnScore - userScore;
 _);
 _function minimax(_var pos:Position; depth, maxNodes: integer; _var alpha, beta: integer):integer;
@@ -1212,9 +1212,9 @@ _(
  minimax := bestScore;
 _);
 
-_procedure validateBookMoves(l4a1z: bitset);
+_procedure validateBookMoves(m: bitset);
 _(
-  _if l4a1z=[] _then _(
+  _if m=[] _then _(
     writeln('"ЧП" ДЕБЮТОВ !!':36);
     _GOTO 12561;
   _);
@@ -1239,8 +1239,8 @@ _(
       moveMask.s := moveMask.s - [moveNumber];
       moveNumber := moveNumber - 41;
       testPosition := pos;
-      l3v42z := exMvLogic(testPosition, moveNumber );
-      _if l3v42z = 1 _then _(
+      moveType := exMvLogic(testPosition, moveNumber );
+      _if moveType = 1 _then _(
         continuations := continuations + 1;
       _) _else _(
         continuations := consultOpeningBook(testPosition, bookIndex + moveNumber) + continuations;
@@ -1251,20 +1251,20 @@ _(
   consultOpeningBook := continuations;
 _);
 _( (* selAIMove *)
-  l3v9z :=   remainingCPUTime;
-  _for l3v2z := 1 _to 30 _do
-   haveSaid[l3v2z] := [];
+  startTime :=   remainingCPUTime;
+  _for bestScore := 1 _to 30 _do
+   haveSaid[bestScore] := [];
 
-  l3v71z := weights.f1;
-  l3v72z := weights.f2;
-  l3v73z := weights.f3;
-  l3v74z := weights.f4;
-  l3v75z := weights.f5;
-  l3v76z := weights.f6;
-  l3v77z := weights.f7;
-  l3v10z := pos;
-  l3v2z := minusHundredMillion;
-  l3v3z := hundredMillion;
+  kalahWeight := weights.f1;
+  extraTurnBonus := weights.f2;
+  emptyOppWeight := weights.f3;
+  multiLapBonus := weights.f4;
+  captureSetup := weights.f5;
+  mobilityWeight := weights.f6;
+  distanceWeight := weights.f7;
+  curPos := pos;
+  bestScore := minusHundredMillion;
+  worstScore := hundredMillion;
   uncertaintyBits := 0;
   moveEntropy := ;
   bookIsActive := true;
@@ -1275,77 +1275,77 @@ _( (* selAIMove *)
        useCorrections := true;
        _goto 5250;
      _);
-     _if openingBookIndex > 1547 _then l3v64z := openingBookIndex - 224
-     _else l3v64z := openingBookIndex;
-     l3v4z := (7 - l3v64z _MOD 8) * 6;
-     l3v4z := sel(zoneBuffer@[l3v64z_div 8], l3v4z, 6);
+     _if openingBookIndex > 1547 _then bookZoneIndex := openingBookIndex - 224
+     _else bookZoneIndex := openingBookIndex;
+     l3v4z := (7 - bookZoneIndex _MOD 8) * 6;
+     l3v4z := sel(zoneBuffer@[bookZoneIndex_div 8], l3v4z, 6);
      code(СД/-51/=);
      l3v65z := ;
      validateBookMoves( l3v65z );
    _) _else _((* 5302 *)
-   _if (randint(100) >= rndnessFactor) _then _(
-     l3v66z := billion;
-     l3v67z := ;
+   _if randint(100) >= rndnessFactor _then _(
+     alpha := billion;
+     beta := ;
      bookIsActive := false;
      l2v74z := nodesSearched;
-     l3v7z :=   minimax(l3v10z, l3a3z, maxNodesToSearch, l3v66z, l3v67z);
-     l3v6z := chosenMove;
+     moveScore :=   minimax(curPos, searchDepth, maxNodesToSearch, alpha, beta);
+     retVal := chosenMove;
      _goto 5655;
    _);
-   l3v8z :=   evaluatePosition(l3v10z);
+   l3v8z :=   evaluatePosition(curPos);
   _); (* 5325 *)
-  l3v70z := 1;
-  l3v4z := l3v10z[user].move.i;
+  legalMoveCount := 1;
+  l3v4z := curPos[user].move.i;
   l3v68z := maxNodesToSearch;
-  _for l3v1z := 1 _to 6 _do _(
-    _if pos[l3v4z].pits[l3v1z].val > 0 _then l3v70z := l3v70z + 1;
+  _for pitIndex := 1 _to 6 _do _(
+    _if pos[l3v4z].pits[pitIndex].val > 0 _then legalMoveCount := legalMoveCount + 1;
   _);
   l3v4z := 0;
-  l3v6z := ;
+  retVal := ;
   l3v61z := ;
-  _for l3v1z := 1 _to 6 _do _(
-    l3v26z := l3v10z;
+  _for pitIndex := 1 _to 6 _do _(
+    testPos := curPos;
     _if useOpeningBook _then _(
-    _if (l3v1z _IN l3v65z) _then _(
-      l3v42z :=   exMvLogic(l3v26z, l3v1z );
-      l2v179z[l3v1z] := ;
-      _if (l3v42z = 0) _then _(
+    _if (pitIndex _IN l3v65z) _then _(
+      moveType :=   exMvLogic(testPos, pitIndex );
+      l2v179z[pitIndex] := ;
+      _if (moveType = 0) _then _(
         writeln('ПУСТАЯ ЛУНКА В ДЕБЮТАХ - "ЧП" !');
         writeln('ИСТОРИЯ ', openingBookIndex:1);
         _GOTO 12561;
       _); (* 5401 *)
       l3v4z := l3v4z + 1;
-      l3v6z := l3v1z;
-      _if l3v42z = 2 _then
-        l3v63z :=   consultOpeningBook(l3v26z, openingBookIndex * 6 + l3v1z)
+      retVal := pitIndex;
+      _if moveType = 2 _then
+        l3v63z :=   consultOpeningBook(testPos, openingBookIndex * 6 + pitIndex)
       _else
         l3v63z := 1;
-      l2v172z[l3v1z] := l3v63z;
+      l2v172z[pitIndex] := l3v63z;
     _) (* 5417 *)
-    _else l2v179z[l3v1z] := 0;
+    _else l2v179z[pitIndex] := 0;
     _) _else _( (* 5422 *)
-      l3v42z :=   exMvLogic(l3v26z, l3v1z );
-      l2v179z[l3v1z] := ;
+      moveType :=   exMvLogic(testPos, pitIndex );
+      l2v179z[pitIndex] := ;
       l2v74z := nodesSearched;
-      _if (l3v42z <> 0) _then _(
-        l3v66z := billion;
-        l3v67z := ;
-        l3v69z := l3v68z * 2 _div l3v70z;
-        l3v70z := l3v70z - 1;
-        _if l3v42z = 1 _then _(
-          l3v7z := - minimax(l3v26z, l3a3z-1, l3v69z, l3v66z, l3v67z);
+      _if (moveType <> 0) _then _(
+        alpha := billion;
+        beta := ;
+        nodesPerMove := l3v68z * 2 _div legalMoveCount;
+        legalMoveCount := legalMoveCount - 1;
+        _if moveType = 1 _then _(
+          moveScore := - minimax(testPos, searchDepth-1, nodesPerMove, alpha, beta);
         _) _else _(
-          l3v7z :=   minimax(l3v26z, l3a3z, l3v69z, l3v66z, l3v67z);
+          moveScore :=   minimax(testPos, searchDepth, nodesPerMove, alpha, beta);
         _); (* 5467 *)
         l3v68z := (l3v68z - nodesSearched) + l2v74z;
-        l3v7z := l3v7z - l3v8z;
-        l2v172z[l3v1z] := ;
+        moveScore := moveScore - l3v8z;
+        l2v172z[pitIndex] := ;
         l3v4z := l3v4z + 1;
-        _if l3v7z > l3v2z _then _(
-          l3v6z := l3v1z;
-          l3v2z := l3v7z;
+        _if moveScore > bestScore _then _(
+          retVal := pitIndex;
+          bestScore := moveScore;
         _);
-        _if l3v7z < l3v3z _then l3v3z := l3v7z;
+        _if moveScore < worstScore _then worstScore := moveScore;
       _)
     _); (* 5504 *)
   _); (* 5506 *)
@@ -1354,54 +1354,54 @@ _( (* selAIMove *)
     l3v61z := 0
   _else _(
     l3v4z := 0;
-    _for l3v1z := 1 _to 6 _do _(
-      _if ((l2v172z[l3v1z] <> l3v3z) _or (l3v3z = l3v2z)) _and (l2v179z[l3v1z] <> 0) _then _(
-        l3v61z := l3v61z + l2v172z[l3v1z];
+    _for pitIndex := 1 _to 6 _do _(
+      _if ((l2v172z[pitIndex] <> worstScore) _or (worstScore = bestScore)) _and (l2v179z[pitIndex] <> 0) _then _(
+        l3v61z := l3v61z + l2v172z[pitIndex];
         l3v4z := l3v4z + 1;
       _)
     _);
     _if l3v4z < 2 _then _goto 5655;
     l3v61z := l3v61z _div l3v4z - 1;
   _); (* 5541 *)
-  l3v59z := 0;
+  candCount := 0;
   l3v60z := ;
   _for l3v5z := 1 _to 6 _do
   _if (l2v179z[l3v5z] <> 0) _and (l2v172z[l3v5z] > l3v61z) _then _(
-    l3v59z := l3v59z + 1;
-    l3v1z := (l2v172z[l3v5z] - l3v61z);
-    l3v43z[l3v59z] := ;
-    l3v60z := l3v60z + l3v1z;
-    l3v51z[l3v59z] := l3v5z;
+    candCount := candCount + 1;
+    pitIndex := (l2v172z[l3v5z] - l3v61z);
+    candWeight[candCount] := ;
+    l3v60z := l3v60z + pitIndex;
+    candMove[candCount] := l3v5z;
   _); (* 5563 *)
-  _if l3v59z < 2 _then _goto 5655;
+  _if candCount < 2 _then _goto 5655;
   l3v62z := 0;
-  _for l3v6z := 1 _to l3v59z _do _(
-    l3v1z := l3v43z[l3v6z] * 100 _div l3v60z;
+  _for retVal := 1 _to candCount _do _(
+    pitIndex := candWeight[retVal] * 100 _div l3v60z;
     _if useOpeningBook _then
-      l3v63z := l3v1z
+      l3v63z := pitIndex
     _else
-      l3v63z := l3v1z * l3v1z;
+      l3v63z := pitIndex * pitIndex;
 
     _if l3v63z > 0 _then
       moveEntropy := moveEntropy - l3v63z * LN(l3v63z);
     l3v62z := l3v63z + l3v62z;
-    l3v43z[l3v6z] := ;
+    candWeight[retVal] := ;
   _); (* 5622 *)
   moveEntropy := moveEntropy / l3v62z + LN(l3v62z);
   totalEntropy := moveEntropy + totalEntropy;
   uncertaintyBits := round(moveEntropy * 10.0 * oneOverLn2);
-  l3v1z := randint( l3v62z) + 1;
-  _for l3v2z := 1 _to l3v59z _do _(
-    _if l3v1z <= l3v43z[l3v2z] _then _(
-      l3v6z := l3v51z[l3v2z];
+  pitIndex := randint( l3v62z) + 1;
+  _for bestScore := 1 _to candCount _do _(
+    _if pitIndex <= candWeight[bestScore] _then _(
+      retVal := candMove[bestScore];
       _goto 5655
     _)
   _); (* 5650 *)
   writeln('ОШ ДРЕВД');
   _GOTO 12561;
 5655:
-  selAIMove := l3v6z;
-  jinnThinkingTime := (  remainingCPUTime  - l3v9z) + jinnThinkingTime;
+  selAIMove := retVal;
+  jinnThinkingTime := remainingCPUTime - startTime + jinnThinkingTime;
 _);
 (*=m- ... and back to non-negative multiplicative ops *)
 
@@ -1902,7 +1902,7 @@ _( (* generateAIPhrase *)
  lastUserKalah := userStones;
 _);
 _procedure procInputChars;
-_var l3v1z:integer;
+_var u:integer;
 _(
   reset(INP);
   inputLength := 5;
@@ -1924,7 +1924,7 @@ _(
 _);
 _procedure dsplGameHeader;
 _label 10017;
-_var l3v1z:char;
+_var c:char;
 _(
   writeTerminalOutput;
   write((gamesPlayedToday + 1):1);
@@ -1936,12 +1936,12 @@ _(
   write(space:3);
   writeUserName;
   _select
-    difficultyLevel = 1 : l3v1z := 'Ю';
-    difficultyLevel = 2 : l3v1z := 'K';
-    difficultyLevel = 3 : l3v1z := 'У';
-    difficultyLevel = 4 : l3v1z := 'Э'
+    difficultyLevel = 1 : c := 'Ю';
+    difficultyLevel = 2 : c := 'K';
+    difficultyLevel = 3 : c := 'У';
+    difficultyLevel = 4 : c := 'Э'
   _end;
-  write(l3v1z:3);
+  write(c:3);
   writeTerminalOutput;
   _if ((jinnTotalScore + userTotalScore) >= (255)) _and  _not isTrainingGame _then _(
     writeTerminalOutput;
@@ -1991,7 +1991,7 @@ _(
   l3v2z := zoneBuffer@[l3a2z].i;
   l3v11z := sel(l3v1z, 24, 4);
   l3v12z := sel(l3v2z, 24, 4);
-  _if (l3v11z <> l3v12z) _then _(
+  _if l3v11z <> l3v12z _then _(
     l3v13z := l3v11z > l3v12z;
   _) _else _(
     l3v3z := sel(l3v1z, 8, 8);
@@ -2004,7 +2004,7 @@ _(
     l3v5z := sel(l3v2z, 8, 8);
     l3v6z := sel(l3v2z, 0, 8);
     l3v10z := l3v6z + l3v5z;
-    _if (l3v10z = 0) _then
+    _if l3v10z = 0 _then
       l3v13z := true
     _else _( (* 10145 *)
       l3v7z := l3v3z * l3v10z;
