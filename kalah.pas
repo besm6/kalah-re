@@ -22,7 +22,6 @@ word = _record _case integer _of
 1:(c:char);
 2:(b:boolean);
 5:(a:alfa);
-6:(r:real);
 7:(s:bitset)
 _end;
 zone = _array [0..1023] _of word;
@@ -40,7 +39,7 @@ gndr = integer;
 
 _var
 gl10z,
-commandEntered, gl12z:alfa;
+commandEntered, tambov:alfa;
 gl13z,gl14z,cursorCol,logIndex,charIndex:integer;gameActive,isNightTime,isAdmin, cmdResult:boolean;
 startRemTime,startWallClock,gl24z,gl25z,gl26z,animSpeed,animDelay:integer;zoneBuffer:@zone;
 userName:sixchars;
@@ -84,7 +83,7 @@ _(
   _);
   rewrite(INP);
   v2 := 0;
-  _while input@ <> chr(255) _do _(
+  _while input@ <> charEtx _do _(
     _if gl90z _then write(input@);
     v2 := v2 + 1;
     _if v2 > 128 _then _(
@@ -97,7 +96,7 @@ _(
     write(INP,input@);
     get(input);
   _); (* while *)
-  write(INP, chr(255));
+  write(INP, charEtx);
   1570:
   reset(INP);
   _if gl90z _then _(
@@ -193,13 +192,13 @@ _( code(=14ПВ77457,) _);
 _procedure lockZone66;
 _var i:integer;
 _(
-  i := 66B;
+  i := nu;
   code(СД/-14/=Э050105,Э050115=,)
 _);
 _procedure unlockZone66;
 _var i:integer;
 _(
-  i := 66B;
+  i := nu;
   code(СД/-14/=Э050105,Э050116=,)
 _);
 
@@ -426,14 +425,14 @@ _(
   code(2СЧ4=СД/-11/,МР=2ИК3,ЗЧ7=);
 _);
 
-_procedure getUserName(_var l2a1z:alfa; _var l2a2z:alfa);
+_procedure getUserName(_var first, second:alfa);
 _var l2v1z:sixchars; l2v7z: boolean; l2v8z:integer;
-l2v9z:char; l2v10z, isResumedGame:alfa;
+l2v9z:char; l2v10z, fromOS:alfa;
 _(
-  l2v10z := l2a1z;
-  code(7ПАРАЗ=,7Э020=СД/40/,7ЗЧ1=7СА1,ВИ7=Э050104,7СЧ=7ПБ2,C;РАЗ:360741703600000,0,0,К;);
-  isResumedGame := ;
-  unpck(l2v1z[1], isResumedGame);
+  l2v10z := first;
+  code(7ПАРАЗ=,7СБ=СД/40/,7ЗЧ1=7СА1,ВИ7=Э050104,7СЧ=7ПБ2,C;РАЗ:360741703600000,0,0,К;);
+  fromOS := ;
+  unpck(l2v1z[1], fromOS);
   l2v7z := false;
   _for l2v8z := 1 _to 6 _do _(
     l2v9z := l2v1z[l2v8z];
@@ -441,13 +440,13 @@ _(
       l2v7z := true;
   _);
   _if l2v7z _then _(
-    l2a1z := 'НЕТ ТА';
-    l2a2z := 'КОГО  ';
+    first := 'НЕТ ТА';
+    second := 'КОГО  ';
     exit
   _);
-  l2a1z := isResumedGame;
+  first := fromOS;
   code(7CЧ1=);
-  l2a2z := ;
+  second := ;
 _);
 
 _procedure writeTerminalOutput;
@@ -461,13 +460,13 @@ _(
 _);
 
 _procedure flushOutput;
-_var len, cnt, l2v3z: integer;
+_var len, cnt, goal: integer;
 _(
   code(СЧ75224=АВ75205,);
-  l2v3z := ;
-  len := cursorCol - l2v3z + 1;
+  goal := ;
+  len := cursorCol - goal + 1;
   _for cnt := 1 _to len _do write(spaces);
-  cursorCol := l2v3z;
+  cursorCol := goal;
   writeTerminalOutput;
 _);
 _procedure dsplBoard(_var pckPits:_array [0..1] _of word);
@@ -610,7 +609,7 @@ _label 10266, 999, 12341, 11426, 11616, 11531, 11027, 12032, 12162,
 _const billion = 1000000000; hundredMillion = 100000000;
 minusHundredMillion = 37777202417400C; lakh = 100000;
 minusLakh = 37777777474540C; million = 1000000;
-bookSize = 8415; cbb = 72; cbc = 114; right = '{171'; left = '{146';
+bookSize = 8415; cbb = 72; erase = '{162'; right = '{171'; left = '{146';
 up = '{176'; down = '{177'; delay = '{142';
 _type
 Position = _array [jinn..user] _of OneSide;
@@ -636,7 +635,9 @@ posBeforeMove:Position;
 pckPosition:_array [0..1] _of word;
 knownGender:gndr;
 l2v118z:sixchars;
-l2v124z:@sixchars; l2v125z, lastMoveResult:integer; l2v127z:bitset; l2v128z:bitset; totalEntropy, moveEntropy: real;
+l2v124z:@sixchars; l2v125z, lastMoveResult:integer;
+l2v127z:bitset; l2v128z:bitset;
+totalEntropy, moveEntropy: real;
 oneOverLN2:real; (* 131 *)
 l2v132z:@rec1;
 l2v133z:eightwords;
@@ -644,10 +645,9 @@ l2v140z:_array[1..12] _of char;
 l2v153z:@zone; (* for simplicity *)
 moveBuffer: _array [1..10] _of char;
 l2v164z:eightwords;
-x172z:integer;
-l2v172z:_array [1..6] _of integer;  xx179z:integer;
-l2v179z:_array [1..6] _of integer; l2v186z: integer;
-haveSaid:_array[1..30] _of bitset;
+moveValues:_array [0..6] _of integer;
+moveExecuted:_array [0..6] _of integer;
+haveSaid:_array[0..30] _of bitset;
 _FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
 _(
   СОDЕ(К;ВР77=17ЗЧ1,РА3=СЧХRАND,АУАRАND=МР,
@@ -769,7 +769,7 @@ _(
         _)
       _);
     _) _else _(
-      stonesToMove := ((stonesToMove - stoneIndex) + 1);
+      stonesToMove := stonesToMove - stoneIndex + 1;
       code(3cч6=ср13,3зч6=); (* curPlayer := _not curPlayer *)
       pitIndex := 0;
       _goto 3520;
@@ -777,140 +777,155 @@ _(
   _)
 _);
 
-_functin exMvAnimated(_var pos:Position; l3a2z:integer):integer;
+_functin exMvAnimated(_var pos:Position; pitIdx:integer):integer;
 _label 4171;
-_var l3v1z:word;
-l3v2z:integer; l3v3z:integer; l3v4z:integer;
-l3v5z:word;
-l3v6z, l3v7z:integer;
-l3v8z:word;
-l3v9z, l3v10z: integer;
-l3v11z, l3v12z:integer; l3v13z:char;
-_procedure drawMove(p: player; l4a2z: integer);
-_var l4v1z, l4v2z, l4v3z,l4v4z,l4v5z,l4v6z,l4v7z:integer;
-dir:char;
+_var
+curPlr:word;        % Current player as word (for .i and .b access)
+curPit:integer;     % Current pit being filled during sowing
+loopCt:integer;     % Loop counter for stones/pits
+maxPit:integer;     % Maximum pit number (6 or 7 depending on player)
+origPl:word;        % Original player who made the move
+stones:integer;     % Number of stones to sow / total stones collected
+pitVal:integer;     % Value of pit after placing a stone
+oppPlr:word;        % Opponent player as word (for .i and .b access)
+capStone:integer;   % Captured stones from opposite pit
+oppIdx:integer;     % Opposite pit index (7 - current pit)
+cursCol:integer;    % Cursor column position for animation
+cursRow:integer;    % Cursor row position for animation
+dirChr:char;        % Direction character for cursor movement
+
+_procedure drawMove(p: player; pitNum: integer);
+_var
+delayI:integer;     % Inner loop counter for animation delay
+moveI:integer;      % Loop counter for cursor movement steps
+moveDist:integer;   % Distance to move cursor
+targCol:integer;    % Target column position on screen
+targRow:integer;    % Target row position on screen
+adjPit:integer;     % Adjusted pit index for screen positioning
+stoneCount:integer; % Number of stones to display in pit
+dir:char;           % Direction character (left/right/up/down)
 _(
-  _if l4a2z = 7 _then _(
-    l4v5z := 0;
+  _if pitNum = 7 _then _(
+    targRow := 0;
     _if p = user _then
-      l4v4z := 18 + 36
+      targCol := 18 + 36
     _else
-      l4v4z := 18 - 1;
+      targCol := 18 - 1;
   _) _else _(
     _if p = user _then _(
-      l4v6z := l4a2z;
-      l4v5z := -1;
+      adjPit := pitNum;
+      targRow := -1;
     _) _else _(
-      l4v6z := 7 - l4a2z;
-      l4v5z := 1;
+      adjPit := 7 - pitNum;
+      targRow := 1;
     _);
-    l4v4z := l4v6z * 5 + 18;
+    targCol := adjPit * 5 + 18;
   _);
   _select
-    l4v4z > l3v11z : _(
+    targCol > cursCol : _(
       dir := right;
-      l4v3z := l4v4z - l3v11z;
+      moveDist := targCol - cursCol;
     _);
-    l4v4z < l3v11z : _(
+    targCol < cursCol : _(
       dir := left;
-      l4v3z := l3v11z - l4v4z;
+      moveDist := cursCol - targCol;
     _);
-    true: l4v3z := 0
+    true: moveDist := 0
   _end;
-  _for l4v2z := 1 _to l4v3z _do _(
-    _for l4v1z := 1 _to animDelay _do _(
+  _for moveI := 1 _to moveDist _do _(
+    _for delayI := 1 _to animDelay _do _(
       write(delay);
     _);
     write(dir);
   _);
   _select
-  l4v5z > l3v12z : _(
+  targRow > cursRow : _(
     dir := up;
-    l4v3z := l4v5z - l3v12z;
+    moveDist := targRow - cursRow;
   _);
-  l3v12z > l4v5z : _(
+  cursRow > targRow : _(
       dir := down;
-      l4v3z := l3v12z - l4v5z;
+      moveDist := cursRow - targRow;
   _);
-  true: l4v3z := 0
+  true: moveDist := 0
   _end;
-  _for l4v2z := 1 _to l4v3z _do _(
-    _for l4v1z := 1 _to animDelay _do
+  _for moveI := 1 _to moveDist _do _(
+    _for delayI := 1 _to animDelay _do
       write(delay);
     write(dir);
   _);
-  l4v7z := pos[p].pits[l4a2z].val;
-  _if l4v7z = 0 _then
+  stoneCount := pos[p].pits[pitNum].val;
+  _if stoneCount = 0 _then
     write(space:2)
   _else
-    write(l4v7z:2);
+    write(stoneCount:2);
   writeCharNTimes(delay, animDelay );
-  l3v11z := l4v4z + 2;
-  l3v12z := l4v5z;
+  cursCol := targCol + 2;
+  cursRow := targRow;
 _);
 _( (* exMvAnimated *)
-  l3v12z := 0;
-  l3v1z := pos[user].move;
-  l3v5z := ;
-  _if l3a2z = 0 _then _(
-    l3v8z.i := 0;
-    l3v6z := ;
-    l3v11z := 0;
-    _for l3v3z := 1 _to 6 _do _(
-      l3v8z.i := pos[jinn].pits[l3v3z].val + l3v8z.i;
-      l3v6z := pos[user].pits[l3v3z].val + l3v6z;
+  cursRow := 0;
+  curPlr := pos[user].move;
+  origPl := ;
+  _if pitIdx = 0 _then _(
+    oppPlr.i := 0;
+    stones := ;
+    cursCol := 0;
+    _for loopCt := 1 _to 6 _do _(
+      oppPlr.i := pos[jinn].pits[loopCt].val + oppPlr.i;
+      stones := pos[user].pits[loopCt].val + stones;
     _);
-    (*=c-*)l3v3z := l3v8z.i = 0; (*=c+*)
-    l3v6z := l3v6z + l3v8z.i;
-    writeCharNTimes(up, l3v1z.i);
-    _for l3v4z := 1 _to 6 _do _(
-      _if pos[l3v3z].pits[l3v4z].val > 0 _then _(
-        pos[l3v3z].pits[l3v4z].val := 0;
-        drawMove(l3v3z, l3v4z);
+    (*=c-*)loopCt := oppPlr.i = 0; (*=c+*)
+    stones := stones + oppPlr.i;
+    writeCharNTimes(up, curPlr.i);
+    _for maxPit := 1 _to 6 _do _(
+      _if pos[loopCt].pits[maxPit].val > 0 _then _(
+        pos[loopCt].pits[maxPit].val := 0;
+        drawMove(loopCt, maxPit);
       _)
     _);
-    pos[l3v3z].pits[7].val := pos[l3v3z].pits[7].val + l3v6z;
-    drawMove(l3v3z, 7);
+    pos[loopCt].pits[7].val := pos[loopCt].pits[7].val + stones;
+    drawMove(loopCt, 7);
   _) _else _( (* 4035 *)
-    l3v11z := 7;
-    l3v6z := pos[l3v1z.i].pits[l3a2z].val;
-    pos[l3v1z.i].pits[l3a2z].val := 0;
-    writeCharNTimes(up, l3v1z.i);
+    cursCol := 7;
+    stones := pos[curPlr.i].pits[pitIdx].val;
+    pos[curPlr.i].pits[pitIdx].val := 0;
+    writeCharNTimes(up, curPlr.i);
     write(totalMovesPlayed:4);
     write(space:3);
-    drawMove(l3v1z.i, l3a2z);
+    drawMove(curPlr.i, pitIdx);
     (loop) _(
-     l3v8z.b := _not l3v1z.b;
-    _if l3v1z.i = l3v5z.i _then _(
-      l3v4z := 7;
+     oppPlr.b := _not curPlr.b;
+    _if curPlr.i = origPl.i _then _(
+      maxPit := 7;
     _) _else _(
-      l3v4z := 6;
+      maxPit := 6;
     _);
 % L4066:
-    _for l3v3z := 1 _to l3v6z _do _(
-      l3v2z := l3a2z + l3v3z;
-      _if l3v2z <= l3v4z _then _(
-        pos[l3v1z.i].pits[l3v2z].val := pos[l3v1z.i].pits[l3v2z].val + 1;
-        l3v7z := ;
-        drawMove( l3v1z.i, l3v2z );
-        _if l3v3z = l3v6z _then _(
-          _if l3v2z = 7 _then _(
+    _for loopCt := 1 _to stones _do _(
+      curPit := pitIdx + loopCt;
+      _if curPit <= maxPit _then _(
+        pos[curPlr.i].pits[curPit].val := pos[curPlr.i].pits[curPit].val + 1;
+        pitVal := ;
+        drawMove( curPlr.i, curPit );
+        _if loopCt = stones _then _(
+          _if curPit = 7 _then _(
             exMvAnimated := 2;
           _) _else _(
             exMvAnimated := 1;
-            pos[jinn].move := l3v5z;
+            pos[jinn].move := origPl;
             code(ср13=);
             pos[user].move := ;
-            _if (l3v7z = 1) _and (l3v1z.i = l3v5z.i) _then _(
-              l3v10z := 7 - l3v2z;
-              l3v9z := pos[l3v8z.i].pits[l3v10z].val;
-              _if l3v9z > 0 _then _(
-                pos[l3v8z.i].pits[l3v10z].val := 0;
-                drawMove( l3v8z.i, l3v10z );
-                pos[l3v1z.i].pits[l3v2z].val := 0;
-                drawMove( l3v1z.i, l3v2z );
-                pos[l3v5z.i].pits[7].val := pos[l3v5z.i].pits[7].val + l3v9z + 1;
-                drawMove( l3v5z.i, 7 );
+            _if (pitVal = 1) _and (curPlr.i = origPl.i) _then _(
+              oppIdx := 7 - curPit;
+              capStone := pos[oppPlr.i].pits[oppIdx].val;
+              _if capStone > 0 _then _(
+                pos[oppPlr.i].pits[oppIdx].val := 0;
+                drawMove( oppPlr.i, oppIdx );
+                pos[curPlr.i].pits[curPit].val := 0;
+                drawMove( curPlr.i, curPit );
+                pos[origPl.i].pits[7].val := pos[origPl.i].pits[7].val + capStone + 1;
+                drawMove( origPl.i, 7 );
               _);
 % L4160:
               _goto 4171
@@ -920,9 +935,9 @@ _( (* exMvAnimated *)
         _)
       _) _else _(
 % L4162:
-        l3v6z := (l3v6z - l3v3z) + 1;
-        l3v1z.b := _not l3v1z.b;
-        l3a2z := 0;
+        stones := (stones - loopCt) + 1;
+        curPlr.b := _not curPlr.b;
+        pitIdx := 0;
         _goto loop;
       _);
 % L4167:
@@ -930,14 +945,14 @@ _( (* exMvAnimated *)
   _)
   _); (* 4171 *)
 4171:
-  writeCharNTimes(left, l3v11z);
-  _if l3v12z > 0 _then _(
-    l3v13z := down;
-  _) _else _if l3v12z < 0 _then _(
-    l3v12z := -l3v12z;
-    l3v13z := up;
+  writeCharNTimes(left, cursCol);
+  _if cursRow > 0 _then _(
+    dirChr := down;
+  _) _else _if cursRow < 0 _then _(
+    cursRow := -cursRow;
+    dirChr := up;
   _);
-  writeCharNTimes( l3v13z, l3v12z );
+  writeCharNTimes( dirChr, cursRow );
   writeTerminalOutput;
 _);
 _function isGameOver(_var pos:Position): boolean;
@@ -953,39 +968,69 @@ _(
   isGameOver := false;
 _);
 _procedure collectAllStones; (* unused *)
-_var l3v1z, l3v2z: integer;
+_var player, pit: integer;
 _(
-  _for l3v1z := 0 _to 1 _do
-  _for l3v2z := 1 _to 6 _do _(
-    curPosition[l3v1z].pits[7].val := curPosition[l3v1z].pits[7].val + curPosition[l3v1z].pits[l3v2z].val;
-    curPosition[l3v1z].pits[l3v2z].val := 0;
+  _for player := 0 _to 1 _do
+  _for pit := 1 _to 6 _do _(
+    curPosition[player].pits[7].val := curPosition[player].pits[7].val + curPosition[player].pits[pit].val;
+    curPosition[player].pits[pit].val := 0;
   _)
 _);
 
 _function getExtraTurnMoves(_var pos:Position; p:player):bitset; (* unused *)
-_var l3v1z, l3v2z, l3v3z:integer; l3v4z:bitset;
+_var target, stones, pit:integer; retVal:bitset;
 _(
-  l3v4z := [];
-  _for l3v3z := 1 _to 6 _do _(
-    l3v2z := pos[p].pits[l3v3z].val;
-    _if l3v2z > 0 _then _(
-      l3v1z := l3v2z + l3v3z;
-      _if (l3v1z = 7) _or (l3v1z = 20) _then
-        l3v4z := [l3v3z] + l3v4z;
+  retVal := [];
+  _for pit := 1 _to 6 _do _(
+    stones := pos[p].pits[pit].val;
+    _if stones > 0 _then _(
+      target := stones + pit;
+      _if (target = 7) _or (target = 20) _then
+        retVal := [pit] + retVal;
     _)
   _);
-  getExtraTurnMoves := l3v4z;
+  getExtraTurnMoves := retVal;
 _);
 
 _function selAIMove(_var pos:Position; _var weights: eightwords; searchDepth:integer):integer;
 _label 5250, 5655;
-_var pitIndex, bestScore, worstScore, l3v4z, l3v5z: integer;
-retVal, moveScore, l3v8z, startTime:integer;
-curPos, testPos:Position;
-moveType, l3x43z:integer; candWeight:_array [1..6] _of integer; l3v50z,
-l3x51z:integer; candMove: _array[1..6] _of integer; l3v58z, candCount, l3v60z,
-l3v61z, l3v62z, l3v63z, bookZoneIndex:integer; l3v65z: bitset; alpha, beta, l3v68z, nodesPerMove, legalMoveCount,
-kalahWeight, extraTurnBonus, emptyOppWeight, multiLapBonus, captureSetup, mobilityWeight, distanceWeight: integer;
+_var
+pitIndex: integer;           % Multi-purpose loop counter - heavily reused across 6+ contexts
+bestScore: integer;          % Best score found so far - also reused as loop counter
+worstScore: integer;         % Worst score found so far - threshold for filtering
+idx1: integer;               % Multi-purpose temp - book bits, current player, move counter
+idx2: integer;               % Loop counter for building candidates
+retVal: integer;             % * THE RETURN VALUE * Selected pit number 1-6
+moveScore: integer;          % Evaluation score for current move
+baseEval: integer;           % Base evaluation of position before any move
+startTime: integer;          % Start time in CPU ticks - for thinking time calculation
+curPos: Position;            % Working copy of input position - never modified
+testPos: Position;           % Test position for simulating individual moves
+moveType: integer;           % Move result code from exMvLogic - 0=invalid, 1=normal, 2=extra turn
+candWeight: _array [0..6] _of integer;  % Cumulative probability weights - for random selection
+unu1: integer;               % Unused auxiliary - may be optimized out
+candMove: _array[0..6] _of integer;     % Pit indices of candidate moves
+unu2: integer;               % Unused - possible remnant
+candCount: integer;          % Number of good candidate moves
+scoreSum: integer;           % Total score sum for normalization
+averageScore: integer;       % Score threshold for filtering moves
+totalWeight: integer;        % Total probability weight sum
+moveWeight: integer;         % Probability weight for individual move - also book continuations
+bookZoneIndex: integer;      % Adjusted opening book index
+bookMoves: bitset;           % Valid moves from opening book
+alpha: integer;              % Alpha parameter for minimax - upper bound
+beta: integer;               % Beta parameter for minimax - lower bound
+nodeBudget: integer;         % Remaining node budget for search
+nodesPerMove: integer;       % Node budget allocated to single move
+legalMoveCount: integer;     % Number of legal moves - countdown variable
+kalahWeight: integer;        % Weight for stones in kalah
+extraTurnBonus: integer;     % Bonus for extra turn moves
+emptyOppWeight: integer;     % Weight for empty pits with stones opposite
+multiLapBonus: integer;      % Bonus for stones that lap around
+captureSetup: integer;       % Weight for capture threat potential
+mobilityWeight: integer;     % Weight for mobile stones
+distanceWeight: integer;     % Weight for distance to kalah
+
 _function materialDifference(_var pos:Position):integer;
 _var sum, pit, curPLayer, oppPlayer:integer;
 _(
@@ -1276,11 +1321,11 @@ _( (* selAIMove *)
      _);
      _if openingBookIndex > 1547 _then bookZoneIndex := openingBookIndex - 224
      _else bookZoneIndex := openingBookIndex;
-     l3v4z := (7 - bookZoneIndex _MOD 8) * 6;
-     l3v4z := sel(zoneBuffer@[bookZoneIndex_div 8], l3v4z, 6);
+     idx1 := (7 - bookZoneIndex _MOD 8) * 6;
+     idx1 := sel(zoneBuffer@[bookZoneIndex_div 8], idx1, 6);
      code(СД/-51/=);
-     l3v65z := ;
-     validateBookMoves( l3v65z );
+     bookMoves := ;
+     validateBookMoves( bookMoves );
    _) _else _((* 5302 *)
    _if randint(100) >= rndnessFactor _then _(
      alpha := billion;
@@ -1291,55 +1336,55 @@ _( (* selAIMove *)
      retVal := chosenMove;
      _goto 5655;
    _);
-   l3v8z :=   evaluatePosition(curPos);
+   baseEval := evaluatePosition(curPos);
   _); (* 5325 *)
   legalMoveCount := 1;
-  l3v4z := curPos[user].move.i;
-  l3v68z := maxNodesToSearch;
+  idx1 := curPos[user].move.i;
+  nodeBudget := maxNodesToSearch;
   _for pitIndex := 1 _to 6 _do _(
-    _if pos[l3v4z].pits[pitIndex].val > 0 _then legalMoveCount := legalMoveCount + 1;
+    _if pos[idx1].pits[pitIndex].val > 0 _then legalMoveCount := legalMoveCount + 1;
   _);
-  l3v4z := 0;
+  idx1 := 0;
   retVal := ;
-  l3v61z := ;
+  averageScore := ;
   _for pitIndex := 1 _to 6 _do _(
     testPos := curPos;
     _if useOpeningBook _then _(
-    _if pitIndex _IN l3v65z _then _(
-      moveType :=   exMvLogic(testPos, pitIndex );
-      l2v179z[pitIndex] := ;
+    _if pitIndex _IN bookMoves _then _(
+      moveType := exMvLogic(testPos, pitIndex );
+      moveExecuted[pitIndex] := ;
       _if moveType = 0 _then _(
         writeln('ПУСТАЯ ЛУНКА В ДЕБЮТАХ - "ЧП" !');
         writeln('ИСТОРИЯ ', openingBookIndex:1);
         _GOTO 12561;
       _); (* 5401 *)
-      l3v4z := l3v4z + 1;
+      idx1 := idx1 + 1;
       retVal := pitIndex;
       _if moveType = 2 _then
-        l3v63z :=   consultOpeningBook(testPos, openingBookIndex * 6 + pitIndex)
+        moveWeight := consultOpeningBook(testPos, openingBookIndex * 6 + pitIndex)
       _else
-        l3v63z := 1;
-      l2v172z[pitIndex] := l3v63z;
+        moveWeight := 1;
+      moveValues[pitIndex] := moveWeight;
     _) (* 5417 *)
-    _else l2v179z[pitIndex] := 0;
+    _else moveExecuted[pitIndex] := 0;
     _) _else _( (* 5422 *)
-      moveType :=   exMvLogic(testPos, pitIndex );
-      l2v179z[pitIndex] := ;
+      moveType := exMvLogic(testPos, pitIndex);
+      moveExecuted[pitIndex] := ;
       l2v74z := nodesSearched;
       _if moveType <> 0 _then _(
         alpha := billion;
         beta := ;
-        nodesPerMove := l3v68z * 2 _div legalMoveCount;
+        nodesPerMove := nodeBudget * 2 _div legalMoveCount;
         legalMoveCount := legalMoveCount - 1;
         _if moveType = 1 _then _(
           moveScore := - minimax(testPos, searchDepth-1, nodesPerMove, alpha, beta);
         _) _else _(
           moveScore :=   minimax(testPos, searchDepth, nodesPerMove, alpha, beta);
         _); (* 5467 *)
-        l3v68z := (l3v68z - nodesSearched) + l2v74z;
-        moveScore := moveScore - l3v8z;
-        l2v172z[pitIndex] := ;
-        l3v4z := l3v4z + 1;
+        nodeBudget := nodeBudget - nodesSearched + l2v74z;
+        moveScore := moveScore - baseEval;
+        moveValues[pitIndex] := ;
+        idx1 := idx1 + 1;
         _if moveScore > bestScore _then _(
           retVal := pitIndex;
           bestScore := moveScore;
@@ -1348,48 +1393,48 @@ _( (* selAIMove *)
       _)
     _); (* 5504 *)
   _); (* 5506 *)
-  _if l3v4z < 2 _then _goto 5655;
+  _if idx1 < 2 _then _goto 5655;
   _if useOpeningBook _then
-    l3v61z := 0
+    averageScore := 0
   _else _(
-    l3v4z := 0;
+    idx1 := 0;
     _for pitIndex := 1 _to 6 _do _(
-      _if ((l2v172z[pitIndex] <> worstScore) _or (worstScore = bestScore)) _and (l2v179z[pitIndex] <> 0) _then _(
-        l3v61z := l3v61z + l2v172z[pitIndex];
-        l3v4z := l3v4z + 1;
+      _if ((moveValues[pitIndex] <> worstScore) _or (worstScore = bestScore)) _and (moveExecuted[pitIndex] <> 0) _then _(
+        averageScore := averageScore + moveValues[pitIndex];
+        idx1 := idx1 + 1;
       _)
     _);
-    _if l3v4z < 2 _then _goto 5655;
-    l3v61z := l3v61z _div l3v4z - 1;
+    _if idx1 < 2 _then _goto 5655;
+    averageScore := averageScore _div idx1 - 1;
   _); (* 5541 *)
   candCount := 0;
-  l3v60z := ;
-  _for l3v5z := 1 _to 6 _do
-  _if (l2v179z[l3v5z] <> 0) _and (l2v172z[l3v5z] > l3v61z) _then _(
+  scoreSum := ;
+  _for idx2 := 1 _to 6 _do
+  _if (moveExecuted[idx2] <> 0) _and (moveValues[idx2] > averageScore) _then _(
     candCount := candCount + 1;
-    pitIndex := (l2v172z[l3v5z] - l3v61z);
+    pitIndex := moveValues[idx2] - averageScore;
     candWeight[candCount] := ;
-    l3v60z := l3v60z + pitIndex;
-    candMove[candCount] := l3v5z;
+    scoreSum := scoreSum + pitIndex;
+    candMove[candCount] := idx2;
   _); (* 5563 *)
   _if candCount < 2 _then _goto 5655;
-  l3v62z := 0;
+  totalWeight := 0;
   _for retVal := 1 _to candCount _do _(
-    pitIndex := candWeight[retVal] * 100 _div l3v60z;
+    pitIndex := candWeight[retVal] * 100 _div scoreSum;
     _if useOpeningBook _then
-      l3v63z := pitIndex
+      moveWeight := pitIndex
     _else
-      l3v63z := pitIndex * pitIndex;
+      moveWeight := pitIndex * pitIndex;
 
-    _if l3v63z > 0 _then
-      moveEntropy := moveEntropy - l3v63z * LN(l3v63z);
-    l3v62z := l3v63z + l3v62z;
+    _if moveWeight > 0 _then
+      moveEntropy := moveEntropy - moveWeight * LN(moveWeight);
+    totalWeight := moveWeight + totalWeight;
     candWeight[retVal] := ;
   _); (* 5622 *)
-  moveEntropy := moveEntropy / l3v62z + LN(l3v62z);
+  moveEntropy := moveEntropy / totalWeight + LN(totalWeight);
   totalEntropy := moveEntropy + totalEntropy;
   uncertaintyBits := round(moveEntropy * 10.0 * oneOverLn2);
-  pitIndex := randint( l3v62z) + 1;
+  pitIndex := randint(totalWeight) + 1;
   _for bestScore := 1 _to candCount _do _(
     _if pitIndex <= candWeight[bestScore] _then _(
       retVal := candMove[bestScore];
@@ -1607,7 +1652,7 @@ _( (* generateAIPhrase *)
            write('  ТЫ ПРОИГРАЛ');  maybeFeminine;  write('!!');
          _);
          rndChoice = 3 : write('НЕ ПЕЧАЛЬСЯ, УДАЧА БУДЕТ ЖДАТЬ ТЕБЯ ЗАВТРА !');
-	 true: _( write('СДАВАЙСЯ, ТЫ УЖЕ ПРОИГРАЛ'); maybeFeminine; _)
+         true: _( write('СДАВАЙСЯ, ТЫ УЖЕ ПРОИГРАЛ'); maybeFeminine; _)
        _end
   _);
   (* 6465 *) userStones > 36 : (again) _(
@@ -2309,7 +2354,7 @@ _( (* playGameSession *)
         _goto 11225;
     _); (* 11150 *)
     _if matchesCommand( 'ПОВ   ') _then _(
-      write(chr(162B)); (* erase *)
+      write(erase);
       packPosition(curPosition, pckPosition);
       dsplGameHeader;
       movesInBuffer := 0;
@@ -2381,7 +2426,7 @@ _( (* playGameSession *)
   l2v132z@.f8 := ;
   currentPlayer := 0;
 % 11335
-  _while (currentPlayer <= 1) _do _(
+  _while currentPlayer <= 1 _do _(
     _for loopIndex := 1 _to 8 _do _(
       l2v140z[loopIndex] := chr(curPosition[currentPlayer].pits[loopIndex-1].val);
     _);
@@ -2426,7 +2471,7 @@ _( (* playGameSession *)
     l2v5z := zoneBuffer@[1008 - entryIndex].a;
     code(2ЛУ4=2ЗЧ11,); (* cmdString := l2v5z & l2v2z *)
     _if cmdString = l2v4z _then _(
-      code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,2ЗЧ7=);
+      code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,2ЗЧ7=); (* cmdString := l2v5z << 16; l2v5z := cmdString unp l2v3z; *)
       unpck(l2v124z@[1], l2v5z);
       currentPlayer := packedData.i;
       gamesPlayedToday := currentPlayer _div 2;
@@ -2702,7 +2747,7 @@ _(
   P12424;
   P12450(INP, userId, userEntryLen );
 _);
-_procedure P12501;
+_procedure Init;
 _var l2v1z, l2v2z: integer;
 _procedure P12473(_var f:text; _var i:integer; j:integer); _( code(ПБ76021=); _);
 _(
@@ -2728,12 +2773,12 @@ _(
   gameActive := true;
   isNightTime := false;
   code(СЧ76421=); gl420z := ;
-  code(СЧ76233=); gl12z := ;
-  _if gl12z <> 'ТАМБОВ' _then _(
+  code(СЧ76233=); tambov := ;
+  _if tambov <> 'ТАМБОВ' _then _(
     code(СЧ=Э0620,);
     _goto 12561
   _);
-  P12501;
+  Init;
 12561:
   _if checkRemainingTime _then _goto 12633;
   readTerminalInput(true);
