@@ -3,7 +3,7 @@ _label 12561, 12566, 12633, 12636;
 _const list = 64000B; jinn = 0; user = 1;
 nu = 66B; z236 = 2400236B; zoneSchedule = 1005B; zonePlayers = 1013B;
 z730 = 1660730B; zoneOpeningBook = 400153B; zoneCorrections = 660635B; zoneLog = 1012B;
-z600 = 660600B; z611 = 660611B; c4 = 4; c5 = 5; c25 = 25;
+logStartZone = 660600B; logEndZone = 660611B; friday = 4; c5 = 5; c25 = 25;
 charEtx = '{377'; userEntryLen = 62; c1008 = 1008; space = ' '; dot = '.';
 c13 = 13; c10 = 10; c11 = 11; lf = '{214'; cr = '{175'; c212 = 21;
 spaces = '      '; arrow = ' =++> '; adminId = '417700'; sleep = 'sle   ';
@@ -26,34 +26,39 @@ word = _record _case integer _of
 _end;
 zone = _array [0..1023] _of word;
 largeset = _array [0..5] _of bitset;
-rec1 = _record i:integer;
+SlotRec = _record i:integer;
   ls:largeset;
-  f7, f8: integer;
-  f9, f10, f11, f12:alfa;
-  f13:_array [5..12] _of alfa
+  date, expires: integer;
+  log: _array [1..12] _of alfa
 _end;
 player = integer;
 contents = _record val:integer _end;
 OneSide = _record move:word; pits:_array [1..7] _of contents _end;
 gndr = integer;
+Region = _record
+  userId:integer;
+  tempSet:bitset;
+  u2,u3,u4,u5,u6,u7,timeoutTicks:integer;
+  userBirthDate,unknData,userAccount:alfa;
+  userGender:gndr;
+  permFlags,unknFlags:bitset;
+  systemFlags:bitset;
+  u16,u17:word;
+  echo:boolean;
+  u19,u20,u21:integer;
+  statsArray:_array [0..7] _of integer;
+  unused:_array [0..31] _of integer
+_end;
 
 _var
 gl10z,
 commandEntered, tambov:alfa;
 gl13z,gl14z,cursorCol,logIndex,charIndex:integer;gameActive,isNightTime,isAdmin, cmdResult:boolean;
-startRemTime,startWallClock,gl24z,gl25z,gl26z,animSpeed,animDelay:integer;zoneBuffer:@zone;
+startRemTime,startWallClock,statVal,statVersion,msDelay,animSpeed,animDelay:integer;zoneBuffer:@zone;
 userName:sixchars;
 curLogWord:sixchars;
 logPacked:_array [1..30] _of alfa;
-userId:integer;tempSet:bitset;gl74z,gl75z,gl76z,gl77z,gl78z,gl79z,timeoutTicks:integer;
-userBirthDate,gl82z,userAccount:alfa;userGender:gndr;permFlags,gl86z:bitset;
-systemFlags:bitset;gl88z,gl89z:word;
-gl90z:boolean; gl91z,gl92z,gl93z:integer;
-statsArray:_array [0..7] _of integer;
-gl102z,gl103z,gl104z,gl105z,gl106z,gl107z,gl108z,gl109z,gl110z:integer;
-gl111z,gl112z,gl113z,gl114z,gl115z,gl116z,gl117z,gl118z,gl119z,gl120z:integer;
-gl121z,gl122z,gl123z,gl124z,gl125z,gl126z,gl127z,gl128z,gl129z,gl130z:integer;
-gl131z,gl132z,gl133z:integer;
+userData:Region;
 INP:text;gl420z:integer;
 _function remainingCPUTime:integer;
 _( code(Э0634=,); remainingCPUTime := ; _);
@@ -75,7 +80,7 @@ _label 1570;
 _var v1, v2: integer;
 _(
   _if top _then  BIND(' ==* {172') _else  BIND(' =-* {172');
-  _if gl90z _then  _(
+  _if userData.echo _then  _(
     code(СЧ76013=УИ7,);
     v1 := 2;
     code(ЗЧ76013=,);
@@ -84,13 +89,13 @@ _(
   rewrite(INP);
   v2 := 0;
   _while input@ <> charEtx _do _(
-    _if gl90z _then write(input@);
+    _if userData.echo _then write(input@);
     v2 := v2 + 1;
     _if v2 > 128 _then _(
       rewrite(INP);
       gameActive := false;
       write(INP,'SLЕ  {377');
-      systemFlags := systemFlags + [47];
+      userData.systemFlags := userData.systemFlags + [47];
       _goto 1570
     _);
     write(INP,input@);
@@ -99,19 +104,19 @@ _(
   write(INP, charEtx);
   1570:
   reset(INP);
-  _if gl90z _then _(
+  _if userData.echo _then _(
     writeLN;
     code(ВИ7=ЗЧ76013,);
   _)
 _);
 
 _function checkRemainingTime:boolean;
-_var l2v1z:integer;
+_var remTime:integer;
 _(
   checkRemainingTime := false;
   code(Э0634=,);
-  l2v1z := ;
-  _if timeoutTicks - l2v1z < 120 _then _(
+  remTime := ;
+  _if userData.timeoutTicks - remTime < 120 _then _(
     rewrite(output);
     rewrite(INP);
     writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
@@ -122,11 +127,11 @@ _(
   _)
 _);
 _procedure checkNegativeResponse;
-_var l2v1z:alfa;
+_var resp:alfa;
 _(
   writeLN;
-  code(сч77015=); l2v1z := ;
- _if l2v1z = 'Н{3770000' _then _GOTO 12561;
+  code(сч77015=); resp := ;
+ _if resp = 'Н{3770000' _then _GOTO 12561;
 _);
 
 _function getDigit(i:integer):integer;
@@ -135,18 +140,18 @@ _( code(=14ПВ77463,) _);
 _procedure updateStatistics(index:integer);
 _var currentValue, increment, divisor, tempValue:integer;
 _(
-  currentValue := statsArray[index];
+  currentValue := userData.statsArray[index];
   tempValue := ;
-  currentValue := sel(tempValue, 24, 6) + gl24z;
+  currentValue := sel(tempValue, 24, 6) + statVal;
   code(СД/6/=2ЗЧ5,МР=СД/-6/,МР=2ЗЧ4,);
   ins(tempValue, currentValue, 24, 6);
-  statsArray[index] := ;
+  userData.statsArray[index] := ;
   _if increment > 0 _then _(
-    gl24z := increment;
+    statVal := increment;
     updateStatistics(index - 1);
-    gl24z := 1;
+    statVal := 1;
   _);
-  _if gl25z = 1 _then _(
+  _if statVersion = 1 _then _(
     divisor := 36;
   _) _else _(
     divisor := 22;
@@ -328,9 +333,9 @@ _(
   epochDaysToDate := (v3 * 100 + v2) * 100 + v1;
 _);
 
-_function addDaysToDate(l2a1z, l2a2z:integer):integer;
+_function addDaysToDate(date, days:integer):integer;
 _(
-  addDaysToDate := epochDaysToDate( (dateToEpochDays( l2a1z) + l2a2z) );
+  addDaysToDate := epochDaysToDate( dateToEpochDays(date) + days );
 _);
 
 _function dayOfWeek(day, month, year:integer):integer;
@@ -339,53 +344,53 @@ _(
  month := month + 9;
  _if month > 11 _then month := month - 12;
  month := month + 1;
- dayOfWeek := (((((day + year) + (year _div 4)) + (((13 * month) - 1) _DIV 5)) - 28) _MOD 7);
-  _);
+ dayOfWeek := (day + year + year _div 4 + (13 * month - 1) _DIV 5 - 28) _MOD 7;
+_);
 
 _procedure checkGameSchedule;
 _label 1, 2;
-_var l2v1z, l2v2z, l2v3z, l2v4z, l2v5z:integer;
-l2v6z:alfa;
-t:sixchars;
-isTrainingGame:bitset;
+_var hour, halfHour, day, month, year:integer;
+alfaTime:alfa;
+time:sixchars;
+isOpen:bitset;
 _(
-  _if 32 _IN permFlags _then _( permFlags := permFlags - [32]; exit _);
-  _if tempSet * [3] = [3] _then exit;
+  _if 32 _IN userData.permFlags _then _( userData.permFlags := userData.permFlags - [32]; exit _);
+  _if userData.tempSet * [3] = [3] _then exit;
 
-  _if 26 _IN systemFlags _then _(
+  _if 26 _IN userData.systemFlags _then _(
 1:
     writeln('КАЛАХ ЗАКРЫТ');
     _GOTO 12561;
   _);
-  _if tempSet * [2] = [2] _then _(
+  _if userData.tempSet * [2] = [2] _then _(
     write('ДЛЯ ВАС '); _goto 1;
   _);
-  _if 30 _IN permFlags _then _(
+  _if 30 _IN userData.permFlags _then _(
     writeln('БОЛЬШЕ ИГРАТЬ НЕ БУДУ.');
     _goto 2
   _);
-  l2v3z := getDaysInt;
-  l2v5z := l2v3z _DIV 10000;
-  l2v3z := l2v3z - (l2v5z * 10000);
-  l2v4z := l2v3z _DIV 100;
-  l2v3z := l2v3z - (l2v4z * 100);
-  _if dayOfWeek( l2v3z, l2v4z, l2v5z) > 4 _then exit;
+  day := getDaysInt;
+  year := day _DIV 10000;
+  day := day - year * 10000;
+  month := day _DIV 100;
+  day := day - month * 100;
+  _if dayOfWeek( day, month, year) > friday _then exit;
   readDiskZone( nu, zoneSchedule );
-  isTrainingGame := zoneBuffer@[5].s;
-  l2v6z :=   getTimeStr;
-  unpck(t[1], l2v6z);
-  l2v2z := (((ord(t[2]) * 10) + ord(t[3])) * 2) + (((ord(t[5]) * 10) + ord(t[6])) _DIV 30);
-  _if _not (l2v2z _IN isTrainingGame) _then _(
+  isOpen := zoneBuffer@[5].s;
+  alfaTime :=   getTimeStr;
+  unpck(time[1], alfaTime);
+  halfHour := (ord(time[2]) * 10 + ord(time[3])) * 2 + (ord(time[5]) * 10 + ord(time[6])) _DIV 30;
+  _if _not (halfHour _IN isOpen) _then _(
     writeln('ИГРА СЕЙЧАС ЗАКРЫТА');
     _repeat
-      l2v2z := l2v2z + 1;
-      _if l2v2z _IN isTrainingGame _then _(
+      halfHour := halfHour + 1;
+      _if halfHour _IN isOpen _then _(
         write('ОТКРОЕТСЯ В ');
-        l2v1z := (l2v2z _div 2);
-        l2v2z := ((l2v2z - (l2v1z * 2)) * 30);
-        printDecimal( l2v1z );
+        hour := halfHour _div 2;
+        halfHour := (halfHour - hour * 2) * 30;
+        printDecimal( hour );
         write(dot);
-        printDecimal( l2v2z );
+        printDecimal( halfHour );
         writeln(' - СЕЙЧАС', getTimeStr);
 2:
         rewrite(INP);
@@ -393,11 +398,11 @@ _(
         gameActive := false;
         _GOTO 12633;
       _);
-    _until (l2v2z >= 47);
+    _until halfHour >= 47;
     writeln('СЕГОДНЯ НЕ ОТКРОЕТСЯ');
     _goto 2
   _);
-  isNightTime := (l2v2z < 13) _or (l2v2z > 41); (* < 6:30 or > 20:30 *)
+  isNightTime := (halfHour < 13) _or (halfHour > 41); (* < 6:30 or > 20:30 *)
 _);
 
 _function readCommand(_var a:alfa; b:integer):boolean;
@@ -414,32 +419,33 @@ _( code(2ИК3=СЧ,СД/-6/=17ЗЧ,);
   packedWord :=;
 _);
 
-_procedure unpPitState(_var l2a1z:OneSide; l2a2z:word);
-_var l2v1z:integer;
+_procedure unpPitState(_var side:OneSide; state:word);
+_var pit:integer;
 _(
   code(2СЧ4=СД/-3/,2ЗЧ4=МР,);
-  l2a1z.move := ;
-  _for l2v1z := 1 _to 6 _do _(
+  side.move := ;
+  _for pit := 1 _to 6 _do _(
+    % side.pits[pit] := next 6 bits of state
     code(2СЧ4=СД/-6/,2ЗЧ4=MP,17ЗЧ=2СЧ5,2АС3=17ЗЧ,17ИК=ИА,15ПА=17СЧ,15ЗЧ=)
   _);
-  code(2СЧ4=СД/-11/,МР=2ИК3,ЗЧ7=);
+  code(2СЧ4=СД/-11/,МР=);
+  side.pits[7] := ;
 _);
-
 _procedure getUserName(_var first, second:alfa);
-_var l2v1z:sixchars; l2v7z: boolean; l2v8z:integer;
-l2v9z:char; l2v10z, fromOS:alfa;
+_var a:sixchars; absent: boolean; i:integer;
+c:char; id, fromOS:alfa;
 _(
-  l2v10z := first;
+  id := first;
   code(7ПАРАЗ=,7СБ=СД/40/,7ЗЧ1=7СА1,ВИ7=Э050104,7СЧ=7ПБ2,C;РАЗ:360741703600000,0,0,К;);
   fromOS := ;
-  unpck(l2v1z[1], fromOS);
-  l2v7z := false;
-  _for l2v8z := 1 _to 6 _do _(
-    l2v9z := l2v1z[l2v8z];
-    _if _not ((l2v9z _in letter) _or (l2v9z = ' ') _or (l2v9z = '.')) _then
-      l2v7z := true;
+  unpck(a[1], fromOS);
+  absent := false;
+  _for i := 1 _to 6 _do _(
+    c := a[i];
+    _if _not ((c _in letter) _or (c = ' ') _or (c = '.')) _then
+      absent := true;
   _);
-  _if l2v7z _then _(
+  _if absent _then _(
     first := 'НЕТ ТА';
     second := 'КОГО  ';
     exit
@@ -451,7 +457,7 @@ _);
 
 _procedure writeTerminalOutput;
 _(
-  _if gl90z _then checkNegativeResponse _else _(
+  _if userData.echo _then checkNegativeResponse _else _(
     write('{172     ');
     code(CЧ75205=УИ7,СЧ76401=ЛСисэ71,17ЗЧ1=17Э0711,Э07176402=,);
     rewrite(output); exit;
@@ -546,34 +552,34 @@ _(
 _);
 
 _procedure initializeLog;
-_var l2v1z:alfa; l2v2z:sixchars;
+_var acct:alfa; unp:sixchars;
 _(
   logPacked[1] := 'САLАН+';
   logPacked[2] := getDateStr;
   logPacked[3] := getTimeStr;
-  l2v1z := userAccount;
+  acct := userData.userAccount;
   code(СД/10/=);
-  l2v1z := ;
-  unpck(l2v2z[1], l2v1z);
-  l2v2z[1] := space;
-  l2v2z[6] := '{175';
-  pck(l2v2z[1], logPacked[4]);
+  acct := ;
+  unpck(unp[1], acct);
+  unp[1] := space;
+  unp[6] := '{175';
+  pck(unp[1], logPacked[4]);
   logIndex := 5;
 _);
 
 _procedure saveLogToZone;
 _label 3247;
-_var l2v1z, l2v2z, l2v3z, l2v4z:integer; l2v5z: alfa;
-_procedure P3203(l3a1z:alfa);
+_var header, dst, idx, curZone:integer; scoreEntry: alfa;
+_procedure P3203(data:alfa);
 _label 1;
 _(
-  _if l2v2z > 1023 _then _goto 1;
-  zoneBuffer@[l2v2z].a := l3a1z;
-  l2v5z := ;
-  l2v2z := l2v2z + 1;
-  _if l2v5z = fin _then _(
+  _if dst > 1023 _then _goto 1;
+  zoneBuffer@[dst].a := data;
+  scoreEntry := ;
+  dst := dst + 1;
+  _if scoreEntry = fin _then _(
 1:  code(2СЧ3=СД/-14/,2ЛС4=);
-    zoneBuffer@[0].i := ;
+    zoneBuffer@[0].i := (* header << 12 | dst *);
     _GOTO 3247;
   _)
 _);
@@ -581,22 +587,22 @@ _( (* saveLogToZone *)
   _if logIndex > 30 _then exit;
   logWord( fin );
   readDiskZone( nu, zoneLog );
-  l2v5z := zoneBuffer@[0].a;
-  code(СД/14/=2ЗЧ3,МР=СД/44/,);
-  l2v2z := ;
-  _if (l2v2z <= 896) _or (z600 <> 0) _then _(
-    l2v3z := 1;
+  scoreEntry := zoneBuffer@[0].a;
+  code(СД/14/=); header := ; code(МР=СД/44/,);
+  dst := ;
+  _if (dst <= 896) _or (logStartZone <> 0) _then _(
+    idx := 1;
     (loop) _(
-      P3203( logPacked[l2v3z] );
-      l2v3z := l2v3z + 1;
+      P3203( logPacked[idx] );
+      idx := idx + 1;
       _goto loop
     _);
 3247:
-    _if (l2v2z > 928) _and (z600 > 0) _then _(
-      l2v4z := zoneBuffer@[1].i;
-      _if (l2v4z > 0) _and (l2v4z <= z611) _and (l2v4z >= z600) _then _(
-        writeDiskZone(0, l2v4z );
-        zoneBuffer@[1].i := l2v4z + 1;
+    _if (dst > 928) _and (logStartZone > 0) _then _(
+      curZone := zoneBuffer@[1].i;
+      _if (curZone > 0) _and (curZone <= logEndZone) _and (curZone >= logStartZone) _then _(
+        writeDiskZone(0, curZone );
+        zoneBuffer@[1].i := curZone + 1;
         zoneBuffer@[0].i := (sel(zoneBuffer@[0].i, 12, 12) + 1) * 4096 + 2;
       _)
     _);
@@ -615,39 +621,111 @@ _type
 Position = _array [jinn..user] _of OneSide;
 pckboth = _array [jinn..user] _of word;
 eightwords = _record f0, kalah, extraTurn, emptyOpp, multiLap, capture, mobility, distance:integer _end;
-_var l2v1z, l2v2z, l2v3z, l2v4z:alfa;
-l2v5z, l2v6z, cmdString, inputCmd:alfa;
-resultChar:char; hasScore, isResumedGame, isNewGame, isTrainingGame, movesPending,
-isFirstGame, testMode, gameIsDecided: boolean; aiSilent: boolean;
-userSilent, isMasterLevel, postponeFlag, hasWarned:boolean;
-gndrMismatch, allowExit, useOpeningBook, bookIsActive, enableLogging, useCorrections:boolean;
-l2v29z:boolean; packedData:word; difficultyLevel : integer; resumeCount,
-userTotalScore, jinnTotalScore, gamesPlayedToday, levelChoice, savedLevel, rndnessFactor: integer;
-chosenMove, wordsSinceLastSpeak, insertPos, scorePos, maxNodesToSearch, alphaBetaCutoffs, deepenCount, extraDepth, prevNodes, jinnWins: integer;
-userWins, startPlayer, savedGameSlot, loopIndex, currentPlayer, seledMove, numScoreEntries, userFinalKalah, jinnFinalKalah, lastJinnKalah,
-lastUserKalah, startTickCount, searchDepth, actualDepth, entryIndex, inputLength : integer;
-totalMovesPlayed:integer;
-curMoveNumber, corrStartIdx, corrEndIdx, oldHandler, openingBookIndex, posSignature, uncertaintyBits, nodesSearched,
-l2v74z, jinnThinkingTime, userThinkingTime, l2v77z, movesInBuffer, l2v79z, nodesThisMove: integer;
-userAge, curThinkTime: integer;
-curPosition:Position;
-posBeforeMove:Position;
-pckPosition:_array [0..1] _of word;
-knownGender:gndr;
-l2v118z:sixchars;
-l2v124z:@sixchars; l2v125z, lastMoveResult:integer;
-l2v127z:bitset; l2v128z:bitset;
-totalEntropy, moveEntropy: real;
-oneOverLN2:real; (* 131 *)
-l2v132z:@rec1;
-l2v133z:eightwords;
-l2v140z:_array[1..12] _of char;
-l2v153z:@zone; (* for simplicity *)
-moveBuffer: _array [1..10] _of char;
-l2v164z:eightwords;
-moveValues:_array [0..6] _of integer;
-moveExecuted:_array [0..6] _of integer;
-haveSaid:_array[0..30] _of bitset;
+_var
+mask1:alfa;                         % First packing mask for string operations
+mask2:alfa;                         % Second packing mask for string operations
+mask3:alfa;                         % Third packing mask for string operations
+acctCopy:alfa;                      % Copy of userData.userAccount for comparisons
+scoreEntry:alfa;                    % Score zone data entry read/write buffer
+scoreCheck:alfa;                    % Comparison value for score validation
+cmdString:alfa;                     % Command string buffer
+inputCmd:alfa;                      % Parsed user input command
+resultChar:char;                    % Game result character (N/+/-/C)
+hasScore:boolean;                   % True if player has score entry in table
+isResumedGame:boolean;              % True if resuming a saved game
+isNewGame:boolean;                  % True if starting a new game
+isTrainingGame:boolean;             % True if in training mode
+movesPending:boolean;               % True if moves in input buffer
+isFirstGame:boolean;                % True if first game of session
+testMode:boolean;                   % True if in test mode (B command)
+gameIsDecided:boolean;              % True if game outcome is certain
+aiSilent:boolean;                   % True if AI should not speak
+userSilent:boolean;                 % True if user is silent
+isMasterLevel:boolean;              % True if difficulty level is 4 (Efendi)
+postponeFlag:boolean;               % True if game should be postponed
+hasWarned:boolean;                  % True if warned about early exit
+gndrMismatch:boolean;               % True if name/gender mismatch detected
+allowExit:boolean;                  % True if exit is allowed
+useOpeningBook:boolean;             % True if using opening book
+bookIsActive:boolean;               % True if currently in opening book
+enableLogging:boolean;              % True if game logging is enabled
+useCorrections:boolean;             % True if using corrections database
+echoSaved:boolean;                  % Saved userData.echo flag for restore
+packedData:word;                    % Packed game state data
+difficultyLevel:integer;            % Game difficulty (1=Junior, 2=Candidate, 3=Participant, 4=Efendi)
+resumeCount:integer;                % Count of game resumptions
+userTotalScore:integer;             % User total score in tournament
+jinnTotalScore:integer;             % Jinn total score in tournament
+gamesPlayedToday:integer;           % Number of games played today
+levelChoice:integer;                % User-selected difficulty level
+savedLevel:integer;                 % Saved difficulty level
+rndnessFactor:integer;              % Randomness factor for move selection
+chosenMove:integer;                 % AI chosen move pit number
+wordsSinceLastSpeak:integer;        % Words since last AI speech
+insertPos:integer;                  % Position to insert score entry
+scorePos:integer;                   % Position in score table
+maxNodesToSearch:integer;           % Maximum nodes to search in minimax
+alphaBetaCutoffs:integer;           % Count of alpha-beta cutoffs
+deepenCount:integer;                % Count of search deepening
+extraDepth:integer;                 % Extra search depth added
+prevNodes:integer;                  % Previous node count
+jinnWins:integer;                   % Jinn wins this game
+userWins:integer;                   % User wins this game
+startPlayer:integer;                % Starting player (0=jinn, 1=user)
+savedGameSlot:integer;              % Saved game slot index
+loopIndex:integer;                  % General loop counter
+currentPlayer:integer;              % Current player (0=jinn, 1=user)
+seledMove:integer;                  % Selected move pit number
+numScoreEntries:integer;            % Number of score entries in table
+userFinalKalah:integer;             % User final kalah count
+jinnFinalKalah:integer;             % Jinn final kalah count
+lastJinnKalah:integer;              % Jinn kalah count at last AI phrase
+lastUserKalah:integer;              % User kalah count at last AI phrase
+startTickCount:integer;             % CPU ticks at game start
+searchDepth:integer;                % Base minimax search depth
+actualDepth:integer;                % Actual search depth used
+entryIndex:integer;                 % Index in score table
+inputLength:integer;                % Length of input string
+totalMovesPlayed:integer;           % Total moves played in game
+curMoveNumber:integer;              % Current move number (for corrections)
+corrStartIdx:integer;               % Corrections start index
+corrEndIdx:integer;                 % Corrections end index
+oldHandler:integer;                 % Saved interrupt handler
+openingBookIndex:integer;           % Current position in opening book
+posSignature:integer;               % Position signature (for corrections)
+uncertaintyBits:integer;            % Move uncertainty in decisibits
+nodesSearched:integer;              % Total nodes searched
+nodesBefore:integer;                % Nodes searched count before minimax call
+jinnThinkingTime:integer;           % Jinn total thinking time in ticks
+userThinkingTime:integer;           % User total thinking time in ticks
+inputTicks:integer;                 % Wall clock ticks at input start
+movesInBuffer:integer;              % Number of moves in input buffer
+upLines:integer;                    % Number of cursor up lines (5 or 1)
+nodesThisMove:integer;              % Nodes searched for current move
+userAge:integer;                    % User age in years
+curThinkTime:integer;               % Current move thinking time
+curPosition:Position;               % Current game position
+posBeforeMove:Position;             % Position before move execution
+pckPosition:_array [0..1] _of word; % Packed position representation
+knownGender:gndr;                   % Known user gender
+unpLog:sixchars;                    % Unpacked log entry
+dataPtr:@sixchars;                  % Pointer to packedData for unpacking
+moveResult:integer;                 % Result of exMvAnimated (0=invalid, 1=normal, 2=extra turn)
+lastMoveResult:integer;             % Result of last move
+usedSlots:bitset;                   % Used saved game slots
+freeSlots:bitset;                   % Free saved game slots
+totalEntropy:real;                  % Total move entropy
+moveEntropy:real;                   % Current move entropy
+oneOverLN2:real;                    % Constant 1/ln(2) for entropy calculation
+slotPtr:@SlotRec;                   % Pointer to saved game record
+weights:eightwords;                 % AI evaluation weights (working copy)
+posEnc:_array[1..12] _of char;      % Position state encoding buffer for saved game
+statsPtr:@zone;                     % Pointer to statistics accumulator zone
+moveBuffer:_array [1..10] _of char; % Input move buffer
+defWeights:eightwords;              % Default AI weights [kalah, extraTurn, emptyOpp, multiLap, capture, mobility, distance]
+moveValues:_array [0..6] _of integer;    % Evaluation scores for each move
+moveExecuted:_array [0..6] _of integer;  % Non-zero if move was executed
+haveSaid:_array[0..30] _of bitset;       % Bitset tracking which phrases have been said
 _FUNСТI RАNDОМ:RЕАL;(* СЛУЧАЙНОЕ ЧИСЛО В (0,1) *)
 _(
   СОDЕ(К;ВР77=17ЗЧ1,РА3=СЧХRАND,АУАRАND=МР,
@@ -665,13 +743,13 @@ _(
   randint := trunc(RANDOM * arg);
 _);
 
-_function isAllZeros(arg:alfa):boolean;
+_function matchNchars(arg:alfa):boolean;
 _(
   code(тут2:7патут2=пбдавай,
 c;7760000000000000,7777740000000000,7777777700000000,
 7777777777600000,7777777777777400,377,15,17,
 к;давай:3сч4=7лу6,уи6=1сч12,3ср4=6иа,7лу=3зч4,);
-  isAllZeros := arg = '{000{000{000{000{000{000';
+  matchNchars := arg = '000000';
 _);
 
 _function matchesCommand(command:alfa):boolean;
@@ -687,14 +765,15 @@ _(
   _if a = inputCmd _then matchesCommand := true;
 _);
 
-_function procStrings(l3a1z, l3a2z: alfa):alfa;
-_var l3v1z, l3v2z, l3v3z: alfa;
+_function decodePos(word1, word2: alfa):alfa;
+_var mask1, mask2, mask3: alfa;
 _(
-  l3v1z := '7DDDDD';
-  l3v2z := 'D{3770000';
-  l3v3z := '{375{3760000';
+  mask1 := '{007{077{077{077{077{077';
+  mask2 := '{077{3770000';
+  mask3 := '{375{3760000';
+% Repack from byte-encoded counts to 6-bit
   code(3сч4=3сб6,3см5=3сб7,3рб10=сд/-17/,мр=17лс,);
-  procStrings := ;
+  decodePos := ;
 _);
 _procedure writeCharNTimes(character:char; repeatCount:integer);
 _var counter:integer;
@@ -1331,7 +1410,7 @@ _( (* selAIMove *)
      alpha := billion;
      beta := ;
      bookIsActive := false;
-     l2v74z := nodesSearched;
+     nodesBefore := nodesSearched;
      moveScore :=   minimax(curPos, searchDepth, maxNodesToSearch, alpha, beta);
      retVal := chosenMove;
      _goto 5655;
@@ -1370,7 +1449,7 @@ _( (* selAIMove *)
     _) _else _( (* 5422 *)
       moveType := exMvLogic(testPos, pitIndex);
       moveExecuted[pitIndex] := ;
-      l2v74z := nodesSearched;
+      nodesBefore := nodesSearched;
       _if moveType <> 0 _then _(
         alpha := billion;
         beta := ;
@@ -1381,7 +1460,7 @@ _( (* selAIMove *)
         _) _else _(
           moveScore :=   minimax(testPos, searchDepth, nodesPerMove, alpha, beta);
         _); (* 5467 *)
-        nodeBudget := nodeBudget - nodesSearched + l2v74z;
+        nodeBudget := nodeBudget - nodesSearched + nodesBefore;
         moveScore := moveScore - baseEval;
         moveValues[pitIndex] := ;
         idx1 := idx1 + 1;
@@ -1514,11 +1593,23 @@ _);
 
 _procedure generateAIPhrase;
 _label 6553, 7650, 7660;
-_var pckName:_array [0..1] _of alfa;pitNum, rndChoice, loopVar, oppositePit, jinnStones, userStones, phraseCategory, moveType: integer;
-l3v11z:boolean; l3v12z, l3v13z:boolean; suffixChar:char;
-l3v15z:Position;
-unpName:_array [1..12] _of char;
-l3v43z:_array [1..6] _of char;
+_var
+pckName:_array [0..1] _of alfa;  % Packed user name (first/last)
+pitNum:integer;                  % Pit number for move analysis
+rndChoice:integer;               % Random choice value
+loopVar:integer;                 % General loop variable
+oppositePit:integer;             % Opposite pit index
+jinnStones:integer;              % Jinn's stone count after move
+userStones:integer;              % User's stone count after move
+phraseCategory:integer;          % Phrase category for tracking
+moveType:integer;                % Move result type
+hasSaid:boolean;                 % True if phrase already said
+hasKalah:boolean;                % True if kalah move available
+hasNonKalah:boolean;             % True if non-kalah move available
+suffixChar:char;                 % Character suffix for output
+posAfter:Position;               % Position after simulated move
+unpName:_array [1..12] _of char; % Unpacked full name buffer
+dateBuf:_array [1..6] _of char;  % Date/name unpacking buffer
 _function chkRandom(range:integer):integer;
 _var try:integer;
 _(
@@ -1544,8 +1635,8 @@ _(
   _if knownGender = FEM _then write(femEnding);
   write(excl:2);
 _);
-_function countEnding(number:integer):integer;
 
+_function countEnding(number:integer):integer;
 _(
   _if number >= 20 _then
     number := number _MOD 10;
@@ -1557,23 +1648,23 @@ _(
   countEnding := number;
 _);
 _( (* generateAIPhrase *)
-  l3v11z := false;
-  l3v15z := curPosition;
-  moveType :=   exMvLogic(l3v15z, seledMove );
-  jinnStones := l3v15z[jinn].pits[7].val;
-  userStones := l3v15z[user].pits[7].val;
+  hasSaid := false;
+  posAfter := curPosition;
+  moveType :=   exMvLogic(posAfter, seledMove );
+  jinnStones := posAfter[jinn].pits[7].val;
+  userStones := posAfter[user].pits[7].val;
   _if isTrainingGame _then _goto 7660;
   write(space:3);
   _if isFirstGame _then _(
     isFirstGame := false;
-    unpck(l3v43z[1], userBirthDate);
-    userAge := ord(l3v43z[5]) * 10 + ord(l3v43z[6]);
+    unpck(dateBuf[1], userData.userBirthDate);
+    userAge := ord(dateBuf[5]) * 10 + ord(dateBuf[6]);
     _if userAge > 0 _then _(
       pckName[1] :=   getDateStr;
-      unpck(l3v43z[1], pckName[1]);
-      userAge := ord(l3v43z[5]) * 10 + ord(l3v43z[6]) - userAge;
+      unpck(dateBuf[1], pckName[1]);
+      userAge := ord(dateBuf[5]) * 10 + ord(dateBuf[6]) - userAge;
     _);
-    pckName[0] := userAccount;
+    pckName[0] := userData.userAccount;
     getUserName(pckName[0], pckName[1]);
     _select
       gamesPlayedToday = 0: write(' ПРИВЕТСТВУЮ ТЕБЯ, ');
@@ -1585,8 +1676,8 @@ _( (* generateAIPhrase *)
     gndrMismatch := false;
     _if ((knownGender = MASC) _or (knownGender = FEM)) _and (userAge > 0) _then _(
       _select
-        (userAge < 20): write('ЮН');
-        (userAge < 50): write('УВАЖАЕМ');
+        userAge < 20 : write('ЮН');
+        userAge < 50 : write('УВАЖАЕМ');
         true: write('ПОЧТЕНН')
       _end;
       _if knownGender = MASC _then write('ЫЙ ')
@@ -1599,22 +1690,22 @@ _( (* generateAIPhrase *)
     _);
 
     pckName[0] := '      ';
-    unpck(l3v43z[1], pckName[0]);
+    unpck(dateBuf[1], pckName[0]);
     _for loopVar := 1 _to 3 _do _(
     _if rndChoice - loopVar > 0 _then
-      l3v43z[loopVar] := unpName[rndChoice - loopVar];
+      dateBuf[loopVar] := unpName[rndChoice - loopVar];
     _);
     _select
       knownGender = MASC :
-      gndrMismatch := isAllZeros( 'ОВА  4') _or
-        isAllZeros( 'ЕВА  4') _or
-        isAllZeros( 'ИНА  4') _or
-        isAllZeros( 'АЯ   3');
+      gndrMismatch := matchNchars( 'ОВА  4') _or
+        matchNchars( 'ЕВА  4') _or
+        matchNchars( 'ИНА  4') _or
+        matchNchars( 'АЯ   3');
       knownGender = FEM :
-      gndrMismatch := isAllZeros( 'ОВ   3') _or
-        isAllZeros( 'ЕВ   3') _or
-        isAllZeros( 'ИН   3') _or
-        isAllZeros( 'ИЙ   3')
+      gndrMismatch := matchNchars( 'ОВ   3') _or
+        matchNchars( 'ЕВ   3') _or
+        matchNchars( 'ИН   3') _or
+        matchNchars( 'ИЙ   3')
     _end;
     _select
       knownGender = MASC: write('-ХАН');
@@ -1854,13 +1945,13 @@ _( (* generateAIPhrase *)
     (rndChoice = 22) _and (moveType <> 2) : _(
       rndChoice :=   chkRandom( 2 );
       (loop) _for loopVar := 1 _to 6 _do _(
-        rndChoice := l3v15z[user].pits[loopVar].val;
+        rndChoice := posAfter[user].pits[loopVar].val;
         _if rndChoice > 0 _then _(
           pitNum := rndChoice + loopVar;
           oppositePit := 7 - pitNum;
           _if (pitNum < 7) _and
-              (l3v15z[user].pits[pitNum].val = 0) _and
-              (l3v15z[jinn].pits[oppositePit].val <> 0) _then _(
+              (posAfter[user].pits[pitNum].val = 0) _and
+              (posAfter[jinn].pits[oppositePit].val <> 0) _then _(
             rndChoice :=   chkRandom( 4 );
             _select
             rndChoice < 1: write('НЕ БЕРИ МОЮ ', oppositePit:1, ' ЛУНКУ.');
@@ -1910,15 +2001,15 @@ _( (* generateAIPhrase *)
   _); (* 7560 *)
   moveType <> 2 : _(
     oppositePit := 0;
-    l3v12z := ;
-    l3v13z := ;
+    hasKalah := ;
+    hasNonKalah := ;
     _for loopVar := 1 _to 6 _do _(
-      rndChoice := l3v15z[user].pits[loopVar].val;
+      rndChoice := posAfter[user].pits[loopVar].val;
       _if rndChoice > 0 _then _(
         pitNum := rndChoice + loopVar;
         oppositePit := oppositePit + 1;
-        _if (pitNum = 7) _or (pitNum = 20) _then l3v12z := true
-        _else l3v13z := true;
+        _if (pitNum = 7) _or (pitNum = 20) _then hasKalah := true
+        _else hasNonKalah := true;
       _)
     _); (* 7605 *)
     rndChoice :=   chkRandom( 4 );
@@ -1929,7 +2020,7 @@ _( (* generateAIPhrase *)
      true: write('У ТЕБЯ ВСЕГО ОДИН ХОД.')
       (* 7624 *)
      _end;
-     l3v12z _and l3v13z : _select
+     hasKalah _and hasNonKalah : _select
        rndChoice = 1 : write('НЕ СОВЕТУЮ ХОДИТЬ В КАЛАХ.');
        rndChoice = 2 : write('СОВЕТУЮ ПОЙТИ В КАЛАХ.');
        rndChoice = 3 : write('НА ХОД В КАЛАХ ОСОБЕННО НЕ НАДЕЙСЯ.');
@@ -1940,9 +2031,10 @@ _( (* generateAIPhrase *)
    _)
   _end;
 7650:
-  _if l3v11z _then _goto 7660;
-  code(СЧ75205=3ЗЧ6,СЧ75224=3ЗЧ7,);
-  l3v11z := true;
+  _if hasSaid _then _goto 7660;
+  code(СЧ75205=); rndChoice := ;
+  code(СЧ75224=); loopVar := ;
+  hasSaid := true;
   _if rndChoice + 1 = loopVar _then _goto 6553;
  _);
 7660:
@@ -2013,13 +2105,13 @@ _(
   _end;
   _if isTrainingGame _then
     write('Т Р Е Н И Р О В О Ч Н А Я':49)
-  _else _if (25 _IN systemFlags) _and (tempSet * [3,6] = []) _then _(
+  _else _if (25 _IN userData.systemFlags) _and (userData.tempSet * [3,6] = []) _then _(
     writeTerminalOutput;
     write('ТУРНИР ДЛЯ ВАС ЗАКРЫТ':47);
     _goto 10017
   _);
-  l2v29z := gl90z;
-  gl90z := false;
+  echoSaved := userData.echo;
+  userData.echo := false;
   code(СЧ13=ЗЧ76013,); (* C/2013 := 1; ??? *)
   write(lf, lf, lf);
   dsplBoard(pckPosition);
@@ -2027,56 +2119,60 @@ _(
   writeTerminalOutput;
 _);
 
-_function compareScoreEntries(l3a1z, l3a2z:integer):boolean;
-_var l3v1z:integer;
-l3v2z,l3v3z:integer;
-l3v4z:integer;
-l3v5z:player;
-l3v6z:integer;
-l3v7z:integer;
-l3v8z:player;
-l3v9z:integer;
-l3v10z:integer;
-l3v11z,l3v12z:integer;l3v13z:boolean;
+_function compareScoreEntries(idx1, idx2:integer):boolean;
+_var
+entry1:integer;     % First score entry from zone buffer
+entry2:integer;     % Second score entry from zone buffer
+wins1:integer;      % Jinn wins from first entry
+loss1:integer;      % Jinn losses from first entry
+wins2:integer;      % Jinn wins from second entry
+loss2:integer;      % Jinn losses from second entry
+cross1:integer;     % Cross product for win rate comparison
+cross2:integer;     % Cross product for win rate comparison
+total1:integer;     % Total games from first entry
+total2:integer;     % Total games from second entry
+level1:integer;     % Difficulty level from first entry
+level2:integer;     % Difficulty level from second entry
+result:boolean;     % Comparison result
 _(
-  l3v1z := zoneBuffer@[l3a1z].i;
-  l3v2z := zoneBuffer@[l3a2z].i;
-  l3v11z := sel(l3v1z, 24, 4);
-  l3v12z := sel(l3v2z, 24, 4);
-  _if l3v11z <> l3v12z _then _(
-    l3v13z := l3v11z > l3v12z;
+  entry1 := zoneBuffer@[idx1].i;
+  entry2 := zoneBuffer@[idx2].i;
+  level1 := sel(entry1, 24, 4);
+  level2 := sel(entry2, 24, 4);
+  _if level1 <> level2 _then _(
+    result := level1 > level2;
   _) _else _(
-    l3v3z := sel(l3v1z, 8, 8);
-    l3v4z := sel(l3v1z, 0, 8);
-    l3v9z := l3v4z + l3v3z;
-    _if l3v9z = 0 _then _(
+    wins1 := sel(entry1, 8, 8);
+    loss1 := sel(entry1, 0, 8);
+    total1 := loss1 + wins1;
+    _if total1 = 0 _then _(
       compareScoreEntries := false;
       exit
     _); (* 10135 *)
-    l3v5z := sel(l3v2z, 8, 8);
-    l3v6z := sel(l3v2z, 0, 8);
-    l3v10z := l3v6z + l3v5z;
-    _if l3v10z = 0 _then
-      l3v13z := true
+    wins2 := sel(entry2, 8, 8);
+    loss2 := sel(entry2, 0, 8);
+    total2 := loss2 + wins2;
+    _if total2 = 0 _then
+      result := true
     _else _( (* 10145 *)
-      l3v7z := l3v3z * l3v10z;
-      l3v8z := l3v5z * l3v9z;
-      _if l3v7z = l3v8z _then _(
-        _if l3v7z = 0 _then _(
-          l3v13z := l3v4z < l3v6z;
+      cross1 := wins1 * total2;
+      cross2 := wins2 * total1;
+      _if cross1 = cross2 _then _(
+        _if cross1 = 0 _then _(
+          result := loss1 < loss2;
         _) _else _(
-          l3v13z := ((l3v3z > l3v4z) _and (l3v3z > l3v5z)) _or
-                    ((l3v3z < l3v4z) _and (l3v3z < l3v5z));
+          result := ((wins1 > loss1) _and (wins1 > wins2)) _or
+                    ((wins1 < loss1) _and (wins1 < wins2));
         _)
       _) _else _( (* 10175 *)
-        l3v13z := l3v7z > l3v8z;
+        result := cross1 > cross2;
       _)
     _)
   _); (* 10202 *)
-  compareScoreEntries := l3v13z;
-  _if l3v13z _then _(
-    zoneBuffer@[l3a1z].i := l3v2z;
-    zoneBuffer@[l3a2z].i := l3v1z;
+  compareScoreEntries := result;
+  _if result _then _(
+    zoneBuffer@[idx1].i := entry2;
+    zoneBuffer@[idx2].i := entry1;
   _);
 _);
 
@@ -2090,7 +2186,7 @@ _( (* playGameSession *)
   nodesSearched := 0;
   jinnThinkingTime := ;
   userThinkingTime := ;
-  l2v77z := ;
+  inputTicks := ;
   movesInBuffer := ;
   openingBookIndex := ;
   posSignature := ;
@@ -2122,7 +2218,7 @@ _( (* playGameSession *)
   curMoveNumber := ;
   enableLogging := true;
   isTrainingGame := INP@ = 'T';
-  _if 27 _IN systemFlags _then _(
+  _if 27 _IN userData.systemFlags _then _(
   _if isTrainingGame _then _(
     levelChoice := 0;
     startPlayer := 2;
@@ -2156,15 +2252,15 @@ _( (* playGameSession *)
    _GOTO 12561;
   _)
   _); (* 10366 *)
-  knownGender := shift(userGender, 46);
-  l2v164z := [0, 572, 136, 16, 53, 33, 110, 80];
-  l2v133z := l2v164z;
-  l2v1z := '    00';
-  l2v2z := '{377{3770000';
-  l2v3z := '  {377{377{3770';
-  l2v4z := userAccount;
-  code(2СБ3=); l2v4z := ;
-  l2v124z := ref(packedData);
+  knownGender := shift(userData.userGender, 46);
+  defWeights := [0, 572, 136, 16, 53, 33, 110, 80];
+  weights := defWeights;
+  mask1 := '    00';
+  mask2 := '{377{3770000';
+  mask3 := '  {377{377{3770';
+  acctCopy := userData.userAccount;
+  code(2СБ3=); acctCopy := ;
+  dataPtr := ref(packedData);
   startTickCount := remainingCPUTime;
   code(СЧ=Э06255,); oldHandler := ;
   code(7ПАОБРАБ=ВИ7,Э050103=,СЧ=Э050102,ВИ1=7ЗЧ1,ВИ2=7ЗЧ2,ВИ17=7ЗЧ3,ВИ13=7ЗЧ4,ПБЧЕРЕЗ=,ОБРАБ:7ПАОБРАБ=7ПБ5,С;0,0,0,0,К;7СЧ1=УИ1,7СЧ2=УИ2,7СЧ3=УИ17,7СЧ4=УИ13,СЧ=УИ10,СЧ=ЗЧ76013,РА3=);
@@ -2192,16 +2288,16 @@ _( (* playGameSession *)
   _) _else _( (* 10517 *)
     lockZone66;
     readDiskZone( nu, zonePlayers );
-    l2v127z := zoneBuffer@[3].s;
-    l2v128z := ;
+    usedSlots := zoneBuffer@[3].s;
+    freeSlots := ;
     numScoreEntries := zoneBuffer@[1].i;
     hasScore := false;
     isResumedGame := ;
     isNewGame := ;
-    (loop) _while _not isTrainingGame _and extractMinElement(savedGameSlot, l2v127z) _do _(
-      l2v132z := ptr(savedGameSlot * 21 + 64004C);
-      _if (l2v132z@.i = 7) _and isInLargeSet( userId, l2v132z@.ls) _then _(
-        l2v128z := l2v128z - [savedGameSlot];
+    (loop) _while _not isTrainingGame _and extractMinElement(savedGameSlot, usedSlots) _do _(
+      slotPtr := ptr(savedGameSlot * 21 + 64004C);
+      _if (slotPtr@.i = 7) _and isInLargeSet( userData.userId, slotPtr@.ls) _then _(
+        freeSlots := freeSlots - [savedGameSlot];
         zoneBuffer@[3] := ;
         isResumedGame := true;
         isNewGame := ;
@@ -2211,12 +2307,12 @@ _( (* playGameSession *)
     _); (* 10565 *)
     unlockZone66;
     _if isResumedGame _then _(
-      totalMovesPlayed := sel(l2v132z@.f12, 8, 8);
-      pckPosition[0].a :=   procStrings( l2v132z@.f9, l2v132z@.f10 );
-      pckPosition[1].a :=   procStrings( l2v132z@.f11, l2v132z@.f12 );
+      totalMovesPlayed := sel(slotPtr@.log[4], 8, 8);
+      pckPosition[0].a :=   decodePos( slotPtr@.log[1], slotPtr@.log[2] );
+      pckPosition[1].a :=   decodePos( slotPtr@.log[3], slotPtr@.log[4] );
       loopIndex := 4;
       _for currentPlayer := 5 _to 12 _do _(
-        logPacked[currentPlayer] := l2v132z@.f13[currentPlayer];
+        logPacked[currentPlayer] := slotPtr@.log[currentPlayer];
         cmdString := ;
         _if cmdString <> spaces _then loopIndex := currentPlayer;
       _);
@@ -2226,16 +2322,16 @@ _( (* playGameSession *)
       totalMovesPlayed := 1;
     _); (* 10624 *)
     _for entryIndex := 1 _to numScoreEntries _do _(
-      l2v5z := zoneBuffer@[1008 - entryIndex].a;
+      scoreEntry := zoneBuffer@[1008 - entryIndex].a;
       code(2ЛУ4=2ЗЧ11,);
-      _if cmdString = l2v4z _then _(
+      _if cmdString = acctCopy _then _(
         hasScore := true;
         code(2сч7=пбнашел,);
       _);
     _);
-    l2v5z := '001000';
+    scoreEntry := '001000';
     code(нашел:сд/-20/=2зч10,2рб5=2зч7,);
-    unpck(l2v124z@[1], l2v5z);
+    unpck(dataPtr@[1], scoreEntry);
     savedLevel := difficultyLevel;
     currentPlayer := packedData.i;
     gamesPlayedToday := currentPlayer _div 2;
@@ -2245,7 +2341,7 @@ _( (* playGameSession *)
       curPosition[jinn].move.b := packedData.b;
       curPosition[user].move.b := _not packedData.b;
     _);
-    _if isTrainingGame _and (systemFlags * [27] = [27]) _then _(
+    _if isTrainingGame _and (userData.systemFlags * [27] = [27]) _then _(
       difficultyLevel := levelChoice;
       curPosition[jinn].move.i := startPlayer;
       curPosition[user].move.i := 1 - startPlayer;
@@ -2253,7 +2349,7 @@ _( (* playGameSession *)
     dsplGameHeader;
     updateStatistics( 6 );
   _); (* 10677 *)
-  l2v125z := 0;
+  moveResult := 0;
   lastMoveResult := ;
   animDelay := animSpeed + 1 - difficultyLevel _div 2;
   _if animDelay < 0 _then animDelay := 0;
@@ -2300,10 +2396,10 @@ _( (* playGameSession *)
   _) _else _if movesInBuffer = 0 _then _(
     writeCharNTimes( down, 2 ); (* this must cause scrolling if needed *)
     write('ВАШ ХОД:');
-    l2v79z := 5;
+    upLines := 5;
     writeTerminalOutput;
   _) _else
-    l2v79z := 1;
+    upLines := 1;
   (* 11024 *)
   userFinalKalah := 0;
   _if currentPlayer = user _then _(
@@ -2314,13 +2410,13 @@ _( (* playGameSession *)
     writeCharNTimes( up, 1 );
     writeTerminalOutput;
   _); (* 11040 *)
-  l2v77z :=   wallClockTicks;
+  inputTicks :=   wallClockTicks;
   readTerminalInput(false);
-  curThinkTime := wallClockTicks - l2v77z;
+  curThinkTime := wallClockTicks - inputTicks;
   _if curThinkTime < 0 _then curThinkTime := 50;
 % 11052
   movesPending := readCommand( commandEntered, 3 );
-  postponeFlag := (commandEntered = 'SLЕ   ') _and (47 _IN systemFlags);
+  postponeFlag := (commandEntered = 'SLЕ   ') _and (47 _IN userData.systemFlags);
   reset(INP);
   _if postponeFlag _then _(
     _if isTrainingGame _then _goto 12341 _else _goto 11225;
@@ -2374,7 +2470,7 @@ _( (* playGameSession *)
       _if hasWarned _then _(
         write('НЕСЕРЬЕЗНО !');
         writeTerminalOutput;
-        permFlags := permFlags + [30];
+        userData.permFlags := userData.permFlags + [30];
         exit
       _) _else _(
         hasWarned := true;
@@ -2389,8 +2485,8 @@ _( (* playGameSession *)
 11225:
     writeCharNTimes(down, 2 );
     writeTerminalOutput;
-    gl90z := l2v29z;
-    _if gl90z _then _(
+    userData.echo := echoSaved;
+    _if userData.echo _then _(
       userFinalKalah := 2;
       code(ЗЧ76013=);
       packPosition(curPosition, pckPosition);
@@ -2404,79 +2500,79 @@ _( (* playGameSession *)
   isResumedGame := true;
   lockZone66;
   readDiskZone( nu, zonePlayers );
-  l2v127z := zoneBuffer@[3].s;
+  usedSlots := zoneBuffer@[3].s;
   numScoreEntries := zoneBuffer@[1].i;
-  l2v128z := l2v127z _mod [0..47];
-  _if extractMinElement(savedGameSlot, l2v128z) _then _(
+  freeSlots := usedSlots _mod [0..47];
+  _if extractMinElement(savedGameSlot, freeSlots) _then _(
   _if savedGameSlot > 35 _then _(
     unlockZone66;
     write('ОТЛОЖИТЬ ИГРУ НЕ УДАЛОСЬ');
     writeTerminalOutput;
   _goto 12341;
   _); (* 11300 *)
-  l2v132z := ptr(savedGameSlot * 21 + 64004C);
-  l2v127z := l2v127z + [savedGameSlot];
+  slotPtr := ptr(savedGameSlot * 21 + 64004C);
+  usedSlots := usedSlots + [savedGameSlot];
   zoneBuffer@[3] := ;
-  l2v132z@.i := 7;
-  clearLargeSet( l2v132z@.ls );
-  addToLargeSet( userId, l2v132z@.ls );
+  slotPtr@.i := 7;
+  clearLargeSet( slotPtr@.ls );
+  addToLargeSet( userData.userId, slotPtr@.ls );
   savedGameSlot := dateStringToInt(   getDateStr  );
-  l2v132z@.f7 := ;
+  slotPtr@.date := ;
   savedGameSlot := addDaysToDate( savedGameSlot, 7 );
-  l2v132z@.f8 := ;
+  slotPtr@.expires := ;
   currentPlayer := 0;
 % 11335
   _while currentPlayer <= 1 _do _(
     _for loopIndex := 1 _to 8 _do _(
-      l2v140z[loopIndex] := chr(curPosition[currentPlayer].pits[loopIndex-1].val);
+      posEnc[loopIndex] := chr(curPosition[currentPlayer].pits[loopIndex-1].val);
     _);
     _for loopIndex := 9 _to 12 _do _(
-      l2v140z[loopIndex] := space;
+      posEnc[loopIndex] := space;
     _);
-    l2v140z[11] := chr(totalMovesPlayed);
-    pck(l2v140z[1], l2v132z@.f13[currentPlayer*2+1]);
-    pck(l2v140z[7], l2v132z@.f13[currentPlayer*2+2]);
+    posEnc[11] := chr(totalMovesPlayed);
+    pck(posEnc[1], slotPtr@.log[currentPlayer*2+1]);
+    pck(posEnc[7], slotPtr@.log[currentPlayer*2+2]);
     currentPlayer := currentPlayer + 1;
-   _);
+  _);
 % 11374
-   _for loopIndex := 5 _to 12 _do _(
-     l2v132z@.f13[loopIndex] := spaces;
-   _);
-   _if enableLogging _then _(
-   _while charIndex <> 1 _do logChar(space);
-   _if logIndex < 14 _then _(
-     _for loopIndex := 5 _to logIndex - 1 _do _(
-       l2v132z@.f13[loopIndex] := logPacked[loopIndex];
-     _)
-   _) _else
-     l2v132z@.f13[5] := 'ПРОД: ';
+  _for loopIndex := 5 _to 12 _do
+    slotPtr@.log[loopIndex] := spaces;
+  _if enableLogging _then _(
+    _while charIndex <> 1 _do
+      logChar(space);
+    _if logIndex < 14 _then _(
+      _for loopIndex := 5 _to logIndex - 1 _do
+        slotPtr@.log[loopIndex] := logPacked[loopIndex];
+    _) _else
+      slotPtr@.log[5] := 'ПРОД: ';
   _);
 11426:
-  l2v153z := ptr(difficultyLevel * 12 + 65354C);
+  statsPtr := ptr(difficultyLevel * 12 + 65354C);
   _if _not isResumedGame _and _not isNewGame _and _not isTrainingGame _then _(
-    l2v153z@[0].i := l2v153z@[0].i + 1;
-    l2v153z@[1].i := remainingCPUTime  + l2v153z@[1].i - startTickCount;
-    l2v153z@[2].i := l2v153z@[2].i + jinnThinkingTime;
-    l2v153z@[3].i := l2v153z@[3].i + userThinkingTime;
-    l2v153z@[4].i := round(totalEntropy * oneOverLn2) + l2v153z@[4].i;
-    l2v153z@[5].i := l2v153z@[5].i + nodesSearched;
-    l2v153z@[6].i := l2v153z@[6].i + totalMovesPlayed;
-    l2v153z@[7].i := l2v153z@[7].i + alphaBetaCutoffs;
-    l2v153z@[8].i := l2v153z@[8].i + deepenCount;
-    l2v153z@[9].i := l2v153z@[9].i + jinnWins;
-    l2v153z@[10].i := l2v153z@[10].i + userWins;
+    statsPtr@[0].i := statsPtr@[0].i + 1;
+    statsPtr@[1].i := remainingCPUTime  + statsPtr@[1].i - startTickCount;
+    statsPtr@[2].i := statsPtr@[2].i + jinnThinkingTime;
+    statsPtr@[3].i := statsPtr@[3].i + userThinkingTime;
+    statsPtr@[4].i := round(totalEntropy * oneOverLn2) + statsPtr@[4].i;
+    statsPtr@[5].i := statsPtr@[5].i + nodesSearched;
+    statsPtr@[6].i := statsPtr@[6].i + totalMovesPlayed;
+    statsPtr@[7].i := statsPtr@[7].i + alphaBetaCutoffs;
+    statsPtr@[8].i := statsPtr@[8].i + deepenCount;
+    statsPtr@[9].i := statsPtr@[9].i + jinnWins;
+    statsPtr@[10].i := statsPtr@[10].i + userWins;
   _); (* 11473 *)
-  _if isTrainingGame _then l2v153z@[11].i := l2v153z@[11].i + 1;
+  _if isTrainingGame _then statsPtr@[11].i := statsPtr@[11].i + 1;
   _for entryIndex := 1 _to numScoreEntries _do _(
-    l2v5z := zoneBuffer@[1008 - entryIndex].a;
-    code(2ЛУ4=2ЗЧ11,); (* cmdString := l2v5z & l2v2z *)
-    _if cmdString = l2v4z _then _(
-      code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,2ЗЧ7=); (* cmdString := l2v5z << 16; l2v5z := cmdString unp l2v3z; *)
-      unpck(l2v124z@[1], l2v5z);
+    scoreEntry := zoneBuffer@[1008 - entryIndex].a;
+    code(2ЛУ4=); cmdString := (* scoreEntry & mask2 *);
+    _if cmdString = acctCopy _then _(
+      code(2СЧ7=СД/-20/,2ЗЧ11=2РБ5,); (* cmdString := scoreEntry << 16; *)
+      scoreEntry := (* cmdString unp mask3; *) ;
+      unpck(dataPtr@[1], scoreEntry);
       currentPlayer := packedData.i;
       gamesPlayedToday := currentPlayer _div 2;
       packedData.i := currentPlayer _mod 2;
-      _if cmdString <> l2v6z _then gamesPlayedToday := 5;
+      _if cmdString <> scoreCheck _then gamesPlayedToday := 5;
       _goto 11531;
     _)
   _);
@@ -2527,21 +2623,21 @@ _( (* playGameSession *)
 % 11626
     currentPlayer := packedData.i;
     packedData.i := gamesPlayedToday * 2 + currentPlayer;
-    pck(l2v124z@[1], l2v5z);
+    pck(dataPtr@[1], scoreEntry);
     code(2сч7=2сб5,сд/20/=2лс6,17зч=2сч53,1ас35=17зч,17ик=иа,);
     code(15па=17сч,15зч=);
     scorePos := 1008 - 2;
     (loop) _for currentPlayer := insertPos _to scorePos _do _(
       _if _not compareScoreEntries( currentPlayer, currentPlayer + 1) _then _exit loop;
     _); (* 11655 *)
-    _if 28 _IN permFlags _then _(
+    _if 28 _IN userData.permFlags _then _(
       _repeat
         cmdResult := true;
         _for currentPlayer := 1008 - numScoreEntries _to scorePos _do _(
           _if compareScoreEntries( currentPlayer, currentPlayer + 1) _then cmdResult := false;
         _);
       _until cmdResult;
-      permFlags := permFlags - [28];
+      userData.permFlags := userData.permFlags - [28];
     _) _else _(
        scorePos := 1008 - numScoreEntries + 1;
        (loop) _for currentPlayer := insertPos _downto scorePos _do _(
@@ -2552,11 +2648,11 @@ _( (* playGameSession *)
     _if (hasScore _or isResumedGame) _and _not testMode _then
       writeDiskZone( nu, zonePlayers );
 % 11721
-    _if enableLogging _and _not isResumedGame _and (11 _IN systemFlags) _then _(
+    _if enableLogging _and _not isResumedGame _and (11 _IN userData.systemFlags) _then _(
       _while charIndex <> 1 _do logChar(space);
-      unpck(l2v118z[1], logPacked[5]);
-      l2v118z[2] := resultChar;
-      pck(l2v118z[1], logPacked[5]);
+      unpck(unpLog[1], logPacked[5]);
+      unpLog[2] := resultChar;
+      pck(unpLog[1], logPacked[5]);
       saveLogToZone;
     _); (* 11741 *)
     unlockZone66;
@@ -2593,13 +2689,13 @@ _( (* playGameSession *)
     movesInBuffer := 0;
     _goto 12013;
   _);
-  writeCharNTimes(up, l2v79z );
+  writeCharNTimes(up, upLines );
   _) _else 12032: _( (* 12032 *)
     userFinalKalah := userFinalKalah + 1;
     nodesThisMove := nodesSearched;
     _if gameIsDecided _then searchDepth := 2;
     actualDepth := searchDepth;
-    seledMove :=   selAIMove(curPosition, l2v133z, actualDepth );
+    seledMove :=   selAIMove(curPosition, weights, actualDepth );
     nodesThisMove := nodesSearched - nodesThisMove;
     extraDepth := 0;
     prevNodes := ;
@@ -2612,7 +2708,7 @@ _( (* playGameSession *)
       nodesThisMove := nodesSearched;
       extraDepth := extraDepth + 1;
       totalEntropy := totalEntropy - moveEntropy;
-      seledMove :=   selAIMove(curPosition, l2v133z, actualDepth + extraDepth);
+      seledMove :=   selAIMove(curPosition, weights, actualDepth + extraDepth);
       deepenCount := deepenCount + 1;
       nodesThisMove := nodesSearched - nodesThisMove;
     _); (* 12111 *)
@@ -2627,9 +2723,9 @@ _( (* playGameSession *)
     writeCharNTimes(down, 2 );
   _);
   _if enableLogging _then logChar( chr(seledMove) );
-  l2v125z :=   exMvAnimated(curPosition, seledMove );
+  moveResult :=   exMvAnimated(curPosition, seledMove );
   writeCharNTimes(down, 1 );
-  _if l2v125z <> 0 _then _goto 12162;
+  _if moveResult <> 0 _then _goto 12162;
   _if (userFinalKalah = 12) _and isGameOver(curPosition) _then
     _goto 12240
   _else
@@ -2647,15 +2743,15 @@ _( (* playGameSession *)
   rndnessFactor := 144 - (curPosition[jinn].pits[7].val + curPosition[user].pits[7].val) * 4;
   _if rndnessFactor < 10 _then rndnessFactor := 10;
    curMoveNumber := curMoveNumber + 1;
-   _if l2v125z = 1 _then _(
+   _if moveResult = 1 _then _(
      totalMovesPlayed := totalMovesPlayed + 1;
      _if enableLogging _then logChar(space);
   _); (* 12214 *)
   _if isGameOver(curPosition) _then _(
     userFinalKalah := currentPlayer + 1;
-    _if l2v125z = 2 _then  userFinalKalah := userFinalKalah + 1 - currentPlayer * 2;
+    _if moveResult = 2 _then  userFinalKalah := userFinalKalah + 1 - currentPlayer * 2;
     writeCharNTimes(up, userFinalKalah );
-    l2v125z :=   exMvAnimated(curPosition, 0 );
+    moveResult :=   exMvAnimated(curPosition, 0 );
     writeCharNTimes(down, 3 );
     writeTerminalOutput;
   _) _else
@@ -2665,8 +2761,8 @@ _( (* playGameSession *)
   write('ИГРА КОНЧИЛАСЬ');
 12244:
   writeTerminalOutput;
-  gl90z := l2v29z;
-  _if gl90z _then _(
+  userData.echo := echoSaved;
+  _if userData.echo _then _(
     userFinalKalah := 3;
     code(ЗЧ76013=);
   _);
@@ -2703,7 +2799,7 @@ _( (* playGameSession *)
   _if allowExit _then _(
     gameActive := false;
     rewrite(INP);
-    systemFlags := systemFlags + [47];
+    userData.systemFlags := userData.systemFlags + [47];
     write(INP,'СОN  {377');
     _GOTO 12633;
   _); (* 12356 *)
@@ -2723,48 +2819,48 @@ _( (* playGameSession *)
   _if postponeFlag _then _goto 12566;
 _);
 
-_procedure P12424;
-_var l2v1z, l2v2z: integer;
+_procedure account;
+_var remTime, curWallClock: integer;
 _(
   code(Э0634=,);
-  l2v1z := ;
-  l2v1z := l2v1z - startRemTime;
-  _if l2v1z < 0 _then exit;
+  remTime := ;
+  remTime := remTime - startRemTime;
+  _if remTime < 0 _then exit;
   code(Э05310=,);
-  l2v2z := ;
-  l2v2z := l2v2z - startWallClock;
-  _if l2v2z < 0 _then exit;
-  gl24z := l2v1z _div 4;
+  curWallClock := ;
+  curWallClock := curWallClock - startWallClock;
+  _if curWallClock < 0 _then exit;
+  statVal := remTime _div 4;
   updateStatistics( 31 );
-  gl24z := shift(l2v2z, 9);
+  statVal := shift(curWallClock, 9);
   (q) updateStatistics( 33 );
 _);
 _procedure exec(arg:integer);
-_procedure P12450(_var f:text; _var i:integer; j:integer); _( code(ПБ76022=,); _);
+_procedure saveDataAndGo(_var f:text; _var i:Region; j:integer); _( code(ПБ76022=,); _);
 _(
   _if gameActive _then _goto 12636;
-  systemFlags := systemFlags + [13];
-  P12424;
-  P12450(INP, userId, userEntryLen );
+  userData.systemFlags := userData.systemFlags + [13];
+  account;
+  saveDataAndGo(INP, userData, userEntryLen );
 _);
 _procedure Init;
-_var l2v1z, l2v2z: integer;
-_procedure P12473(_var f:text; _var i:integer; j:integer); _( code(ПБ76021=); _);
+_var u1, u2: integer;
+_procedure getData(_var f:text; _var i:Region; j:integer); _( code(ПБ76021=); _);
 _(
-  P12473(INP, userId, userEntryLen );
-  unpck(userName[1], userAccount );
+  getData(INP, userData, userEntryLen );
+  unpck(userName[1], userData.userAccount );
   userName[5] := space;
-  isAdmin := userAccount = adminId;
-  l2v1z := sel(gl75z, 16, 8);
-  l2v2z := sel(gl75z, 24, 8);
-  gl26z := 500;
-  animSpeed := trunc((gl26z - 250) / 500);
+  isAdmin := userData.userAccount = adminId;
+  u1 := sel(userData.u3, 16, 8);
+  u2 := sel(userData.u3, 24, 8);
+  msDelay := 500;
+  animSpeed := trunc((msDelay - 250) / 500);
   _GOTO 12566;
 _);
 (* main program *)
 
 _(
-  gl24z := 1;
+  statVal := 1;
   code(Э0634=,);
   startRemTime := ;
   code(Э05310=,);
