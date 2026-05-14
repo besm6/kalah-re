@@ -2,34 +2,37 @@
 (* д+ = get(INP) -> code(=16ПВ76312,) *)
 _program ШККАЛ;
 _label 3606,3613,3652,3655;
-_const c54=54;c1013=1013B;
+_const c54=54;zonePlayers=1013B;
 loc1=1660730B;loc2=6400230B;c4=4;c5='5';c25=25;
-etx='{377';c62=62;c1008=1008;c400='000400';sp=' ';dot='.';
+etx='{377';userEntryLen=62;c1008=1008;c400='000400';space=' ';dot='.';
 lf = '{175';
-minus='-';eq='=';admID='417700';opar='(';cpar=')';bar='I';
+minus='-';eq='=';admID='417700';oparen='(';cparen=')';bar='I';
 c45=45;c49=49;c36=36;c40=40;c61=61;K='K';c51=51;c60=60;
 _type letter='A'..'Z'; digit='0'..'9';bitset=_set _of 0..47;
-page=_array[0..1023] _of integer; 
+page=_array[0..1023] _of integer;
 sixchars=_array [1..6] _of char;
 t2=0..6;t3=0..7;t4=1..2;t5=0..39;
 contents = _record val:integer _end;
 OneSide = _record move:integer; pits:_array [1..7] _of contents _end;
+EntryRec = _record
+  g25z, g26z, g27z, g28z, g29z, g30z, g31z, g32z, g33z, g34z, g35z:integer;
+  pckUID:alfa;
+  g37z:integer;
+  g38z:bitset;
+  g39z:integer;
+  g40z:bitset;
+  g41z, g42z: integer;
+  prnEnable, g44z, dpyEnable:boolean;
+  g46z: integer;
+  statsArray:_array [0..39] _of integer
+_end;
 _var cmd, tambov: alfa;
 ЗАПРЕТ:boolean;
 admin:boolean;
-startCpuTime,startWallClock, g16z, g17z:integer;
+startCpuTime,startWallClock, statVal, statVersion:integer;
 pptr:@page;
 userID:sixchars;
-g25z, g26z, g27z, g28z, g29z, g30z, g31z, g32z, g33z, g34z, g35z:integer;
-pckUID:alfa;
-g37z:integer;
-g38z:bitset;
-g39z:integer;
-g40z:bitset;
-g41z, g42z: integer;
-prnEnable, g44z, dpyEnable:boolean;
-g46z: integer;
-g47z:_array [0..39] _of integer;
+userData:EntryRec;
 INP:text;
 
 _procedure L1321; _( code(=14ПВ76255,) _); (* ???? *)
@@ -51,7 +54,7 @@ _label 1;
 _var v1, v2: integer;
 _(
   _if top _then  BIND(' ==* {172') _else  BIND(' =-* {172');
-  _if prnEnable  _then _(
+  _if userData.prnEnable  _then _(
     code(СЧ76013=УИ7,);
     v1 := 2; code(ЗЧ76013=,);
     _if top _then write(' ==* ')
@@ -60,12 +63,12 @@ _(
   rewrite(INP);
   v2 := 0;
   _while input@ <> etx _do _(
-    _if prnEnable _then write(input@);
+    _if userData.prnEnable _then write(input@);
     v2 := v2 + 1;
     _if v2 > 128 _then _(
       ЗАПРЕТ := false;
       putCmd('SLЕ  {377');
-      g40z := g40z + [47];
+      userData.g40z := userData.g40z + [47];
       _goto 1
     _);
     write(INP,input@);
@@ -74,7 +77,7 @@ _(
   write(INP, etx);
   1:
   reset(INP);
-  _if prnEnable _then _(
+  _if userData.prnEnable _then _(
     writeLN;
     code(ВИ7=ЗЧ76013,);
   _);
@@ -86,7 +89,7 @@ _(
  timeout := false;
  code(Э0634=,);
  i := ;
- _if g33z - i < 170B _then _(
+ _if userData.g33z - i < 120 _then _(
    rewrite(output);
    writeln('ВАШЕ ВРЕМЯ ИСТЕКЛО');
    ЗАПРЕТ := false;
@@ -95,7 +98,7 @@ _(
   _);
 _);
 
-_proced TTOUT;
+_proced writeTerminalOutput;
 _var r:alfa;
 _(
   writeLN;
@@ -104,32 +107,32 @@ _(
  _if r = 'Н{3770000' _then  _GOTO 3606;
 _);
 
-_procedure L1451(l2a1z:integer);
-_var l2v1z, l2v2z, l2v3z, l2v4z:integer;
+_procedure updateStatistics(index:integer);
+_var currentValue, increment, divisor, tempValue:integer;
 _(
-  l2v1z := g47z[l2a1z];
-  l2v4z := ;
-  l2v1z := sel(l2v4z, 24, 6) + g16z;
+  currentValue := userData.statsArray[index];
+  tempValue := ;
+  currentValue := sel(tempValue, 24, 6) + statVal;
   code(СД/6/=2ЗЧ5,МР=СД/-6/,МР=2ЗЧ4,);
-  ins(l2v4z, l2v1z, 24, 6);
-  g47z[l2a1z] := ;
-  _if l2v2z > 0 _then _(
-    g16z := l2v2z;
-    L1451(l2a1z - 1);
-    g16z := 1;
+  ins(tempValue, currentValue, 24, 6);
+  userData.statsArray[index] := ;
+  _if increment > 0 _then _(
+    statVal := increment;
+    updateStatistics(index - 1);
+    statVal := 1;
   _);
-  _if g17z = 1 _then _(
-    l2v3z := 36;
+  _if statVersion = 1 _then _(
+    divisor := 36;
   _) _else _(
-    l2v3z := 16;
+    divisor := 16;
   _);
-  _if (l2a1z <= l2v3z) _and (l2a1z > 0) _then L1451(0);
+  _if (index <= divisor) _and (index > 0) _then updateStatistics(0);
 _);
 
 _function getTime:alfa;
 _var i, j:integer;
 p:sixchars; r:alfa;
-_( 
+_(
   code(Э05310=,);
   i := ;
   i := i _div 3000;
@@ -149,7 +152,7 @@ _(
 _);
 
 _procedure readZone(nu, zzzz: integer);
-_( code(=14ПВ77451,) _); 
+_( code(=14ПВ77451,) _);
 
 _procedure enq66;
 _var i:integer;
@@ -176,7 +179,7 @@ _function getCmd(_var a:alfa; b:integer):boolean;
 _var l:_array[1..7] _of integer;
 _( code(=14ПВ77400,) _);
 
-_procedure unpackPits(_var l2a1z:OneSide; l2a2z:integer);
+_procedure unpPitState(_var l2a1z:OneSide; l2a2z:integer);
 _var i:integer;
 _(
   code(2СЧ4=СД/-3/,2ЗЧ4=МР,);
@@ -186,79 +189,83 @@ _(
   code(2СЧ4=СД/-11/,МР=2ИК3,ЗЧ7=);
 _);
 
-_procedure getName(_var first:alfa; _var second:alfa);
-_var l2v1z:sixchars; bad: boolean; i:integer;
-l2v9z:char; l2v10z, l2v11z:alfa;
+_procedure getUserName(_var first, second:alfa);
+_var a:sixchars; absent: boolean; i:integer;
+c:char; id, fromOS:alfa;
 _(
-  l2v10z := first;
-  code(7ПАРАЗ=,7Э020=СД/40/,7ЗЧ1=7СА1,ВИ7=Э050104,7СЧ=7ПБ2,C;РАЗ:360741703600000,0,0,К;);
-  l2v11z := ;
-  unpck(l2v1z[1], l2v11z);
-  bad := false;
+  id := first;
+  code(7ПАРАЗ=,7СБ=СД/40/,7ЗЧ1=7СА1,ВИ7=Э050104,7СЧ=7ПБ2,C;РАЗ:360741703600000,0,0,К;);
+  fromOS := ;
+  unpck(a[1], fromOS);
+  absent := false;
   _for i := 1 _to 6 _do _(
-    l2v9z := l2v1z[i];
-    _if _not ((l2v9z _in letter) _or (l2v9z = ' ') _or (l2v9z = '.')) _then
-      bad := true;
+    c := a[i];
+    _if _not ((c _in letter) _or (c = ' ') _or (c = '.')) _then
+      absent := true;
   _);
-  _if bad _then _(
+  _if absent _then _(
     first := 'НЕТ ТА';
     second := 'КОГО  ';
     exit
   _);
-  first := l2v11z;
+  first := fromOS;
   code(7CЧ1=);
   second := ;
 _);
 
-_procedure drawField(_var pckpits:_array [0..1] _of integer);
-_var i, l2v2z:integer;side:OneSide;
+_procedure dsplBoard(_var pckPits:_array [0..1] _of integer);
+_var pitIndex, stoneCount:integer;unpackedSide:OneSide;
 _procedure drawPit(pit:integer);
 _(
-  write(opar:2);
-  l2v2z := side.pits[pit].val;
-  _if l2v2z = 0 _then
-    write(sp:2)
+  write(oparen:2);
+  stoneCount := unpackedSide.pits[pit].val;
+  _if stoneCount = 0 _then
+    write(space:2)
   _else
-    write(l2v2z:2);
-  write(cpar);
-_);  
-_( (* drawField *)
+    write(stoneCount:2);
+  write(cparen);
+_);
+_( (* dsplBoard *)
   write('ДЖИН':13);
-  write(sp:7);
-  unpackPits(side, pckpits[0]);
-  _for i := 6 _downto 1 _do write(chr(i):5);
-  TTOUT;
-  write(sp:21);
-  _for i := 6 _downto 1 _do drawPits(i);
-  TTOUT;
+  write(space:7);
+  unpPitState(unpackedSide, pckpits[0]);
+  _for pitIndex := 6 _downto 1 _do
+    write(chr(pitIndex):5);
+  writeTerminalOutput;
+  write(space:21);
+  _for pitIndex := 6 _downto 1 _do
+   drawPit( pitIndex );
+  writeTerminalOutput;
   write(К:15);
-  drawPits(7);
-  unpackPits(side, pckpits[1]);
-  write(sp:32);
-  drawPits(7);
+  drawPit( 7 );
+  unpPitState(unpackedSide, pckpits[1]);
+  write(space:32);
+  drawPit( 7 );
   write(К:2);
-  TTOUT;
-  write(sp:21);
-  _for i := 1 _to 6 _do drawPits(i);
-  TTOUT;
-  write(sp:20);
-  _for i := 1 _to 6 _do write(chr(i):5);
-  write(sp:9);
-  writeUser;
-  TTOUT;
+  writeTerminalOutput;
+  write(space:21);
+  _for pitIndex := 1 _to 6 _do
+    drawPit( pitIndex );
+  writeTerminalOutput;
+  write(space:20);
+  _for pitIndex := 1 _to 6 _do
+   write(chr(pitIndex):5);
+  write(space:9);
+  writeUserName;
+  writeTerminalOutput;
 _);
 
 _proced L2037;
 _(
  write('К    А    Л    А    Х':46, lf, '^^^^^^^^^^^^^^^^^^^^^^^':48);
- TTOUT;
+ writeTerminalOutput;
 _);
 
 _proced schKalah;
-_var l2v1z: _array [0..1] _of integer;
+_var pos: _array [0..1] _of integer;
 _(
- L1451( 2 );
- write(sp);
+ updateStatistics( 2 );
+ write(space);
  L2037;
  write('
   В КАЛАХ ИГРАЮТ ДВОЕ - ДЖИН И ПОЛЬЗОВАТЕЛЬ.
@@ -266,18 +273,18 @@ _(
    6 "ЛУНОК"  - ИГРОВЫХ ПОЛЕЙ,
    1 "КАЛАХ"  - ЛУНКУ, В КОТОРОЙ НАКАПЛИВАЮТСЯ "КАМНИ".
   ПЕРВОНАЧАЛЬНО КАМНИ ПОРОВНУ РАСПРЕДЕЛЕНЫ ПО ВСЕМ ЛУНКАМ.');
- TTOUT;
+ writeTerminalOutput;
  write(lf, 'И Г Р О В О Е   П О Л Е':44, lf);
- TTOUT;
- l2v1z[0] := 60606060606000C;
- l2v1z[1] := ;
- drawField( l2v1z );
+ writeTerminalOutput;
+ pos[0] := 60606060606000C;
+ pos[1] := ;
+ dsplBoard( pos );
  write('
   ВВЕРХУ НАХОДЯТСЯ ЛУНКИ И СЛЕВА КАЛАХ ДЖИНА.
   ВНИЗУ НАХОДЯТСЯ ЛУНКИ И СПРАВА КАЛАХ ПОЛЬЗОВАТЕЛЯ.');
- TTOUT;
+ writeTerminalOutput;
  write(lf, 'П Р А В И Л А    И Г Р Ы':44);
- TTOUT;
+ writeTerminalOutput;
  write('
   ИГРОКИ ДЕЛАЮТ ХОДЫ ПО ОЧЕРЕДИ. ПРИ ОЧЕРЕДНОМ ХОДЕ ИГРОК БЕРЕТ
 ВСЕ КАМНИ ИЗ ОДНОЙ ИЗ СВОИХ ЛУНОК И РАСКЛАДЫВАЕТ ИХ ПО ОДНОМУ, НАЧИНАЯ
@@ -288,23 +295,23 @@ _(
   ЕСЛИ ПОСЛЕДНИЙ КАМЕНЬ ПОПАДАЕТ В СВОЮ ПУСТУЮ ЛУНКУ, А В ПРОТИВОПОЛОЖНОЙ
 ЛУНКЕ ПРОТИВНИКА ЕСТЬ КАМНИ, ТО СОДЕРЖИМОЕ ЭТИХ ДВУХ ЛУНОК ПЕРЕНОСИТСЯ
 В КАЛАХ ИГРОКА, СДЕЛАВШЕГО ХОД.');
- TTOUT;
+ writeTerminalOutput;
  write('  ЕСЛИ ЛУНКИ ОДНОГО ИГРОКА ОПУСТЕЛИ, ТО НЕЗАВИСИМО ОТ ОЧЕРЕДИ ХОДА
 ВСЕ КАМНИ ИЗ ЛУНОК ПРОТИВНИКА ПЕРЕНОСЯТСЯ В КАЛАХ ПРОТИВНИКА И ДЕЛАЕТСЯ
 ПОДСЧЕТ КАМНЕЙ. ВЫИГРЫВАЕТ ТОТ ИГРОК, В КАЛАХЕ КОТОРОГО КАМНЕЙ БОЛЬШЕ.
 В СЛУЧАЕ РАВЕНСТВА ПАРТИЯ ПРИЗНАЕТСЯ НИЧЬЕЙ.
   ПРИ ОЧЕРЕДНОМ ХОДЕ ПОЛЬЗОВАТЕЛЬ УКАЗЫВАЕТ НОМЕР СВОЕЙ ЛУНКИ, ИЗ
 КОТОРОЙ БЕРУТСЯ КАМНИ.');
- TTOUT;
+ writeTerminalOutput;
  write(lf, 'Д О П О Л Н Е Н И Е':44, lf);
- TTOUT;
+ writeTerminalOutput;
  write('  ЕСЛИ ИГРА ПРЕРВАЛАСЬ ИЗ-ЗА НЕХВАТКИ ВЦП, ТО ПАРТИЯ ОТКЛАДЫВАЕТСЯ
 И ЕЕ МОЖНО ПРОДОЛЖИТЬ ПРИ СЛЕДУЮЩЕМ ВЫЗОВЕ ДЖИНА. ОТЛОЖЕННАЯ ПАРТИЯ
 ЧЕРЕЗ НЕДЕЛЮ СБРАСЫВАЕТСЯ И СЧИТАЕТСЯ ПРОИГРАННОЙ.
   К ИГРЕ МОЖНО ОБРАЩАТЬСЯ ТАКЖЕ В ВИДЕ:
      КАЛАХ  ТРЕНИРОВКА  [ КАТЕГОРИЯ ]
 В ЭТОМ СЛУЧАЕ РЕЗУЛЬТАТ СЧИТАЕТСЯ НИЧЕЙНЫМ И НЕ УЧИТЫВАЕТСЯ.');
- TTOUT;
+ writeTerminalOutput;
  write('  ЕСЛИ ОЧЕРЕДНЫЕ ХОДЫ ЯВЛЯЮТСЯ ХОДАМИ В КАЛАХ, ТО МОЖНО СРАЗУ ЗАДАВАТЬ
 ПОСЛЕДОВАТЕЛЬНОСТЬ ТАКИХ ХОДОВ, РАЗДЕЛЯЯ ИХ ЗАПЯТОЙ ИЛИ ПРОБЕЛОМ.
 ДАЛЕЕ МОЖНО ДОБАВИТЬ ПРОИЗВОЛЬНЫЙ ТЕКСТ.
@@ -312,17 +319,17 @@ _(
 ПОСЛЕ ИЛИ ВМЕСТО ОЧЕРЕДНОГО ХОДА.
   ЕСЛИ ИГРОВОЕ ПОЛЕ ПОЧЕМУ-ЛИБО ИСПОРТИЛОСЬ, ЕГО МОЖНО ВОССТАНОВИТЬ,
 НАБРАВ ЛИТЕРУ "П" ВМЕСТО ОЧЕРЕДНОГО ХОДА.');
- TTOUT;
+ writeTerminalOutput;
  _);
 _proced schTourn;
  _(
- L1451(2);
+ updateStatistics(2);
  write(lf, 'Т У Р Н И Р':44, lf);
- TTOUT;
+ writeTerminalOutput;
  write('  ВСЕ ИГРАЮЩИЕ В КАЛАХ АВТОМАТИЧЕСКИ УЧАСТВУЮТ В ТУРНИРЕ "ДЖИНН-ЧЕЛОВЕК".');
- TTOUT;
+ writeTerminalOutput;
  write('ЕЖЕДНЕВНО МОЖНО СЫГРАТЬ НЕ БОЛЕЕ ', c5, ' ПАРТИЙ.');
- TTOUT;
+ writeTerminalOutput;
  write('  ИМЕЮТСЯ ЧЕТЫРЕ КАТЕГОРИИ ИГРОКОВ: ЮНИОРЫ (НАЧИНАЮЩИЕ), КАНДИДАТЫ,
 УЧАСТНИКИ И "ЭФЕНДИ". ЮНИОРЫ И КАНДИДАТЫ, ДОСТИГШИЕ ПРЕИМУЩЕСТВА
 НАД ДЖИНОМ, ПЕРЕХОДЯТ СООТВЕТСТВЕННО В КАНДИДАТЫ И УЧАСТНИКИ. СЧЕТ
@@ -339,7 +346,7 @@ _proced schTourn;
 МОЖНО СЛЕДИТЬ ЗА ХОДОМ СОРЕВНОВАНИЯ. В КОЛОНКЕ "ФОРА" УКАЗЫВАЕТСЯ
 ЧИСЛО ПАРТИЙ, КОТОРОЕ НУЖНО ВЫИГРАТЬ, ЧТОБЫ ОБОЙТИ ВЫШЕСТОЯЩЕГО
 ИГРОКА.');
- TTOUT;
+ writeTerminalOutput;
  _);
 
 _procedure writeZone(nu, zzzz: integer);
@@ -349,12 +356,12 @@ _procedure checkAdmin;
 _(
   _if _not admin _then _(
     write('ВАМ НЕЛЬЗЯ');
-    TTOUT;
+    writeTerminalOutput;
     _GOTO 3606;
   _)
 _);
 
-_procedure L2214;
+_procedure account;
 _var l2v1z, l2v2z: integer;
 _(
   code(Э0634=,);
@@ -365,10 +372,10 @@ _(
   l2v2z := ;
   l2v2z := l2v2z - startWallClock;
   _if l2v2z < 0 _then exit;
-  g16z := l2v1z _div 4;
-  L1451(31);
-  (q) g16z := shift(l2v2z, 9);
-  L1451(33); 
+  statVal := l2v1z _div 4;
+  updateStatistics(31);
+  (q) statVal := shift(l2v2z, 9);
+  updateStatistics(33);
 _);
 _proced modePrint;
 _label 1, 2;
@@ -378,18 +385,18 @@ _(
   INP@ = 'Д': 1: _(
     l2v1z := 2; code(ЛС76013=ЗЧ76013,);
     writeln('ВКЛЮЧЕНА ПЕЧАТЬ АЦПУ');
-    prnEnable := true;
-    _if g44z  _then _(
+    userData.prnEnable := true;
+    _if userData.g44z  _then _(
       code(СЧ=Э06276,);
-      g44z := false;
+      userData.g44z := false;
     _);
   _);
   INP@  = 'Н': 2: _(
-    prnEnable := false;
+    userData.prnEnable := false;
     writeln('ВЫКЛЮЧЕНА ПЕЧАТЬ АЦПУ');
     code(СЧ76013=ЛУ13,ЗЧ76013=);
   _);
-  INP@ = etx: _if prnEnable _then _goto 2 _else _goto 1;
+  INP@ = etx: _if userData.prnEnable _then _goto 2 _else _goto 1;
   true: writeln('НЕПОНЯТНО')
   _end
  _);
@@ -402,14 +409,14 @@ _(
   INP@ = 'Д': 1: _(
     code(СЧ13=ЛС76013,ЗЧ76013=);
     writeln('ВКЛЮЧЕНА АЧА НА ЭКРАН');
-    dpyEnable := true;
+    userData.dpyEnable := true;
   _);
   INP@  = 'Н': 2: _(
-    dpyEnable := false;
+    userData.dpyEnable := false;
     writeln('ВЫКЛЮЧЕНА АЧА НА ЭКРАН');
     l2v1z := 2; code(ЛУ76013=ЗЧ76013,СЧ=ЗЧ77015,);
   _);
-  INP@ = etx: _if dpyEnable _then _goto 2 _else _goto 1;
+  INP@ = etx: _if userData.dpyEnable _then _goto 2 _else _goto 1;
   true: writeln('НЕПОНЯТНО')
   _end
  _);
@@ -417,18 +424,18 @@ _procedure exec(arg:integer);
 _procedure L2340(_var f:text; _var i:integer; j:integer); _( code(ПБ76022=,); _);
 _(
   _if ЗАПРЕТ _then _GOTO 3655;
-  g40z := (g40z + [13]);
-  L2214;
-  L2340(INP, g25z, 62);
+  userData.g40z := (userData.g40z + [13]);
+  account;
+  L2340(INP, userData.g25z, userEntryLen);
 _);
 
 _procedure L2371;
 _procedure L2363(_var f:text; _var i:integer; j:integer); _( code(ПБ76021=); _);
 _(
-  L2363(INP, g25z, 62);
-  unpck(userID[1], pckUID);
-  userID[5] := sp;
-  admin := pckUID = admID;
+  L2363(INP, userData.g25z, userEntryLen);
+  unpck(userID[1], userData.pckUID);
+  userID[5] := space;
+  admin := userData.pckUID = admID;
   _GOTO 3613;
 _);
 
@@ -461,8 +468,8 @@ _label 3275;
 _const c12=12;c50=50;c41=41;
 _var mask:alfa; unus1, n, i, nEnt, totDjin, totHomo:integer;
 uidDigs, pos:integer;
-categ, curCat, totDispl, Homo, Djin, l2v15z:integer;
-l2v16z, l2v17z, l2v18z:integer;
+categ, curCat, totDispl, Homo, Djin, prevHomo:integer;
+prevDjin, initCat, prevCat:integer;
 curRec:integer;
 curUID:alfa;
 unus2:integer;
@@ -491,71 +498,124 @@ _);
 _(
   unpck(got[1], l3a1z );
   write(got[1]:2 );
-  write(got[2], dot, got[3], got[4], dot, got[5], got[6], sp);
+  write(got[2], dot, got[3], got[4], dot, got[5], got[6], space);
  _);
 
-(* Level 3 *) _proced drawLine(l3a1z:char);
-_var l3v1z:integer;
+(* Level 3 *) _proced drawLine(c:char);
+_var i:integer;
 _(
-  write(sp:2 );
-  _for l3v1z := 1 _to 41 _do
-    write(l3a1z);
- TTOUT;
- _);
+  write(space:2 );
+  _for i := 1 _to 41 _do
+    write(c);
+  writeTerminalOutput;
+_);
 
-(* Level fora *) _function fora(l3a1z, l3a2z, l3a3z:integer):integer;
+(*
+  FORA - Calculate Tournament Handicap
+
+  Purpose: Calculate the "fora" (handicap) - the number of additional games
+  a player needs to win to overtake the player ranked directly above them in
+  the tournament standings.
+
+  Parameters:
+    currHum - Current player's human/user wins
+    currJin - Current player's Jinn/AI wins
+    currCat - Current player's category (0=Junior, 1=Candidate, 2=Participant, 3=Efendi)
+
+  Context Variables (from outer scope):
+    totDispl - Number of players displayed so far (if 1, this is the top player)
+    prevHomo - Previous player's human wins
+    prevDjin - Previous player's Jinn wins
+    prevCat  - Previous player's category
+
+  Algorithm:
+    1. Top player check: If this is the first displayed player (totDispl = 1),
+       return 0 (no one to overtake)
+
+    2. Game limit check: Calculate remaining games until the 255-game limit;
+       if already at limit, return 256 (impossible)
+
+    3. Category transitions: If current player is in a lower category than the
+       previous player, calculate games needed to advance through categories
+       (for Juniors/Candidates: need to overcome the deficit in wins)
+
+    4. Minimum game requirement: For Participants (category 3), ensure at least
+       25 total games
+
+    5. Win ratio comparison: The nested wldRank function compares win ratios
+       between players using cross-multiplication to avoid division. It determines
+       if adding addHum wins to the current player would result in a better win
+       ratio than the previous player
+
+    6. Linear search: Try increasing numbers of additional wins until the current
+       player would rank ahead
+
+  Return values:
+    0-255 - Number of games needed to overtake previous player
+    256   - Impossible to overtake (would exceed game limits)
+*)
+_function fora(currHum, currJin, currCat:integer):integer;
 _label 2644;
-_var l3v1z, l3v2z, l3v3z, l3v4z, l3v5z, l3v6z:integer; 
-(* Level L2561 *) _function L2561(l4a1z:integer):boolean;
-_var l4v1z, l4v2z, l4v3z:integer;
+_var
+  i:integer;               (* Loop counter *)
+  remGms:integer;          (* Remaining games until 255 total *)
+  accum:integer;           (* Accumulated handicap from category transitions *)
+  delta:integer;           (* Games needed for category transition *)
+  prevTot:integer;         (* Previous player's total games *)
+  limit:integer;           (* Search limit for win ratio comparison *)
+(* Check if current player would rank ahead of previous player *)
+_function wldRank(addHum:integer):boolean;
+_var curPrd:integer;       (* Current player product for ratio *)
+    prvPrd:integer;        (* Previous player product for ratio *)
+    totJin:integer;        (* Total Jinn wins with additional games *)
 _(
-  l4v3z := l4a1z + l3a2z;
-  _if l4v3z = 0 _then _(  L2561 := false; EXIT _);
-  _if l3v5z = 0 _then _(  L2561 := true;  EXIT _);
-  l4v1z := l4a1z * l3v5z;
-  l4v2z := l2v15z * l4v3z;
-  _if l4v1z = l4v2z _then _(
-    _if l4v1z = 0 _then _(
-      L2561 := l3a2z < l2v16z;
+  totJin := addHum + currJin;
+  _if totJin = 0 _then _(  wldRank := false; EXIT _);
+  _if prevTot = 0 _then _(  wldRank := true;  EXIT _);
+  curPrd := addHum * prevTot;
+  prvPrd := prevHomo * totJin;
+  _if curPrd = prvPrd _then _(
+    _if curPrd = 0 _then _(
+      wldRank := currJin < prevDjin;
     _) _else _(
-      L2561 := (l4a1z > l3a2z) _and (l4a1z > l2v15z) _or (l4a1z < l3a2z) _and (l4a1z < l2v15z);
+      wldRank := (addHum > currJin) _and (addHum > prevHomo) _or (addHum < currJin) _and (addHum < prevHomo);
     _)
   _) _else _(
-    L2561 := l4v1z > l4v2z;
+    wldRank := curPrd > prvPrd;
   _)
 _);
 _( (* fora *)
   _if totDispl = 1 _then _(  fora := 0; EXIT _);
-  l3v2z := 255 - l3a1z - l3a2z;
-  _if l3v2z = 0 _then 2644: _( fora := 256; EXIT _);
-  l3v3z := 0;
-  l3v5z := l2v15z + l2v16z;
-  _while l3a3z < l2v18z _do _(
+  remGms := 255 - currHum - currJin;
+  _if remGms = 0 _then 2644: _( fora := 256; EXIT _);
+  accum := 0;
+  prevTot := prevHomo + prevDjin;
+  _while currCat < prevCat _do _(
     _select
-    l3a3z < 3: _(
-      l3v4z := l3a2z - l3a1z + 1;
-      _if l3v4z > l3v2z _then _goto 2644;     
-      l3v2z := l3v2z - l3v4z;
-      l3v3z := l3v3z + l3v4z;
-      l3a1z := 0;
-      l3a2z := ;
-      l3a3z := l3a3z + 1;
+    currCat < 3: _(
+      delta := currJin - currHum + 1;
+      _if delta > remGms _then _goto 2644;
+      remGms := remGms - delta;
+      accum := accum + delta;
+      currHum := 0;
+      currJin := ;
+      currCat := currCat + 1;
     _);
-    true: l3a3z := l3a3z + 1 
+    true: currCat := currCat + 1
     _end;
  _);
- _if (l3a3z = 3) & (l3a1z + l3a2z < 25) & (l3v5z >= 25) _then _(
-   l3v4z := 25 - l3a1z - l3a2z;
-   l3v3z := l3v3z + l3v4z;
-   l3a1z := l3a1z + l3v4z;
-   l3v2z := l3v2z - l3v4z;
+ _if (currCat = 3) & (currHum + currJin < 25) & (prevTot >= 25) _then _(
+   delta := 25 - currHum - currJin;
+   accum := accum + delta;
+   currHum := currHum + delta;
+   remGms := remGms - delta;
  _);
- _if l3v5z < 25 _then l3v6z := 25 - l3a1z - l3a2z
- _else l3v6z := l3v2z;
- _for l3v1z := 0 _to l3v6z _do _(
-   _if L2561(l3a1z + l3v1z) _then _(  fora := l3v3z + l3v1z; EXIT _);
+ _if prevTot < 25 _then limit := 25 - currHum - currJin
+ _else limit := remGms;
+ _for i := 0 _to limit _do _(
+   _if wldRank(currHum + i) _then _(  fora := accum + i; EXIT _);
  _);
- _if (l3a3z = 3) & (l3v5z < 25) _then fora := l3v3z + 25 - l3a1z - l3a2z
+ _if (currCat = 3) & (prevTot < 25) _then fora := accum + 25 - currHum - currJin
  _else fora := 256;
 _);
 _( (* tournament *)
@@ -565,7 +625,7 @@ _( (* tournament *)
  uidDigs := ;
  totDispl := ;
  stats := ;
- L1451(11);
+ updateStatistics(11);
  _for i := 1 _to 4 _do _(;
   _if INP@ _in digit _then _(
     want[i] := INP@;
@@ -579,7 +639,7 @@ _( (* tournament *)
    checkAdmin;
    enq66;
  _);
-  readZone(66B, 1013B);
+  readZone(66B, zonePlayers);
   nEnt := pptr@[1];
   _if delete  _then _(
     _if uidDigs <> 4 _then _(
@@ -607,7 +667,7 @@ _( (* tournament *)
         _);
       _);
     _); (* 3055 *)
-    writeZone( 66B, 1013B );
+    writeZone( 66B, zonePlayers );
     deq66;
     _for i := 1 _to 4 _do write(want[i]);
     _if delete  _then  write(' НЕ НАЙДЕН') _else  write(' ИСКЛЮЧЕН');
@@ -617,12 +677,12 @@ _( (* tournament *)
   _if INP@ = 'Q' _then _(
     checkAdmin;
     enq66;
-    readZone( 66B, 1013B );
+    readZone( 66B, zonePlayers );
     nEnt := pptr@[1];
     _for n := 1 _to nEnt _do _(
       ins(pptr@[1008-n], 0, 29, 3);
     _);
-    writeZone( 66B, 1013B );
+    writeZone( 66B, zonePlayers );
     deq66;
     _GOTO 3606;
   _); (* 3133 *)
@@ -645,25 +705,25 @@ _( (* tournament *)
  catSet := catSet - [0];
   _); (* 3177 *)
   write('    ТУРНИР  " Д Ж И Н Н - Ч Е Л О В Е К "');
-  TTOUT;
+  writeTerminalOutput;
   write('С ':6);
   (*=c-*)wrDate(pptr@[1008] ); (*=c+*)
   write(' ПО ');
   wrDate(   getDate  );
   write('  НА ', getTime );
-  TTOUT;
+  writeTerminalOutput;
   drawLine( '=' );
  _if _not stats | (catSet <> []) _then _(
     write('  IМЕСТО ШИФР  ФАМИЛИЯ      НОМО  ДЖИН ФОРI');
    _if admin  _then  write(' ОТЛ');
-   TTOUT;
+   writeTerminalOutput;
    drawLine( '-' );
    aboveDots := true;
    _while catSet <> [] _do _(
   n := minel(catSet);
   catSet := catSet - [n];
   categ := 5 - n;
-  l2v17z := ;
+  initCat := ;
   pos := 0;
   _select
   categ = 4: write('  I^^^^^^^^^^^ Э Ф Е Н Д И ^^^^^^^^^^^^^^^I');
@@ -671,7 +731,7 @@ _( (* tournament *)
   categ = 2: write('  I^^^^^^^^ К А Н Д И Д А Т Ы ^^^^^^^^^^^^I');
   categ = 1: write('  I^^^^^^^^^^^ Ю Н И О Р Ы ^^^^^^^^^^^^^^^I')
   _end;
- TTOUT;
+ writeTerminalOutput;
 3275:
  _for n := 1 _to nEnt _do _(
   curRec := pptr@[1008 - n];
@@ -696,24 +756,24 @@ _( (* tournament *)
     _);
     _if good _then _(
       totDispl := totDispl + 1;
-      write(bar:3, pos:4, sp:2);
+      write(bar:3, pos:4, space:2);
       _for i := 1 _to 4  _do write(got[i]);
-      getName( curUID, name2 );
-      write(sp:2, curUID, name2, Homo:5, Djin:5);
-      i :=   fora( Homo, Djin, l2v17z );
-      _if (totDispl > 1) & (i = 0) _then  g38z := g38z + [28];
+      getUserName( curUID, name2 );
+      write(space:2, curUID, name2, Homo:5, Djin:5);
+      i :=   fora( Homo, Djin, initCat );
+      _if (totDispl > 1) & (i = 0) _then  userData.g38z := userData.g38z + [28];
       _select
         i < 256: write( i:4 );
         true:    write('  >>')
       _end;
-      l2v15z := Homo;
-      l2v16z := Djin;
-      l2v18z := l2v17z;
+      prevHomo := Homo;
+      prevDjin := Djin;
+      prevCat := initCat;
       write(bar:2 );
       totDjin := Djin + totDjin;
       totHomo := Homo + totHomo;
       _if admin _then  write(sel(curRec, 16, 8): 4);
-      TTOUT;
+      writeTerminalOutput;
     _);
   _); (* 3446 *)
   _); (* 3450 *)
@@ -725,15 +785,15 @@ _( (* tournament *)
   _); (* 3457 *)
   drawLine( '-' );
   write('  I', totDispl:4, '   И Т О Г', totHomo:15, totDjin:5, bar:6 );
-  TTOUT;
+  writeTerminalOutput;
   drawLine( '=' );
   _); (* 3477 *)
   _if admin | stats _then _(
     write(' ТРЕН ПАРТ ВЫИГ СДАЛ');
     write('    ВЦП    ДУМ   СЕАН   ЭНТР    ПОЗ    ХОД   СРЕЗ   УСИЛ');
-    TTOUT;
+    writeTerminalOutput;
     _for categ := 1 _to 4 _do _(
-      curptr := ptr(categ * 12 + 27372);
+      curptr := ptr(categ * 12 + 65354C);
       totHomo := curptr@[0];
       _select
       categ = 1: ch := 'Ю';
@@ -742,13 +802,13 @@ _( (* tournament *)
       true: ch := 'Э'
       _end;
       write(ch, curptr@[11]:4, totHomo:5, curptr@[9]:5, curptr@[10]:5 );
-      _for i := 1 _to 8 _do wrStat( i );  
-      TTOUT;
-    _); (* 3561 *) 
+      _for i := 1 _to 8 _do wrStat( i );
+      writeTerminalOutput;
+    _); (* 3561 *)
   _);
 _);
 _(
- g16z := 1;
+ statVal := 1;
  code(Э0634=,);
  startCpuTime := ;
  code(Э05310=,);
@@ -775,7 +835,7 @@ _(
   'ШКО   ' = cmd: school;
   'КОН   ' = cmd: 3652: exec(loc1);
   true: _if ЗАПРЕТ _then 3655: writeln('В БЛОКЕ НЕТ ПРИКАЗА ', cmd) _else _goto 3652
-  _end;  
+  _end;
   _);
   _) _else writeln('НЕ ПОНИМАЮ');
   _goto 3606
